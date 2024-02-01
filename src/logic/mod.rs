@@ -1,4 +1,4 @@
-use crate::data::hierarchy::AppData;
+use crate::data::hierarchy::App;
 use crate::data::{AppEvent, EventUnSubscribe};
 use crate::mqtt::{init_connect, mqtt_public, mqtt_subscribe, to_unsubscribe};
 // use crate::ui::tabs::init_brokers_tabs;
@@ -6,9 +6,6 @@ use crate::data::click_ty::ClickTy;
 use crate::data::common::{Broker, QoS, SubscribeHis, SubscribeTopic};
 use crate::mqtt::data::MqttPublicInput;
 use crate::mqtt::Client;
-use crate::ui::ids::{
-    SCROLL_MSG_ID, SCROLL_SUBSCRIBE_ID, SELECTOR_AUTO_SCROLL, SELECTOR_TABS_SELECTED, TABS_ID, TIPS,
-};
 
 use crate::util::hint::{
     DELETE_BROKER_SUCCESS, DELETE_SUBSCRIBE_SUCCESS, DISCONNECT_SUCCESS, PUBLISH_SUCCESS,
@@ -25,7 +22,6 @@ use log::{debug, error, info, warn};
 use std::collections::HashMap;
 
 use crate::config::AutoRetract;
-use druid::WidgetId;
 use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering::Relaxed;
 use std::sync::Arc;
@@ -38,7 +34,7 @@ static CLICK_LIST: AtomicUsize = AtomicUsize::new(0);
 
 #[tokio::main(flavor = "multi_thread", worker_threads = 10)]
 pub async fn deal_event(
-    event_sink: druid::ExtEventSink,
+    event_sink: ExtEventSink,
     rx: Receiver<AppEvent>,
     tx: Sender<AppEvent>,
     auto_retract: AutoRetract,
@@ -77,8 +73,8 @@ pub async fn deal_event(
             }
             AppEvent::TimeoutClickBrokerInfo(id) => {
                 if click_broker_info == id {
-                    event_sink.add_idle_callback(move |data: &mut AppData| {
-                        if data.broker_tabs.len() > 0 {
+                    event_sink.add_idle_callback(move |data: &mut App| {
+                        if data.broker_tabs.is_empty() {
                             data.display_broker_info = false;
                         }
                     });
@@ -102,8 +98,8 @@ pub async fn deal_event(
             }
             AppEvent::TimeoutClickBrokerList(id) => {
                 if click_broker_list == id {
-                    event_sink.add_idle_callback(move |data: &mut AppData| {
-                        if data.broker_tabs.len() > 0 {
+                    event_sink.add_idle_callback(move |data: &mut App| {
+                        if data.broker_tabs.is_empty() {
                             data.display_history = false;
                         }
                     });
@@ -227,15 +223,15 @@ pub async fn deal_event(
                 }
             }
             AppEvent::OtherDisplayTips => {
-                if let Err(e) = event_sink.submit_command(TIPS, (), WidgetId::reserved(0)) {
-                    error!("{:?}", e);
-                }
+                // if let Err(e) = event_sink.submit_command(TIPS, (), WidgetId::reserved(0)) {
+                //     error!("{:?}", e);
+                // }
             }
         }
     }
 }
 
-async fn first_click(event_sink: &druid::ExtEventSink, ty: ClickTy) {
+async fn first_click(event_sink: &ExtEventSink, ty: ClickTy) {
     match ty {
         ClickTy::Broker(id) => {
             click_broker(event_sink, id);
@@ -245,20 +241,20 @@ async fn first_click(event_sink: &druid::ExtEventSink, ty: ClickTy) {
         ClickTy::ConnectTab(broker_id) => touch_click_tab(event_sink, broker_id),
     }
 }
-async fn double_click(event_sink: &druid::ExtEventSink, ty: ClickTy) -> Result<()> {
+async fn double_click(event_sink: &ExtEventSink, ty: ClickTy) -> Result<()> {
     match ty {
         ClickTy::Broker(id) => {
-            event_sink.add_idle_callback(move |data: &mut AppData| {
+            event_sink.add_idle_callback(move |data: &mut App| {
                 if let Err(e) = data.db_click_broker(id) {
                     error!("{}", e.to_string());
                 }
             });
         }
         ClickTy::SubscribeTopic(broker_id, trace_id) => {
-            touch_unsubscribe(&event_sink, broker_id, trace_id);
+            touch_unsubscribe(event_sink, broker_id, trace_id);
         }
         ClickTy::SubscribeHis(his) => {
-            event_sink.add_idle_callback(move |data: &mut AppData| {
+            event_sink.add_idle_callback(move |data: &mut App| {
                 if let Err(e) = data.touch_subscribe_from_his(his) {
                     error!("{:?}", e);
                 }
@@ -270,44 +266,44 @@ async fn double_click(event_sink: &druid::ExtEventSink, ty: ClickTy) -> Result<(
     }
     Ok(())
 }
-async fn scroll_subscribe_win(event_sink: &druid::ExtEventSink) {
+async fn scroll_subscribe_win(event_sink: &ExtEventSink) {
     sleep(Duration::from_millis(50)).await;
-    if let Err(e) = event_sink.submit_command(SELECTOR_AUTO_SCROLL, (), SCROLL_SUBSCRIBE_ID) {
-        error!("{:?}", e);
-    }
+    // if let Err(e) = event_sink.submit_command(SELECTOR_AUTO_SCROLL, (), SCROLL_SUBSCRIBE_ID) {
+    //     error!("{:?}", e);
+    // }
 }
-async fn scroll_msg_win(event_sink: &druid::ExtEventSink) {
+async fn scroll_msg_win(event_sink: &ExtEventSink) {
     sleep(Duration::from_millis(50)).await;
-    if let Err(e) = event_sink.submit_command(SELECTOR_AUTO_SCROLL, (), SCROLL_MSG_ID) {
-        error!("{:?}", e);
-    }
+    // if let Err(e) = event_sink.submit_command(SELECTOR_AUTO_SCROLL, (), SCROLL_MSG_ID) {
+    //     error!("{:?}", e);
+    // }
 }
-fn update_status_bar(event_sink: &druid::ExtEventSink, msg: String) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn update_status_bar(event_sink: &ExtEventSink, msg: String) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         data.hint = msg.into();
     });
 }
-fn touch_add_broker(event_sink: &druid::ExtEventSink) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn touch_add_broker(event_sink: &ExtEventSink) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         data.touch_add_broker();
     });
 }
-fn edit_broker(event_sink: &druid::ExtEventSink) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn edit_broker(event_sink: &ExtEventSink) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         data.edit_broker();
     });
 }
 
-fn touch_connect_broker_selected(event_sink: &druid::ExtEventSink) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn touch_connect_broker_selected(event_sink: &ExtEventSink) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.touch_connect_broker_selected() {
             error!("{:?}", e);
         }
     });
 }
 
-fn touch_save_broker(event_sink: &druid::ExtEventSink) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn touch_save_broker(event_sink: &ExtEventSink) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.touch_save_broker() {
             error!("{:?}", e);
         } else {
@@ -316,8 +312,8 @@ fn touch_save_broker(event_sink: &druid::ExtEventSink) {
     });
 }
 
-fn touch_delete_subscribe_his(event_sink: &druid::ExtEventSink, id: usize) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn touch_delete_subscribe_his(event_sink: &ExtEventSink, id: usize) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.touch_remove_subscribe_his(id) {
             warn!("{}", e.to_string());
         } else {
@@ -326,16 +322,16 @@ fn touch_delete_subscribe_his(event_sink: &druid::ExtEventSink, id: usize) {
     });
 }
 
-fn touch_click_tab(event_sink: &druid::ExtEventSink, broker_id: usize) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn touch_click_tab(event_sink: &ExtEventSink, broker_id: usize) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.touch_click_tab(broker_id) {
             warn!("{}", e.to_string());
         }
     });
 }
 
-fn touch_unsubscribe(event_sink: &druid::ExtEventSink, broker_id: usize, trace_id: u32) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn touch_unsubscribe(event_sink: &ExtEventSink, broker_id: usize, trace_id: u32) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.touch_unsubscribe(broker_id, trace_id) {
             error!("{:?}", e);
         }
@@ -343,7 +339,7 @@ fn touch_unsubscribe(event_sink: &druid::ExtEventSink, broker_id: usize, trace_i
 }
 
 async fn to_unsubscribe_ing(
-    event_sink: &druid::ExtEventSink,
+    event_sink: &ExtEventSink,
     event: EventUnSubscribe,
     mqtt_clients: &HashMap<usize, Client>,
 ) {
@@ -352,10 +348,10 @@ async fn to_unsubscribe_ing(
         subscribe_pk_id,
         topic,
     } = event;
-    match to_unsubscribe(broke_id, topic, &mqtt_clients).await {
+    match to_unsubscribe(broke_id, topic, mqtt_clients).await {
         Ok(pk_id) => {
-            event_sink.add_idle_callback(move |data: &mut AppData| {
-                if let Err(e) = data.to_unsubscribe(broke_id, subscribe_pk_id, pk_id) {
+            event_sink.add_idle_callback(move |data: &mut App| {
+                if let Err(e) = data.unsubscribe(broke_id, subscribe_pk_id, pk_id) {
                     error!("{:?}", e);
                 }
             });
@@ -366,8 +362,8 @@ async fn to_unsubscribe_ing(
     }
 }
 
-fn un_sub_ack(event_sink: &druid::ExtEventSink, broke_id: usize, unsubscribe_pk_id: u32) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn un_sub_ack(event_sink: &ExtEventSink, broke_id: usize, unsubscribe_pk_id: u32) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.unsubscribe_ack(broke_id, unsubscribe_pk_id) {
             error!("{:?}", e);
         } else {
@@ -376,8 +372,8 @@ fn un_sub_ack(event_sink: &druid::ExtEventSink, broke_id: usize, unsubscribe_pk_
     });
 }
 
-async fn touch_connect_by_button(event_sink: &druid::ExtEventSink) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+async fn touch_connect_by_button(event_sink: &ExtEventSink) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.init_connection_for_selected() {
             error!("{:?}", e);
         }
@@ -385,7 +381,7 @@ async fn touch_connect_by_button(event_sink: &druid::ExtEventSink) {
 }
 
 async fn connect(
-    _event_sink: &druid::ExtEventSink,
+    _event_sink: &ExtEventSink,
     mqtt_clients: &mut HashMap<usize, Client>,
     tx: Sender<AppEvent>,
     broker: Broker,
@@ -406,8 +402,8 @@ async fn connect(
     }
 }
 
-async fn touch_subscribe_by_input(event_sink: &druid::ExtEventSink, index: usize) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+async fn touch_subscribe_by_input(event_sink: &ExtEventSink, index: usize) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.touch_subscribe_by_input(index) {
             error!("{:?}", e);
         }
@@ -415,7 +411,7 @@ async fn touch_subscribe_by_input(event_sink: &druid::ExtEventSink, index: usize
 }
 
 async fn to_subscribe(mqtt_clients: &HashMap<usize, Client>, input: SubscribeTopic) {
-    match mqtt_subscribe(input.broker_id, input.clone().into(), &mqtt_clients).await {
+    match mqtt_subscribe(input.broker_id, input.clone().into(), mqtt_clients).await {
         Ok(()) => {}
         Err(e) => {
             error!("{:?}", e);
@@ -423,16 +419,16 @@ async fn to_subscribe(mqtt_clients: &HashMap<usize, Client>, input: SubscribeTop
     }
 }
 
-async fn touch_subscribe_from_his(event_sink: &druid::ExtEventSink, input: SubscribeHis) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+async fn touch_subscribe_from_his(event_sink: &ExtEventSink, input: SubscribeHis) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.touch_subscribe_from_his(input) {
             error!("{:?}", e);
         }
     });
 }
 
-async fn touch_publish(event_sink: &druid::ExtEventSink, broker_id: usize) -> Result<()> {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+async fn touch_publish(event_sink: &ExtEventSink, broker_id: usize) -> Result<()> {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.publish(broker_id) {
             error!("{:?}", e);
         }
@@ -441,18 +437,18 @@ async fn touch_publish(event_sink: &druid::ExtEventSink, broker_id: usize) -> Re
 }
 
 async fn to_publish(mqtt_clients: &HashMap<usize, Client>, publish: MqttPublicInput) -> Result<()> {
-    mqtt_public(publish.broker_id, publish, &mqtt_clients).await?;
+    mqtt_public(publish.broker_id, publish, mqtt_clients).await?;
     Ok(())
 }
 
 async fn receive_public(
-    event_sink: &druid::ExtEventSink,
+    event_sink: &ExtEventSink,
     index: usize,
     topic: Arc<String>,
     payload: Arc<Bytes>,
     qos: QoS,
 ) -> Result<()> {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.receive_msg(index, topic, payload, qos) {
             error!("{:?}", e);
         }
@@ -460,8 +456,8 @@ async fn receive_public(
     Ok(())
 }
 
-fn pub_ack(event_sink: &druid::ExtEventSink, id: usize, trace_id: u32) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn pub_ack(event_sink: &ExtEventSink, id: usize, trace_id: u32) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.pub_ack(id, trace_id) {
             error!("{}", e.to_string());
         } else {
@@ -470,8 +466,8 @@ fn pub_ack(event_sink: &druid::ExtEventSink, id: usize, trace_id: u32) {
     });
 }
 
-fn sub_ack(event_sink: &druid::ExtEventSink, id: usize, ack: SubscribeAck) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn sub_ack(event_sink: &ExtEventSink, id: usize, ack: SubscribeAck) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.sub_ack(id, ack) {
             error!("{}", e.to_string());
         } else {
@@ -479,33 +475,33 @@ fn sub_ack(event_sink: &druid::ExtEventSink, id: usize, ack: SubscribeAck) {
         }
     });
 }
-fn update_to_select_tabs(event_sink: &druid::ExtEventSink, id: usize) {
-    if let Err(e) = event_sink.submit_command(SELECTOR_TABS_SELECTED, id, TABS_ID) {
-        error!("{:?}", e);
-    }
+fn update_to_select_tabs(event_sink: &ExtEventSink, id: usize) {
+    // if let Err(e) = event_sink.submit_command(SELECTOR_TABS_SELECTED, id, TABS_ID) {
+    //     error!("{:?}", e);
+    // }
 }
 
-fn click_broker(event_sink: &druid::ExtEventSink, id: usize) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn click_broker(event_sink: &ExtEventSink, id: usize) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.click_broker(id) {
             error!("{:?}", e);
         }
     });
 }
 
-fn click_subscribe_his(event_sink: &druid::ExtEventSink, his: SubscribeHis) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn click_subscribe_his(event_sink: &ExtEventSink, his: SubscribeHis) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.click_subscribe_his(his) {
             error!("{:?}", e);
         }
     });
 }
 
-async fn touch_reconnect(event_sink: &druid::ExtEventSink) -> Result<()> {
+async fn touch_reconnect(event_sink: &ExtEventSink) -> Result<()> {
     // if let Some(client) = mqtt_clients.remove(&id) {
     //     client.disconnect().await?;
     // }
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.touch_reconnect() {
             error!("{}", e.to_string());
         }
@@ -514,7 +510,7 @@ async fn touch_reconnect(event_sink: &druid::ExtEventSink) -> Result<()> {
 }
 
 async fn to_disconnect(
-    _event_sink: &druid::ExtEventSink,
+    _event_sink: &ExtEventSink,
     mqtt_clients: &mut HashMap<usize, Client>,
     id: usize,
 ) -> Result<()> {
@@ -528,8 +524,8 @@ async fn to_disconnect(
     Ok(())
 }
 
-async fn disconnect(event_sink: &druid::ExtEventSink) -> Result<()> {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+async fn disconnect(event_sink: &ExtEventSink) -> Result<()> {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.touch_disconnect() {
             error!("{:?}", e);
         }
@@ -537,16 +533,16 @@ async fn disconnect(event_sink: &druid::ExtEventSink) -> Result<()> {
     Ok(())
 }
 
-fn touch_close_broker_tab(event_sink: &druid::ExtEventSink, id: usize) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn touch_close_broker_tab(event_sink: &ExtEventSink, id: usize) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.touch_close_broker_tab(id) {
             error!("{:?}", e);
         }
     });
 }
 
-fn touch_delete_broker_selected(event_sink: &druid::ExtEventSink) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn touch_delete_broker_selected(event_sink: &ExtEventSink) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.touch_delete_broker_selected() {
             error!("{:?}", e);
         } else {
@@ -554,17 +550,17 @@ fn touch_delete_broker_selected(event_sink: &druid::ExtEventSink) {
         }
     });
 }
-fn update_to_connected(event_sink: &druid::ExtEventSink, id: usize, retain: bool) {
+fn update_to_connected(event_sink: &ExtEventSink, id: usize, retain: bool) {
     info!("connect success!");
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.update_to_connected(id, retain) {
             error!("{:?}", e);
         }
     });
 }
 
-fn clear_msg(event_sink: &druid::ExtEventSink, id: usize) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn clear_msg(event_sink: &ExtEventSink, id: usize) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.clear_msg(id) {
             error!("{:?}", e);
         } else {
@@ -573,18 +569,23 @@ fn clear_msg(event_sink: &druid::ExtEventSink, id: usize) {
     });
 }
 
-fn client_disconnect(event_sink: &druid::ExtEventSink, id: usize) {
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+fn client_disconnect(event_sink: &ExtEventSink, id: usize) {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.client_disconnect(id) {
             error!("{:?}", e);
         }
     });
 }
-fn client_connect_err(event_sink: &druid::ExtEventSink, id: usize, msg: String) {
+fn client_connect_err(event_sink: &ExtEventSink, id: usize, msg: String) {
     error!("{:?}", msg);
-    event_sink.add_idle_callback(move |data: &mut AppData| {
+    event_sink.add_idle_callback(move |data: &mut App| {
         if let Err(e) = data.client_disconnect(id) {
             error!("{:?}", e);
         }
     });
+}
+pub struct ExtEventSink;
+
+impl ExtEventSink {
+    fn add_idle_callback(&self, _fn: impl FnOnce(&mut App)) {}
 }

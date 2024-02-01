@@ -351,15 +351,15 @@ impl App {
             {
                 match ack {
                     SubscribeReasonCode::QoS0 => {
-                        subscribe_topic.qos = QoS::AtMost.clone();
+                        subscribe_topic.qos = QoS::AtMostOnce.clone();
                         subscribe_topic.status = SubscribeStatus::SubscribeSuccess;
                     }
                     SubscribeReasonCode::QoS1 => {
-                        subscribe_topic.qos = QoS::AtLeast.clone();
+                        subscribe_topic.qos = QoS::AtLeastOnce.clone();
                         subscribe_topic.status = SubscribeStatus::SubscribeSuccess;
                     }
                     SubscribeReasonCode::QoS2 => {
-                        subscribe_topic.qos = QoS::Exactly.clone();
+                        subscribe_topic.qos = QoS::ExactlyOnce.clone();
                         subscribe_topic.status = SubscribeStatus::SubscribeSuccess;
                     }
                     _reasone => {
@@ -472,21 +472,7 @@ impl App {
         self.disconnect(id)?;
 
         self.db.delete_broker(id)?;
-        if self.brokers.is_empty() {
-            self.touch_add_broker();
-        }
         Ok(())
-    }
-
-    pub fn init_broker(&mut self) {
-        if self.brokers.is_empty() {
-            self.touch_add_broker();
-            self.display_broker_info = true;
-            self.display_history = false;
-        } else {
-            self.display_broker_info = false;
-            self.display_history = true;
-        }
     }
 
     pub fn click_subscribe_his(&mut self, his: SubscribeHis) -> Result<()> {

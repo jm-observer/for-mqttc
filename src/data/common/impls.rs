@@ -123,7 +123,7 @@ impl PublicInput {
             broker_id,
             topic: Arc::new("".to_string()),
             msg: Arc::new("".to_string()),
-            qos: QoS::AtMost,
+            qos: QoS::AtMostOnce,
             retain: false,
             payload_ty: Default::default(),
         }
@@ -153,27 +153,27 @@ impl Msg {
 impl From<mqtt::QoS> for QoS {
     fn from(qos: mqtt::QoS) -> Self {
         match qos {
-            mqtt::QoS::AtLeastOnce => Self::AtLeast,
-            mqtt::QoS::AtMostOnce => Self::AtMost,
-            mqtt::QoS::ExactlyOnce => Self::Exactly,
+            mqtt::QoS::AtLeastOnce => Self::AtLeastOnce,
+            mqtt::QoS::AtMostOnce => Self::AtMostOnce,
+            mqtt::QoS::ExactlyOnce => Self::ExactlyOnce,
         }
     }
 }
 impl From<mqtt::QoSWithPacketId> for QoS {
     fn from(qos: mqtt::QoSWithPacketId) -> Self {
         match qos {
-            mqtt::QoSWithPacketId::AtLeastOnce(_) => Self::AtLeast,
-            mqtt::QoSWithPacketId::AtMostOnce => Self::AtMost,
-            mqtt::QoSWithPacketId::ExactlyOnce(_) => Self::Exactly,
+            mqtt::QoSWithPacketId::AtLeastOnce(_) => Self::AtLeastOnce,
+            mqtt::QoSWithPacketId::AtMostOnce => Self::AtMostOnce,
+            mqtt::QoSWithPacketId::ExactlyOnce(_) => Self::ExactlyOnce,
         }
     }
 }
 impl From<QoS> for mqtt::QoS {
     fn from(qos: QoS) -> Self {
         match qos {
-            QoS::AtLeast => Self::AtLeastOnce,
-            QoS::AtMost => Self::AtMostOnce,
-            QoS::Exactly => Self::ExactlyOnce,
+            QoS::AtLeastOnce => Self::AtLeastOnce,
+            QoS::AtMostOnce => Self::AtMostOnce,
+            QoS::ExactlyOnce => Self::ExactlyOnce,
         }
     }
 }

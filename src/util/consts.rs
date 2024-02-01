@@ -27,9 +27,9 @@ pub trait QosToString {
 impl QosToString for QoS {
     fn qos_to_string(&self) -> Arc<String> {
         match self {
-            QoS::AtMost => QOS_0.clone(),
-            QoS::AtLeast => QOS_1.clone(),
-            QoS::Exactly => QOS_2.clone(),
+            QoS::AtMostOnce => QOS_0.clone(),
+            QoS::AtLeastOnce => QOS_1.clone(),
+            QoS::ExactlyOnce => QOS_2.clone(),
         }
     }
 }

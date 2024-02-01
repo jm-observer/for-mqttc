@@ -157,9 +157,9 @@ pub enum TabKind {
 #[repr(u8)]
 pub enum QoS {
     #[default]
-    AtMost = 0,
-    AtLeast = 1,
-    Exactly = 2,
+    AtMostOnce = 0,
+    AtLeastOnce = 1,
+    ExactlyOnce = 2,
 }
 
 #[derive(Debug, Clone)]
@@ -261,18 +261,18 @@ impl PartialEq for SubscribeHis {
 impl ToString for QoS {
     fn to_string(&self) -> String {
         match self {
-            QoS::AtMost => "0".to_string(),
-            QoS::AtLeast => "1".to_string(),
-            QoS::Exactly => "2".to_string(),
+            QoS::AtMostOnce => "0".to_string(),
+            QoS::AtLeastOnce => "1".to_string(),
+            QoS::ExactlyOnce => "2".to_string(),
         }
     }
 }
 impl QoS {
     pub fn to_u8(&self) -> u8 {
         match self {
-            QoS::AtMost => 0,
-            QoS::AtLeast => 1,
-            QoS::Exactly => 2,
+            QoS::AtMostOnce => 0,
+            QoS::AtLeastOnce => 1,
+            QoS::ExactlyOnce => 2,
         }
     }
 }

@@ -1,7 +1,9 @@
+use log::debug;
+
 pub fn get_locale() -> Locale {
     todo!()
-    // let current_locale = Application::get_locale();
-    // debug!("{}", current_locale);
+    // let current_locale = locale_config::Locale::current();
+    // debug!("{:?}", current_locale);
     // if current_locale.as_str() == "zh-CN" {
     //     Locale::default_zh_cn()
     // } else {
