@@ -178,7 +178,6 @@ pub struct Broker {
     pub password: AString,
     pub stored: bool,
     pub tx: Sender<AppEvent>,
-    pub selected: bool,
     pub tls: bool,
     pub signed_ty: SignedTy,
     pub self_signed_ca: AString,

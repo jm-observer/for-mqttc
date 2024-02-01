@@ -2,7 +2,7 @@ use crate::data::hierarchy::App;
 use crate::data::{AppEvent, EventUnSubscribe};
 use crate::mqtt::{init_connect, mqtt_public, mqtt_subscribe, to_unsubscribe};
 // use crate::ui::tabs::init_brokers_tabs;
-use crate::data::click_ty::ClickTy;
+// use crate::data::click_ty::ClickTy;
 use crate::data::common::{Broker, QoS, SubscribeHis, SubscribeTopic};
 use crate::mqtt::data::MqttPublicInput;
 use crate::mqtt::Client;
@@ -40,7 +40,7 @@ pub async fn deal_event(
     auto_retract: AutoRetract,
 ) -> Result<()> {
     let mut mqtt_clients: HashMap<usize, Client> = HashMap::new();
-    let mut click_his: Option<ClickTy> = None;
+    // let mut click_his: Option<ClickTy> = None;
     let mut click_broker_info = CLICK_INFO.fetch_add(1, Relaxed);
     let mut click_broker_list = CLICK_LIST.fetch_add(1, Relaxed);
 
@@ -49,9 +49,7 @@ pub async fn deal_event(
         // let event = ;
         // debug!("{:?}", event);
         match rx!(rx) {
-            AppEvent::TouchClickTab(broker_id) => touch_click_tab(&event_sink, broker_id),
             AppEvent::TouchAddBroker => touch_add_broker(&event_sink),
-            AppEvent::TouchEditBrokerSelected => edit_broker(&event_sink),
             AppEvent::TouchConnectBrokerSelected => touch_connect_broker_selected(&event_sink),
             AppEvent::TouchSaveBroker => touch_save_broker(&event_sink),
             AppEvent::TouchRemoveSubscribeHis(id) => touch_delete_subscribe_his(&event_sink, id),
@@ -106,7 +104,6 @@ pub async fn deal_event(
             //         error!("{}", e.to_string());
             //     }
             // }
-            AppEvent::TouchDeleteBrokerSelected => touch_delete_broker_selected(&event_sink),
             AppEvent::ClientConnectAckSuccess { broker_id, retain } => {
                 update_to_connected(&event_sink, broker_id, retain)
             } // _ => {}
@@ -124,35 +121,35 @@ pub async fn deal_event(
 
             AppEvent::UpdateScrollSubscribeWin => scroll_subscribe_win(&event_sink).await,
             AppEvent::UpdateScrollMsgWin => scroll_msg_win(&event_sink).await,
-            AppEvent::TouchClick(ty) => {
-                if let Some(old_ty) = click_his.take() {
-                    if old_ty != ty {
-                        click_his = Some(ty)
-                    } else {
-                        // double click
-                        if let Err(e) = double_click(&event_sink, ty).await {
-                            error!("{:?}", e);
-                        }
-                    }
-                } else {
-                    click_his = Some(ty.clone());
-                    first_click(&event_sink, ty.clone()).await;
-                    let tx = tx.clone();
-                    tokio::spawn(async move {
-                        tokio::time::sleep(Duration::from_millis(280)).await;
-                        if let Err(e) = tx.send(AppEvent::OtherClickLifeDead(ty)) {
-                            error!("{:?}", e);
-                        }
-                    });
-                }
-            }
-            AppEvent::OtherClickLifeDead(ty) => {
-                if let Some(old_ty) = click_his.take() {
-                    if old_ty != ty {
-                        click_his = Some(old_ty)
-                    }
-                }
-            }
+            // AppEvent::TouchClick(ty) => {
+            //     if let Some(old_ty) = click_his.take() {
+            //         if old_ty != ty {
+            //             click_his = Some(ty)
+            //         } else {
+            //             // double click
+            //             if let Err(e) = double_click(&event_sink, ty).await {
+            //                 error!("{:?}", e);
+            //             }
+            //         }
+            //     } else {
+            //         click_his = Some(ty.clone());
+            //         first_click(&event_sink, ty.clone()).await;
+            //         let tx = tx.clone();
+            //         tokio::spawn(async move {
+            //             tokio::time::sleep(Duration::from_millis(280)).await;
+            //             if let Err(e) = tx.send(AppEvent::OtherClickLifeDead(ty)) {
+            //                 error!("{:?}", e);
+            //             }
+            //         });
+            //     }
+            // }
+            // AppEvent::OtherClickLifeDead(ty) => {
+            //     if let Some(old_ty) = click_his.take() {
+            //         if old_ty != ty {
+            //             click_his = Some(old_ty)
+            //         }
+            //     }
+            // }
             AppEvent::ToDisconnect(broker_id) => {
                 if let Err(e) = to_disconnect(&event_sink, &mut mqtt_clients, broker_id).await {
                     error!("{:?}", e);
@@ -175,41 +172,33 @@ pub async fn deal_event(
     }
 }
 
-async fn first_click(event_sink: &ExtEventSink, ty: ClickTy) {
-    match ty {
-        ClickTy::Broker(id) => {
-            click_broker(event_sink, id);
-        }
-        ClickTy::SubscribeTopic(_, _) => {}
-        ClickTy::SubscribeHis(his) => click_subscribe_his(event_sink, his.clone()),
-        ClickTy::ConnectTab(broker_id) => touch_click_tab(event_sink, broker_id),
-    }
-}
-async fn double_click(event_sink: &ExtEventSink, ty: ClickTy) -> Result<()> {
-    match ty {
-        ClickTy::Broker(id) => {
-            event_sink.add_idle_callback(move |data: &mut App| {
-                if let Err(e) = data.db_click_broker(id) {
-                    error!("{}", e.to_string());
-                }
-            });
-        }
-        ClickTy::SubscribeTopic(broker_id, trace_id) => {
-            touch_unsubscribe(event_sink, broker_id, trace_id);
-        }
-        ClickTy::SubscribeHis(his) => {
-            event_sink.add_idle_callback(move |data: &mut App| {
-                if let Err(e) = data.touch_subscribe_from_his(his) {
-                    error!("{:?}", e);
-                }
-            });
-        }
-        ClickTy::ConnectTab(_) => {
-            touch_reconnect(event_sink).await?;
-        }
-    }
-    Ok(())
-}
+// async fn first_click(event_sink: &ExtEventSink, ty: ClickTy) {
+//     match ty {
+//         ClickTy::Broker(id) => {
+//             click_broker(event_sink, id);
+//         }
+//         ClickTy::SubscribeTopic(_, _) => {}
+//         ClickTy::ConnectTab(broker_id) => touch_click_tab(event_sink, broker_id),
+//     }
+// }
+// async fn double_click(event_sink: &ExtEventSink, ty: ClickTy) -> Result<()> {
+//     match ty {
+//         ClickTy::Broker(id) => {
+//             event_sink.add_idle_callback(move |data: &mut App| {
+//                 if let Err(e) = data.db_click_broker(id) {
+//                     error!("{}", e.to_string());
+//                 }
+//             });
+//         }
+//         ClickTy::SubscribeTopic(broker_id, trace_id) => {
+//             touch_unsubscribe(event_sink, broker_id, trace_id);
+//         }
+//         ClickTy::ConnectTab(_) => {
+//             touch_reconnect(event_sink).await?;
+//         }
+//     }
+//     Ok(())
+// }
 async fn scroll_subscribe_win(event_sink: &ExtEventSink) {
     sleep(Duration::from_millis(50)).await;
     // if let Err(e) = event_sink.submit_command(SELECTOR_AUTO_SCROLL, (), SCROLL_SUBSCRIBE_ID) {
@@ -230,11 +219,6 @@ fn update_status_bar(event_sink: &ExtEventSink, msg: String) {
 fn touch_add_broker(event_sink: &ExtEventSink) {
     event_sink.add_idle_callback(move |data: &mut App| {
         data.touch_add_broker();
-    });
-}
-fn edit_broker(event_sink: &ExtEventSink) {
-    event_sink.add_idle_callback(move |data: &mut App| {
-        data.edit_broker();
     });
 }
 
@@ -262,14 +246,6 @@ fn touch_delete_subscribe_his(event_sink: &ExtEventSink, id: usize) {
             warn!("{}", e.to_string());
         } else {
             info!("{}", DELETE_SUBSCRIBE_SUCCESS);
-        }
-    });
-}
-
-fn touch_click_tab(event_sink: &ExtEventSink, broker_id: usize) {
-    event_sink.add_idle_callback(move |data: &mut App| {
-        if let Err(e) = data.touch_click_tab(broker_id) {
-            warn!("{}", e.to_string());
         }
     });
 }
@@ -425,22 +401,6 @@ fn update_to_select_tabs(event_sink: &ExtEventSink, id: usize) {
     // }
 }
 
-fn click_broker(event_sink: &ExtEventSink, id: usize) {
-    event_sink.add_idle_callback(move |data: &mut App| {
-        if let Err(e) = data.click_broker(id) {
-            error!("{:?}", e);
-        }
-    });
-}
-
-fn click_subscribe_his(event_sink: &ExtEventSink, his: SubscribeHis) {
-    event_sink.add_idle_callback(move |data: &mut App| {
-        if let Err(e) = data.click_subscribe_his(his) {
-            error!("{:?}", e);
-        }
-    });
-}
-
 async fn touch_reconnect(event_sink: &ExtEventSink) -> Result<()> {
     // if let Some(client) = mqtt_clients.remove(&id) {
     //     client.disconnect().await?;
@@ -485,15 +445,6 @@ fn touch_close_broker_tab(event_sink: &ExtEventSink, id: usize) {
     });
 }
 
-fn touch_delete_broker_selected(event_sink: &ExtEventSink) {
-    event_sink.add_idle_callback(move |data: &mut App| {
-        if let Err(e) = data.touch_delete_broker_selected() {
-            error!("{:?}", e);
-        } else {
-            info!("{}", DELETE_BROKER_SUCCESS)
-        }
-    });
-}
 fn update_to_connected(event_sink: &ExtEventSink, id: usize, retain: bool) {
     info!("connect success!");
     event_sink.add_idle_callback(move |data: &mut App| {

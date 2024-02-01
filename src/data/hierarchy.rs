@@ -52,9 +52,6 @@ impl App {
         // }
     }
     /// 取消所有选中
-    pub fn unselect_broker(&mut self) {
-        self.brokers.iter_mut().for_each(|x| x.selected = false);
-    }
     fn init_broker_tab(&mut self, id: usize) -> bool {
         // let mut is_exist = false;
         // if self.broker_tabs.iter().find(|x| **x == id).is_none() {
@@ -66,48 +63,11 @@ impl App {
         todo!()
     }
     pub fn get_selected_subscribe_his(&self) -> Result<SubscribeHis> {
-        let broker = self.get_selected_broker()?;
-        if let Some(his) = broker.subscribe_hises.iter().find(|x| x.selected) {
-            return Ok(his.clone());
-        }
-        bail!("could not find  subscribe his selected");
-    }
-    pub fn get_selected_broker_id(&self) -> Option<usize> {
-        self.brokers.iter().find(|x| x.selected).map(|x| x.id)
-    }
-    pub fn get_selected_broker_index(&self) -> Option<usize> {
-        self.brokers
-            .iter()
-            .enumerate()
-            .find(|x| x.1.selected)
-            .map(|x| x.0)
-    }
-    pub fn get_selected_broker(&self) -> Result<&Broker> {
-        self.brokers
-            .iter()
-            .find(|x| x.selected)
-            .ok_or(anyhow!("could not find broker selected"))
-    }
-
-    pub fn get_selected_mut_broker(&mut self) -> Result<&mut Broker> {
-        self.brokers
-            .iter_mut()
-            .find(|x| x.selected)
-            .ok_or(anyhow!("could not find broker selected"))
-    }
-    pub fn get_mut_selected_broker_or_zero(&mut self) -> &mut Broker {
-        let _index = self.get_selected_broker_index().unwrap_or(0);
-        self.brokers.get_mut(_index).unwrap()
-    }
-    pub fn get_selected_broker_or_zero(&self) -> &Broker {
-        // for i in self.brokers.iter() {
-        //     debug!("{} {}", i.id, i.selected);
+        // let broker = self.get_selected_broker()?;
+        // if let Some(his) = broker.subscribe_hises.iter().find(|x| x.selected) {
+        //     return Ok(his.clone());
         // }
-        if let Some(broker) = self.brokers.iter().find(|x| x.selected) {
-            broker
-        } else {
-            self.brokers.first().unwrap()
-        }
+        bail!("could not find  subscribe his selected");
     }
 
     pub fn find_broker_by_id(&self, id: usize) -> Result<&Broker> {
@@ -133,27 +93,30 @@ impl App {
             .ok_or(anyhow!("could not find broker:{}", id))
     }
     pub fn touch_save_broker(&mut self) -> Result<()> {
-        let broker = self.get_selected_mut_broker()?;
-        broker.stored = true;
-        let broker = broker.clone_to_db();
-        self.db.save_broker(broker)?;
-        Ok(())
+        todo!()
+        // let broker = self.get_selected_mut_broker()?;
+        // broker.stored = true;
+        // let broker = broker.clone_to_db();
+        // self.db.save_broker(broker)?;
+        // Ok(())
     }
     pub fn touch_reconnect(&mut self) -> Result<()> {
-        let broker = self.get_selected_mut_broker()?;
-        broker.disconnect(false);
-        broker.init_connection()?;
-        let broker = broker.clone();
-        self.disconnect(broker.id)?;
-        self.init_connection_by_broker(broker)?;
-        Ok(())
+        todo!()
+        // let broker = self.get_selected_mut_broker()?;
+        // broker.disconnect(false);
+        // broker.init_connection()?;
+        // let broker = broker.clone();
+        // self.disconnect(broker.id)?;
+        // self.init_connection_by_broker(broker)?;
+        // Ok(())
     }
     pub fn init_connection_for_selected(&mut self) -> Result<()> {
-        let broker = self.get_selected_mut_broker()?;
-        broker.init_connection()?;
-        let broker = broker.clone();
-        self.init_connection_by_broker(broker)?;
-        Ok(())
+        todo!()
+        // let broker = self.get_selected_mut_broker()?;
+        // broker.init_connection()?;
+        // let broker = broker.clone();
+        // self.init_connection_by_broker(broker)?;
+        // Ok(())
     }
 
     fn init_connection_by_broker(&mut self, broker: Broker) -> Result<()> {
@@ -176,10 +139,11 @@ impl App {
         Ok(())
     }
     pub(crate) fn touch_disconnect(&mut self) -> Result<()> {
-        let broker = self.get_selected_mut_broker()?;
-        broker.disconnect(false);
-        let id = broker.id;
-        self.disconnect(id)
+        todo!()
+        // let broker = self.get_selected_mut_broker()?;
+        // broker.disconnect(false);
+        // let id = broker.id;
+        // self.disconnect(id)
     }
     fn disconnect(&self, id: usize) -> Result<()> {
         self.send_event(AppEvent::ToDisconnect(id));
@@ -321,10 +285,6 @@ impl App {
         warn!("{}", DELETE_SUBSCRIBE_NO_SELECTED);
         Ok(())
     }
-    pub fn touch_click_tab(&mut self, broker_id: usize) -> Result<()> {
-        self.select_broker(broker_id);
-        Ok(())
-    }
 
     pub fn sub_ack(&mut self, id: usize, input: SubscribeAck) -> Result<()> {
         let broker = self.find_mut_broker_by_id(id)?;
@@ -398,17 +358,6 @@ impl App {
         // self.send_event(AppEvent::UpdateScrollMsgWin);
         // Ok(())
     }
-    pub fn click_broker(&mut self, id: usize) -> Result<()> {
-        self.select_broker_and_display(id);
-        Ok(())
-    }
-    pub fn edit_broker(&mut self) {
-        if let Ok(broker) = self.get_selected_broker() {
-            self.init_broker_tab(broker.id);
-        } else {
-            warn!("edit_broker: not selected broker");
-        }
-    }
     pub fn touch_connect_broker_selected(&mut self) -> Result<()> {
         self.init_connection_for_selected()?;
         Ok(())
@@ -427,42 +376,6 @@ impl App {
         //     let broker = self.find_broker_by_id(id)?;
         //     self.db.tx.send(AppEvent::ToDisconnect(id))?;
         // }
-        Ok(())
-    }
-    fn select_broker_and_display(&mut self, id: usize) {
-        for broker in self.brokers.iter_mut() {
-            broker.selected = broker.id == id;
-        }
-    }
-
-    fn select_broker(&mut self, id: usize) {
-        for broker in self.brokers.iter_mut() {
-            broker.selected = broker.id == id;
-        }
-    }
-    pub fn touch_delete_broker_selected(&mut self) -> Result<()> {
-        // let broker = self.get_selected_mut_broker()?;
-        let mut broker = self.brokers.remove(
-            self.get_selected_broker_index()
-                .ok_or(anyhow!("could not find broker selected"))?,
-        );
-        broker.disconnect(true);
-        let id = broker.id;
-        self.disconnect(id)?;
-
-        self.db.delete_broker(id)?;
-        Ok(())
-    }
-
-    pub fn click_subscribe_his(&mut self, his: SubscribeHis) -> Result<()> {
-        let Some(id) = self.get_selected_broker_id() else {
-            warn!("could not get selected broker");
-            return Ok(());
-        };
-        let broker = self.find_mut_broker_by_id(id)?;
-        broker.subscribe_hises.iter_mut().for_each(|x| {
-            x.selected = x == &his;
-        });
         Ok(())
     }
 

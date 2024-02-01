@@ -37,9 +37,7 @@ impl ArcDb {
             self.ids = db_brokers_ids.clone();
             debug!("{:?}", self.ids);
             let mut brokers = Vec::new();
-            let mut index = 0;
             for id in db_brokers_ids.into_iter() {
-                index += 1;
                 if id > self.index {
                     self.index = id;
                 }
@@ -47,9 +45,6 @@ impl ArcDb {
                     let broker: BrokerDB = serde_json::from_slice(&val)?;
                     let mut broker = broker.into_broker(self.tx.clone());
                     debug!("{:?}", broker);
-                    if index == 1 {
-                        broker.selected = true;
-                    }
                     brokers.push(broker);
                 } else {
                     warn!("can't find id: {}", id);
@@ -83,7 +78,6 @@ impl ArcDb {
             password: Arc::new("".to_string()),
             stored: false,
             tx: self.tx.clone(),
-            selected: false,
             tls: false,
             signed_ty: SignedTy::Ca,
             self_signed_ca: Arc::new("".to_string()),

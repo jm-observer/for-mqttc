@@ -5,7 +5,6 @@ pub mod hierarchy;
 // pub mod lens;
 pub mod localized;
 
-use crate::data::click_ty::ClickTy;
 use crate::data::common::{QoS, SubscribeHis, SubscribeTopic};
 use bytes::Bytes;
 use common::Broker;
@@ -21,15 +20,13 @@ pub enum AppEvent {
     /// 展示tips
     OtherDisplayTips,
     /// 点击了某个连接tab(broker_id)
-    TouchClickTab(usize),
+    // TouchClickTab(usize),
     /// broker列表的新增图标。新增broker
     TouchAddBroker,
     /// broker列表的编辑图标。编辑选择的broker
-    TouchEditBrokerSelected,
-    /// broker列表的连接图标。连接选择的broker
     TouchConnectBrokerSelected,
     /// broker列表的删除图标。删除选择的broker
-    TouchDeleteBrokerSelected,
+    // TouchDeleteBrokerSelected,
     /// 根据输入进行订阅
     TouchSubscribeByInput(usize),
     TouchSubscribeFromHis(SubscribeHis),
@@ -66,8 +63,8 @@ pub enum AppEvent {
     ClientPubAck(usize, u32),
     ClientSubAck(usize, SubscribeAck),
     ClientUnSubAck(usize, UnsubscribeAck),
-    TouchClick(ClickTy),
-    OtherClickLifeDead(ClickTy),
+    // TouchClick(ClickTy),
+    // OtherClickLifeDead(ClickTy),
     TouchCloseBrokerTab(usize),
     // CloseConnectionTab(usize),
     UpdateStatusBar(String),

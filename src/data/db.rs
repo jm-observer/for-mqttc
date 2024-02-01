@@ -96,7 +96,6 @@ impl BrokerDB {
             password,
             stored: true,
             tx,
-            selected: false,
             tls,
             signed_ty: ca,
             self_signed_ca,
