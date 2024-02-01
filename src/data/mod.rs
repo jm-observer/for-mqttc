@@ -18,12 +18,6 @@ pub type AString = Arc<String>;
 
 #[derive(Debug)]
 pub enum AppEvent {
-    /// info界面被点击
-    TouchClickBrokerInfo,
-    /// 点击超时
-    TimeoutClickBrokerInfo(usize),
-    TouchClickBrokerList,
-    TimeoutClickBrokerList(usize),
     /// 展示tips
     OtherDisplayTips,
     /// 点击了某个连接tab(broker_id)

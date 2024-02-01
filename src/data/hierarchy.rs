@@ -21,13 +21,8 @@ use std::sync::Arc;
 #[derive(Debug, Clone)]
 pub struct App {
     pub brokers: Vec<Broker>,
-    pub broker_tabs: Vec<usize>,
     pub db: ArcDb,
     pub hint: AString,
-    ///  不能加这个，不然就无法改变self_signed_file。为什么？不知道！简单的案例无法复现出来。
-    pub self_signed_file: Option<usize>,
-    pub display_history: bool,
-    pub display_broker_info: bool,
     pub tx: Sender<AppEvent>,
 }
 
@@ -41,13 +36,6 @@ impl App {
         if let Err(e) = self.tx.send(event) {
             error!("fail to send event: {:?}", e.0)
         }
-    }
-    pub fn set_self_signed_file(&mut self, index: usize) {
-        self.self_signed_file = Some(index);
-        self.self_signed_file.replace(index);
-    }
-    pub fn get_self_signed_file(&self) -> Option<usize> {
-        self.self_signed_file
     }
     pub fn touch_add_broker(&mut self) {
         // self.unselect_broker();
@@ -165,7 +153,6 @@ impl App {
         broker.init_connection()?;
         let broker = broker.clone();
         self.init_connection_by_broker(broker)?;
-        self.display_broker_info = false;
         Ok(())
     }
 
@@ -174,7 +161,6 @@ impl App {
         let broker = broker.clone();
         self.init_broker_tab(broker.id);
         self.db.save_broker(broker_db)?;
-        self.display_broker_info = false;
         self.send_event(AppEvent::ToConnect(broker));
         Ok(())
     }
@@ -414,11 +400,6 @@ impl App {
     }
     pub fn click_broker(&mut self, id: usize) -> Result<()> {
         self.select_broker_and_display(id);
-        for (index, tab) in self.broker_tabs.iter().enumerate() {
-            if *tab == id {
-                tx!(self.db.tx, AppEvent::UpdateToSelectTabs(index));
-            }
-        }
         Ok(())
     }
     pub fn edit_broker(&mut self) {
@@ -452,7 +433,6 @@ impl App {
         for broker in self.brokers.iter_mut() {
             broker.selected = broker.id == id;
         }
-        self.display_broker_info = true;
     }
 
     fn select_broker(&mut self, id: usize) {
@@ -468,7 +448,6 @@ impl App {
         );
         broker.disconnect(true);
         let id = broker.id;
-        self.close_broker_tab(id)?;
         self.disconnect(id)?;
 
         self.db.delete_broker(id)?;
@@ -488,17 +467,8 @@ impl App {
     }
 
     pub fn touch_close_broker_tab(&mut self, id: usize) -> Result<()> {
-        self.close_broker_tab(id)?;
         self.find_mut_broker_by_id(id)?.disconnect(true);
         self.disconnect(id)?;
-        Ok(())
-    }
-
-    fn close_broker_tab(&mut self, id: usize) -> Result<()> {
-        if let Some((index, _)) = self.broker_tabs.iter().enumerate().find(|x| *x.1 == id) {
-            debug!("close_tab：{} {}", index, self.broker_tabs.len());
-            self.broker_tabs.remove(index);
-        }
         Ok(())
     }
 

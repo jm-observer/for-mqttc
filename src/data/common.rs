@@ -154,6 +154,7 @@ pub enum TabKind {
     Broker,
 }
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Default)]
+#[allow(clippy::enum_variant_names)]
 #[repr(u8)]
 pub enum QoS {
     #[default]

@@ -61,12 +61,8 @@ impl ArcDb {
         };
         Ok(App {
             brokers,
-            broker_tabs: Default::default(),
             db: self.clone(),
             hint: "".to_string().into(),
-            self_signed_file: None,
-            display_history: false,
-            display_broker_info: false,
             tx: self.tx.clone(),
         })
     }

@@ -45,66 +45,10 @@ pub async fn deal_event(
     let mut click_broker_list = CLICK_LIST.fetch_add(1, Relaxed);
 
     debug!("{:?}", auto_retract);
-    if tx.send(AppEvent::TouchClickBrokerInfo).is_err() {
-        error!("fail to send event");
-    }
-    if tx.send(AppEvent::TouchClickBrokerList).is_err() {
-        error!("fail to send event");
-    }
     loop {
         // let event = ;
         // debug!("{:?}", event);
         match rx!(rx) {
-            // 点击info界面
-            AppEvent::TouchClickBrokerInfo => {
-                let info_tx = tx.clone();
-                click_broker_info = CLICK_INFO.fetch_add(1, Relaxed);
-                if let AutoRetract::Open(time) = auto_retract.clone() {
-                    spawn(async move {
-                        sleep(Duration::from_secs(time)).await;
-                        if info_tx
-                            .send(AppEvent::TimeoutClickBrokerInfo(click_broker_info))
-                            .is_err()
-                        {
-                            error!("fail to send event");
-                        }
-                    });
-                }
-            }
-            AppEvent::TimeoutClickBrokerInfo(id) => {
-                if click_broker_info == id {
-                    event_sink.add_idle_callback(move |data: &mut App| {
-                        if data.broker_tabs.is_empty() {
-                            data.display_broker_info = false;
-                        }
-                    });
-                }
-            }
-            AppEvent::TouchClickBrokerList => {
-                click_broker_list = CLICK_LIST.fetch_add(1, Relaxed);
-
-                let info_tx = tx.clone();
-                if let AutoRetract::Open(time) = auto_retract.clone() {
-                    spawn(async move {
-                        sleep(Duration::from_secs(time)).await;
-                        if info_tx
-                            .send(AppEvent::TimeoutClickBrokerList(click_broker_list))
-                            .is_err()
-                        {
-                            error!("fail to send event");
-                        }
-                    });
-                }
-            }
-            AppEvent::TimeoutClickBrokerList(id) => {
-                if click_broker_list == id {
-                    event_sink.add_idle_callback(move |data: &mut App| {
-                        if data.broker_tabs.is_empty() {
-                            data.display_history = false;
-                        }
-                    });
-                }
-            }
             AppEvent::TouchClickTab(broker_id) => touch_click_tab(&event_sink, broker_id),
             AppEvent::TouchAddBroker => touch_add_broker(&event_sink),
             AppEvent::TouchEditBrokerSelected => edit_broker(&event_sink),
