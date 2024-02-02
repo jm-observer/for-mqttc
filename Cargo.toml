@@ -17,7 +17,7 @@ tauri = { version = "1.5", features = ["shell-open"] }
 chrono = "0.4.26"
 custom-utils = "0.10.13"
 log = "0.4.17"
-anyhow = "1.0.64"
+anyhow = { version = "1.0.64"}
 sled = "0.34.7"
 serde = {version ="1.0.144", features = ["derive", "rc"]}
 serde_json = "1.0.85"

@@ -17,6 +17,7 @@ use for_mqtt_client::protocol::packet::SubscribeReasonCode;
 use for_mqtt_client::SubscribeAck;
 use log::{debug, error, warn};
 use std::sync::Arc;
+use tokio::sync::RwLock;
 
 #[derive(Debug, Clone)]
 pub struct App {

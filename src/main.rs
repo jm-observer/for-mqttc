@@ -14,6 +14,7 @@ use log::error;
 use log::LevelFilter::{Debug, Info};
 use std::process::exit;
 use std::{panic, thread};
+use tokio::sync::RwLock;
 
 mod data;
 mod util;
@@ -24,11 +25,7 @@ mod mqtt;
 mod command;
 mod logic;
 
-// Learn more about Tauri commands at https://tauri.app/v1/guides/features/command
-#[tauri::command]
-fn greet(name: &str) -> String {
-    format!("Hello, {}! You've been greeted from Rust!", name)
-}
+use command::*;
 
 fn main() -> anyhow::Result<()> {
     let (tx, rx) = crossbeam_channel::bounded(1024);
@@ -98,7 +95,8 @@ fn main() -> anyhow::Result<()> {
         .unwrap();
 
     tauri::Builder::default()
-        .invoke_handler(tauri::generate_handler![greet])
+        .manage(RwLock::new(data))
+        .invoke_handler(tauri::generate_handler![broker_list])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 

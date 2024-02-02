@@ -1973,8 +1973,8 @@ input.tab:checked + .tab-content,
   width: 33.333333%;
 }
 
-.w-10 {
-  width: 2.5rem;
+.w-12 {
+  width: 3rem;
 }
 
 .w-20 {
@@ -1985,6 +1985,10 @@ input.tab:checked + .tab-content,
   width: 0.75rem;
 }
 
+.w-36 {
+  width: 9rem;
+}
+
 .w-full {
   width: 100%;
 }
@@ -1992,14 +1996,6 @@ input.tab:checked + .tab-content,
 .w-min {
   width: -moz-min-content;
   width: min-content;
-}
-
-.w-12 {
-  width: 3rem;
-}
-
-.w-36 {
-  width: 9rem;
 }
 
 .min-w-0 {

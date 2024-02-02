@@ -1,7 +1,7 @@
 {
   "build": {
-    "beforeDevCommand": "",
-    "beforeBuildCommand": "",
+    "beforeDevCommand": " --watch",
+    "beforeBuildCommand": "npx tailwindcss -i ./src-web/input.css -o ./src-web/output.css --watch",
     "devPath": "src-web",
     "distDir": "src-web",
     "withGlobalTauri": true
