@@ -10,6 +10,7 @@
 <!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>-->
     <link rel="stylesheet" href="./output.css"></link>
     <script src="brokers.js"></script>
+    <script src="init_element.js"></script>
     <style>
         /* Ensure the font is Inter */
         /** 图标字体 **/
@@ -58,45 +59,31 @@
     </header>
     <main class="h-full block flex-grow">
         <div class="flex h-full">
-<!--            <aside class="w-min">-->
-<!--                    &lt;!&ndash; Navigation Links &ndash;&gt;-->
-<!--                    <nav class="p-2">-->
-<!--                        <ul class="space-y-1">-->
-<!--                            <li>-->
-<!--                                <i class="layui-icon layui-icon-shrink-right" id="LAY_app_flexible"></i>-->
-<!--                            </li>-->
-<!--                            <li><a href="#" class="flex items-center p-2 hover:bg-gray-200 rounded">-->
-<!--                                <i class="layui-icon layui-icon-home"></i>-->
-<!--                                Docume</a></li>-->
-<!--                            <li>-->
-<!--                                <i class="layui-icon layui-icon-auz"></i>-->
-<!--                            </li>-->
-<!--                        </ul>-->
-<!--                    </nav>-->
-<!--            </aside>-->
             <section class="w-full pl-1 h-full flex-grow">
                 <div class="bg-white p-2 rounded shadow  h-inherit flex flex-col" >
                     <!-- Tabs -->
-                    <ul class="flex border-b">
+                    <ul id="tabs" class="flex border-b">
                         <li class="mr-1 shadow rounded-md">
                             <a class="bg-white inline-block py-2 px-4 text-teal-500 hover:text-teal-800 font-semibold" href="#first">Brokers</a>
                         </li>
-                        <li class="mr-1 justify-center">
+                        <li class="mr-1 shadow rounded-md justify-center">
                             <div class="flex px-4">
                                 <a class="bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex" href="#second">
                                     <span class="h-3 w-3 bg-green-400 rounded-full mr-2 py-2 px-1 "></span>
                                     Tab 2</a>
                                 <i class="layui-icon layui-icon-close py-2 px-1 "></i>
                             </div>
-
                         </li>
                     </ul>
 
                     <!-- Tab Content -->
-                    <div id="tab-content" class="tab-content p-4 block bg-amber-50 flex-grow">
+                    <div id="tabs-content" class="tab-content p-4 block bg-amber-50 flex-grow">
                         <div id="first" class="tab-pane active block bg-white h-full">
                             <button id="new" class="bg-yellow-500 hover:bg-yellow-700 font-bold py-2 px-2 rounded focus:outline-none focus:shadow-outline" type="submit">
                                 新增
+                            </button>
+                            <button id="connect" onclick="connect_to_broker(0, 'emq')" class="bg-yellow-500 hover:bg-yellow-700 font-bold py-2 px-2 rounded focus:outline-none focus:shadow-outline" type="submit">
+                                连接测试
                             </button>
                             <table id="brokers" class="table table-xs table-pin-rows table-pin-cols">
                                 <thead>
@@ -336,7 +323,7 @@
 
     document.getElementById('new').addEventListener('click', function(event) {
         var modal = document.getElementById('modal');
-        var triggerButton = document.getElementById('tab-content');
+        var triggerButton = document.getElementById('tabs-content');
         // 获取触发按钮的位置
         var rect = triggerButton.getBoundingClientRect();
 
