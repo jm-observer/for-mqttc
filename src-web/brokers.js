@@ -1,6 +1,6 @@
 // import {init_buttons, init_common_cell, init_name_cell, init_tab, init_version_cell} from "./init_element.js";
 
-// const { invoke } = window.__TAURI__.tauri;
+const { invoke } = window.__TAURI__.tauri;
 //
 // let greetInputEl;
 // let greetMsgEl;

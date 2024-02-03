@@ -1,7 +1,7 @@
 {
   "build": {
-    "beforeDevCommand": "",
-    "beforeBuildCommand": "",
+    "beforeDevCommand": "npx tailwindcss -i ./src-web/input.css -o ./src-web/output.css",
+    "beforeBuildCommand": "npx tailwindcss -i ./src-web/input.css -o ./src-web/output.css",
     "devPath": "src-web",
     "distDir": "src-web",
     "withGlobalTauri": true
@@ -21,7 +21,7 @@
     "bundle": {
       "active": true,
       "targets": "all",
-      "identifier": "com.tauri.dev",
+      "identifier": "for-mqttc",
       "icon": [
         "icons/32x32.png",
         "icons/128x128.png",
