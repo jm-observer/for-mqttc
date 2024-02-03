@@ -47,41 +47,18 @@
 }
 
  function init_tab(id, name) {
-    let a_class = "bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex";
-    let i_class = "layui-icon layui-icon-close py-2 px-1";
-    let li_class = "mr-1 shadow rounded-md justify-center";
-    let span_class = "h-3 w-3 bg-green-400 rounded-full mr-2 py-2 px-1";
-    // <a className="bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex" href="#second">
-    //     <span className="h-3 w-3 bg-green-400 rounded-full mr-2 py-2 px-1 "></span>
-    //     Tab 2</a>
-    var span = document.createElement('span');
-    span.className = span_class;
-    var name = document.createTextNode(name);
-    var name_a = document.createElement('a');
-    name_a.className = a_class;
-    name_a.appendChild(span);
-    name_a.appendChild(name);
+    let template = "<li id='tab-#id#' class='mr-1 shadow rounded-md justify-center'>\n" +
+        "                            <div class='flex px-4'>\n" +
+        "                                <a onclick='display_tab(\"#id#\")' class='bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex' href='#'>\n" +
+        "                                    <span class='h-3 w-3 bg-green-400 rounded-full mr-2 py-2 px-1 '></span>\n" +
+        "                                    #name#</a>\n" +
+        "                                <i class='layui-icon layui-icon-close py-2 px-1 '></i>\n" +
+        "                            </div>\n" +
+        "                        </li>";
 
-    // <a className="bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex" href="#second">
-    //     <i className="layui-icon layui-icon-close py-2 px-1 "></i></a>
-    var i = document.createElement('i');
-    i.className = i_class;
-    var i_a = document.createElement('a');
-    i_a.className = a_class;
-    i_a.appendChild(i);
+     const htmlString = template.replaceAll("#id#", id).replaceAll("#name#", name);
 
-    // <li class="mr-1 shadow rounded-md justify-center">
-    //     <div class="flex px-4">
-    //         <a></a>
-    //         <a></a>
-    //     </div>
-    // </li>
-    var div = document.createElement('div');
-    div.className = "flex px-4";
-    div.appendChild(name_a);
-    div.appendChild(i_a);
-    var li = document.createElement('li');
-    li.className = li_class;
-    li.appendChild(div);
-    return li;
+     var tempDiv = document.createElement('div');
+     tempDiv.innerHTML = htmlString;
+     return tempDiv.children[0];
 }

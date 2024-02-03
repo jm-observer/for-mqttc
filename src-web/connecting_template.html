@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head></head>
+<body>
+<div id="tab-content-#id#" class="tab-pane block h-full w-full">
+    <div class="grid gap-2 mb-8 h-full w-full grid-cols-content">
+        <!-- Replace with actual content -->
+        <div class="min-w-0 p-2 bg-white rounded-lg shadow-xs flex flex-col">
+            <div id="#id#subs" class="flex-grow">
+                <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-md mb-4">
+                    <div class="flex items-center">
+                        <span class="h-3 w-3 bg-gray-400 rounded-full mr-2"></span>
+                        <span class="text-gray-800">testtopic/#</span>
+                    </div>
+                    <span class="text-gray-500">QoS 0</span>
+                </div>
+            </div>
+            <form class="bg-white p-2 rounded shadow">
+                <input name="id" type="hidden" value="#id#">
+                <div class="mb-1">
+                    <label class="text-sm mb-2 p-2" for="qos">
+                        QoS
+                    </label>
+                    <select name="qos" class="shadow px-2 border rounded w-20 relative -left-12 text-right text-last-right bg-transparent z-10">
+                        <option class="text-center">0</option>
+                        <option class="text-center">1</option>
+                        <option class="text-center">2</option>
+                    </select>
+                    <select  name="sub-type" class="shadow border rounded px-0.5" title="Payload Type">
+                        <option>Text</option>
+                        <option>Json</option>
+                        <option>Hex</option>
+                    </select>
+                </div>
+                <div class="mb-4">
+                    <input name="sub-topic"  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" type="text" placeholder="topic">
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                        订阅
+                    </button>
+                </div>
+            </form>
+        </div>
+        <div class="min-w-0 p-2 bg-white rounded-lg shadow-xs flex flex-col">
+            <div class="flex-grow">
+                <div class="rounded-lg p-4 max-w-sm shadow-lg">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-lg font-medium text-gray-700">Topic: gateway</h2>
+                        <span class="px-2 py-1 text-xs text-green-800 bg-green-200 rounded-full">QoS: 0</span>
+                    </div>
+                    <div class="mb-4 bg-green-100 p-4 rounded">
+                        <pre class="text-green-700">{ "msg": "hellodddd" }</pre>
+                    </div>
+                    <p class="text-xs text-right text-gray-600">2024-01-21 20:26:22:057</p>
+                </div>
+            </div>
+            <form class="bg-white p-2 rounded shadow">
+                <div class="mb-1">
+                    <label class="text-sm mb-2 p-2" for="qos">
+                        QoS
+                    </label>
+                    <select class="shadow px-2 border rounded w-20 relative -left-12 text-right text-last-right bg-transparent z-10" id="qos">
+                        <option class="text-center">0</option>
+                        <option class="text-center">1</option>
+                        <option class="text-center">2</option>
+                    </select>
+                    <select class="shadow border rounded px-0.5" title="Payload Type" id="byteType">
+                        <option>Text</option>
+                        <option>Json</option>
+                        <option>Hex</option>
+                    </select>
+                </div>
+
+                <div class="mb-4">
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" id="topic" type="text" placeholder="topic">
+                    <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="message" placeholder="payload"></textarea>
+                </div>
+                <div class="flex items-center justify-between">
+                    <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                        发布
+                    </button>
+                </div>
+            </form>
+            <!-- Additional content -->
+        </div>
+    </div>
+</div>
+</body>
+</html>

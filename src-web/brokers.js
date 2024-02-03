@@ -1,12 +1,26 @@
-// import {init_buttons, init_common_cell, init_name_cell, init_tab, init_version_cell} from "./init_element.js";
+function get_invoke() {
+    if (isTauriEnvironment()) {
+        // Tauri特有的API
+        return window.__TAURI__.tauri
+    } else {
+        return function (method, data) {
+            console.log(method, data);
+            return method
+        }
+    }
+}
 
-const { invoke } = window.__TAURI__.tauri;
+function isTauriEnvironment() {
+    return typeof window.__TAURI__ !== 'undefined';
+}
+
+
 //
 // let greetInputEl;
 // let greetMsgEl;
 async function broker_list() {
     try {
-        let rs = await invoke("broker_list", { page : {start: 0, size: 10 }});
+        let rs = await get_invoke()("broker_list", { page : {start: 0, size: 10 }});
         console.log(rs);
         var jsonObj = JSON.parse(rs);
         var tableBody = document.getElementById("brokers").getElementsByTagName('tbody')[0];
@@ -27,8 +41,29 @@ async function broker_list() {
 function connect_to_broker(id, name) {
     console.log("connect_to_broker" + id);
     const tableBody = document.getElementById("tabs");
-    tableBody.appendChild(init_tab(id, name));
+    const tab = init_tab(id, name);
+    tableBody.appendChild(tab);
 
+    fetch('connecting_template.html')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.text();
+        })
+        .then(htmlString => {
+            var parser = new DOMParser();
+            let content = htmlString.replaceAll("#id#", id);
+            var doc = parser.parseFromString(content, 'text/html');
+            return doc.body.children[0]; // 或者 doc.documentElement，视情况而定
+        })
+        .then(htmlElement => {
+            var targetElement = document.getElementById('tabs-content'); // 目标元素
+            targetElement.appendChild(htmlElement);
+        })
+        .catch(error => {
+            console.error('There has been a problem with your fetch operation:', error);
+        });
 }
 function delete_broker(id) {
     console.log("delete_broker" + id);
@@ -38,7 +73,35 @@ function edit_broker(id) {
     console.log("edit_broker" + id);
 }
 
+function display_tab(tab_id) {
+    console.log("display_tab" + tab_id);
+    let parentElement = document.getElementById('tabs');
+    for (let i = 0; i < parentElement.children.length; i++) {
+        let tab = parentElement.children[i];
+        if(tab.id.endsWith(tab_id)) {
+            tab.classList.remove('text-gray-500');
+            tab.classList.add('text-teal-500');
+        } else {
+            tab.classList.remove('text-teal-500');
+            tab.classList.add('text-gray-500');
+        }
+    }
+
+    parentElement = document.getElementById('tabs-content');
+    for (let i = 0; i < parentElement.children.length; i++) {
+        let tab = parentElement.children[i];
+        if(tab.id.endsWith(tab_id)) {
+            tab.style.display = 'block';
+        } else {
+            tab.style.display = 'none';
+        }
+    }
+}
+
 //
 window.addEventListener("DOMContentLoaded", () => {
+    display_tab("brokers");
     broker_list();
 });
+
+
