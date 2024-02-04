@@ -53,7 +53,7 @@ async function connect_to_broker(id, name) {
         })
         .then(htmlString => {
             var parser = new DOMParser();
-            let content = htmlString.replaceAll("#id#", id);
+            let content = htmlString.replaceAll("__id__", id);
             var doc = parser.parseFromString(content, 'text/html');
             return doc.body.children[0]; // 或者 doc.documentElement，视情况而定
         })

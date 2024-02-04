@@ -2,11 +2,11 @@
 <html lang="en">
 <head></head>
 <body>
-<div id="tab-content-#id#" class="tab-pane block h-full w-full">
+<div id="tab-content-__id__" class="tab-pane block h-full w-full">
     <div class="grid gap-2 mb-8 h-full w-full grid-cols-content">
         <!-- Replace with actual content -->
         <div class="min-w-0 p-2 bg-white rounded-lg shadow-xs flex flex-col">
-            <div id="#id#subs" class="flex-grow">
+            <div id="__id__subs" class="flex-grow">
                 <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-md mb-4">
                     <div class="flex items-center">
                         <span class="h-3 w-3 bg-gray-400 rounded-full mr-2"></span>
@@ -15,7 +15,7 @@
                     <span class="text-gray-500">QoS 0</span>
                 </div>
             </div>
-            <form id="form-subscribe-#id#" class="bg-white p-2 rounded shadow">
+            <form id="form-subscribe-__id__" class="bg-white p-2 rounded shadow">
                 <div class="mb-1">
                     <label class="text-sm mb-2 p-2" for="qos">
                         QoS
@@ -35,7 +35,7 @@
                     <input name="topic"  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" type="text" placeholder="topic">
                 </div>
                 <div class="flex items-center justify-between">
-                    <button onclick="subscribe(#id#)" type="button" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    <button onclick="subscribe(__id__)" type="button" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         订阅
                     </button>
                 </div>
