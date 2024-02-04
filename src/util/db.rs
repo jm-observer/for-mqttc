@@ -42,7 +42,8 @@ impl ArcDb {
                     self.index = id;
                 }
                 if let Some(val) = self.db.get(DbKey::broker_key(id).as_bytes()?)? {
-                    let broker: BrokerDB = serde_json::from_slice(&val)?;
+                    let mut broker: BrokerDB = serde_json::from_slice(&val)?;
+                    broker.id = id;
                     let mut broker = broker.into_broker(self.tx.clone());
                     debug!("{:?}", broker);
                     brokers.push(broker);
@@ -59,6 +60,7 @@ impl ArcDb {
             db: self.clone(),
             hint: "".to_string().into(),
             tx: self.tx.clone(),
+            mqtt_clients: Default::default(),
         })
     }
 

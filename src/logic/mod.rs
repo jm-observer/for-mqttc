@@ -26,6 +26,7 @@ use std::sync::atomic::AtomicUsize;
 use std::sync::atomic::Ordering::Relaxed;
 use std::sync::Arc;
 use std::time::Duration;
+use tauri::AppHandle;
 use tokio::spawn;
 use tokio::time::sleep;
 
@@ -64,7 +65,8 @@ pub async fn deal_event(
                 un_sub_ack(&event_sink, broke_id, unsubscribe_ack.id)
             }
             AppEvent::ToConnect(broker) => {
-                connect(&event_sink, &mut mqtt_clients, tx.clone(), broker).await
+                // debug!("deal connect_to_broker: {}", broker.id);
+                // connect(&event_sink, &mut mqtt_clients, tx.clone(), broker).await
             }
             AppEvent::TouchConnectByButton => touch_connect_by_button(&event_sink).await,
             AppEvent::TouchSubscribeByInput(index) => {
@@ -300,21 +302,16 @@ async fn touch_connect_by_button(event_sink: &ExtEventSink) {
     });
 }
 
-async fn connect(
-    _event_sink: &ExtEventSink,
-    mqtt_clients: &mut HashMap<usize, Client>,
-    tx: Sender<AppEvent>,
-    broker: Broker,
-) {
-    if let Some(old_client) = mqtt_clients.remove(&broker.id) {
+pub async fn connect(mqtt_clients: &mut HashMap<usize, Client>, tx: AppHandle, broker: Broker) {
+    let id = broker.id;
+    if let Some(old_client) = mqtt_clients.remove(&id) {
         if let Err(err) = old_client.disconnect().await {
             error!("diconnect fail: {:?}", err);
         };
     };
-    match init_connect(broker.clone(), tx.clone()).await {
+    match init_connect(broker, tx).await {
         Ok(client) => {
-            let id = broker.id;
-            mqtt_clients.insert(id, client.clone());
+            mqtt_clients.insert(id, client);
         }
         Err(e) => {
             error!("{:?}", e);

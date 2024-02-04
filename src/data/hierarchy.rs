@@ -14,17 +14,18 @@ use bytes::Bytes;
 use crossbeam_channel::Sender;
 use custom_utils::tx;
 use for_mqtt_client::protocol::packet::SubscribeReasonCode;
-use for_mqtt_client::SubscribeAck;
+use for_mqtt_client::{Client, SubscribeAck};
 use log::{debug, error, warn};
+use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-#[derive(Debug, Clone)]
 pub struct App {
     pub brokers: Vec<Broker>,
     pub db: ArcDb,
     pub hint: AString,
     pub tx: Sender<AppEvent>,
+    pub mqtt_clients: HashMap<usize, Client>,
 }
 
 impl App {

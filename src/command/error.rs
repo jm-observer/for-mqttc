@@ -5,6 +5,11 @@ pub struct Error {
     msg: String,
 }
 
+impl From<String> for Error {
+    fn from(msg: String) -> Self {
+        Self { msg }
+    }
+}
 impl From<anyhow::Error> for Error {
     fn from(value: anyhow::Error) -> Self {
         Self {

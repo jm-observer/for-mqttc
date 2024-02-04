@@ -14,5 +14,8 @@
   "description": "npm install -D tailwindcss",
   "main": "tailwind.config.js",
   "author": "",
-  "license": "ISC"
+  "license": "ISC",
+  "dependencies": {
+    "@tauri-apps/api": "^1.5.3"
+  }
 }

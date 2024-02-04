@@ -85,18 +85,18 @@ fn main() -> anyhow::Result<()> {
 
     let config_clone = config.clone();
 
-    thread::Builder::new()
-        .name("logic-worker".to_string())
-        .spawn(move || {
-            if let Err(e) = deal_event(ExtEventSink, rx, tx, config_clone.auto_retract) {
-                error!("{:?}", e);
-            }
-        })
-        .unwrap();
+    // thread::Builder::new()
+    //     .name("logic-worker".to_string())
+    //     .spawn(move || {
+    //         if let Err(e) = deal_event(ExtEventSink, rx, tx, config_clone.auto_retract) {
+    //             error!("{:?}", e);
+    //         }
+    //     })
+    //     .unwrap();
 
     tauri::Builder::default()
         .manage(RwLock::new(data))
-        .invoke_handler(tauri::generate_handler![broker_list])
+        .invoke_handler(tauri::generate_handler![broker_list, connect_to_broker])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 

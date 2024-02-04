@@ -35,7 +35,7 @@ impl<'a> From<&'a Broker> for BrokerSimpleView<'a> {
             ..
         } = value;
         Self {
-            id: 0,
+            id: *id,
             protocol: *protocol,
             name: name.as_ref(),
             port: *port,

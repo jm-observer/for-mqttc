@@ -16,8 +16,9 @@ use for_mqtt_client::protocol::MqttOptions;
 use for_mqtt_client::tls::TlsConfig;
 use for_mqtt_client::MqttEvent;
 pub use for_mqtt_client::{Client, QoS, QoSWithPacketId};
+use tauri::{AppHandle, Manager};
 
-pub async fn init_connect(broker: Broker, tx: Sender<AppEvent>) -> Result<Client> {
+pub async fn init_connect(broker: Broker, tx: AppHandle) -> Result<Client> {
     let Some(port) = broker.port else {
         // error!("port is none");
         bail!("port is none");
@@ -41,7 +42,7 @@ pub async fn init_connect(broker: Broker, tx: Sender<AppEvent>) -> Result<Client
     let id = broker.id;
     tokio::spawn(async move {
         while let Ok(event) = eventloop.recv().await {
-            let tx = tx.clone();
+            let tx = &tx;
             // debug!("{:?}", event);
             match event.as_ref() {
                 MqttEvent::ConnectSuccess(retain) => {
@@ -54,10 +55,7 @@ pub async fn init_connect(broker: Broker, tx: Sender<AppEvent>) -> Result<Client
                     );
                 }
                 MqttEvent::ConnectFail(err) => {
-                    send_event(
-                        tx,
-                        AppEvent::ClientConnectAckFail(id, format!("{:?}", err).into()),
-                    );
+                    send_event(tx, AppEvent::ClientConnectAckFail(id, format!("{:?}", err)));
                 }
                 MqttEvent::PublishSuccess(packet_id) => {
                     send_event(tx, AppEvent::ClientPubAck(id, *packet_id));
@@ -109,9 +107,16 @@ pub async fn init_connect(broker: Broker, tx: Sender<AppEvent>) -> Result<Client
     Ok(client)
 }
 
-fn send_event(tx: Sender<AppEvent>, event: AppEvent) {
-    if tx.send(event).is_err() {
-        error!("fail to send event!");
+fn send_event(tx: &AppHandle, event: AppEvent) {
+    let (event, event_data) = event.event();
+    if if let Some(event_data) = event_data {
+        tx.emit_all(event, event_data)
+    } else {
+        tx.emit_all(event, ())
+    }
+    .is_err()
+    {
+        error!("mqtt-loop fail to send event!");
     }
 }
 

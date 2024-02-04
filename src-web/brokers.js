@@ -1,7 +1,7 @@
 function get_invoke() {
     if (isTauriEnvironment()) {
         // Tauri特有的API
-        return window.__TAURI__.tauri
+        return window.__TAURI__.tauri.invoke
     } else {
         return function (method, data) {
             console.log(method, data);
@@ -38,7 +38,7 @@ async function broker_list() {
 
 }
 
-function connect_to_broker(id, name) {
+async function connect_to_broker(id, name) {
     console.log("connect_to_broker" + id);
     const tableBody = document.getElementById("tabs");
     const tab = init_tab(id, name);
@@ -64,6 +64,8 @@ function connect_to_broker(id, name) {
         .catch(error => {
             console.error('There has been a problem with your fetch operation:', error);
         });
+
+    await get_invoke()("connect_to_broker", { id : id});
 }
 function delete_broker(id) {
     console.log("delete_broker" + id);

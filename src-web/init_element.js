@@ -50,7 +50,7 @@
     let template = "<li id='tab-#id#' class='mr-1 shadow rounded-md justify-center'>\n" +
         "                            <div class='flex px-4'>\n" +
         "                                <a onclick='display_tab(\"#id#\")' class='bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex' href='#'>\n" +
-        "                                    <span class='h-3 w-3 bg-green-400 rounded-full mr-2 py-2 px-1 '></span>\n" +
+        "                                    <span id='status-#id#' class='h-3 w-3 bg-gray-400 rounded-full mr-2 py-2 px-1 '></span>\n" +
         "                                    #name#</a>\n" +
         "                                <i class='layui-icon layui-icon-close py-2 px-1 '></i>\n" +
         "                            </div>\n" +
