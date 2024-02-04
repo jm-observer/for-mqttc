@@ -61,7 +61,13 @@ pub async fn init_connect(broker: Broker, tx: AppHandle) -> Result<Client> {
                     send_event(tx, AppEvent::ClientPubAck(id, *packet_id));
                 }
                 MqttEvent::SubscribeAck(packet) => {
-                    send_event(tx, AppEvent::ClientSubAck(id, packet.clone()));
+                    send_event(
+                        tx,
+                        AppEvent::ClientSubAck {
+                            broker_id: id,
+                            ack: packet.clone(),
+                        },
+                    );
                 }
                 MqttEvent::UnsubscribeAck(packet) => {
                     send_event(tx, AppEvent::ClientUnSubAck(id, packet.clone()));
@@ -108,7 +114,9 @@ pub async fn init_connect(broker: Broker, tx: AppHandle) -> Result<Client> {
 }
 
 fn send_event(tx: &AppHandle, event: AppEvent) {
-    let (event, event_data) = event.event();
+    let Some((event, event_data)) = event.event() else {
+        return;
+    };
     if if let Some(event_data) = event_data {
         tx.emit_all(event, event_data)
     } else {

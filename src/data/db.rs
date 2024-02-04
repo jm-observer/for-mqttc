@@ -102,14 +102,7 @@ impl BrokerDB {
             subscribe_hises,
             subscribe_topics: Default::default(),
             msgs: Default::default(),
-            subscribe_input: SubscribeInput::init(id),
-            public_input: PublicInput::default(id),
             unsubscribe_ing: Default::default(),
-            tab_status: TabStatus {
-                id,
-                try_connect: false,
-                connected: false,
-            },
             auto_connect,
         }
     }

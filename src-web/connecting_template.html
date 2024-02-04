@@ -15,8 +15,7 @@
                     <span class="text-gray-500">QoS 0</span>
                 </div>
             </div>
-            <form class="bg-white p-2 rounded shadow">
-                <input name="id" type="hidden" value="#id#">
+            <form id="form-subscribe-#id#" class="bg-white p-2 rounded shadow">
                 <div class="mb-1">
                     <label class="text-sm mb-2 p-2" for="qos">
                         QoS
@@ -26,17 +25,17 @@
                         <option class="text-center">1</option>
                         <option class="text-center">2</option>
                     </select>
-                    <select  name="sub-type" class="shadow border rounded px-0.5" title="Payload Type">
+                    <select  name="payload_ty" class="shadow border rounded px-0.5" title="Payload Type">
                         <option>Text</option>
                         <option>Json</option>
                         <option>Hex</option>
                     </select>
                 </div>
                 <div class="mb-4">
-                    <input name="sub-topic"  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" type="text" placeholder="topic">
+                    <input name="topic"  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" type="text" placeholder="topic">
                 </div>
                 <div class="flex items-center justify-between">
-                    <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                    <button onclick="subscribe(#id#)" type="button" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
                         订阅
                     </button>
                 </div>

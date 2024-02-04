@@ -29,10 +29,10 @@ impl SubscribeTopic {
         }
     }
 
-    pub fn from(val: SubscribeInput, trace_id: u32) -> Self {
+    pub fn from(val: SubscribeInput) -> Self {
         Self {
             broker_id: val.broker_id,
-            trace_id,
+            trace_id: val.trace_id,
             topic: val.topic.clone(),
             qos: val.qos.clone(),
             status: SubscribeStatus::SubscribeIng,

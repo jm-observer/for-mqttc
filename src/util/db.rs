@@ -14,23 +14,21 @@ use log::{debug, warn};
 pub struct ArcDb {
     pub index: usize,
     pub db: Db,
-    pub tx: Sender<AppEvent>,
     pub ids: Vec<usize>,
 }
 
 const BROKERS: &[u8; 7] = b"brokers";
 impl ArcDb {
-    pub fn init_db(tx: Sender<AppEvent>, db_path: PathBuf) -> Result<Self> {
+    pub fn init_db(db_path: PathBuf) -> Result<Self> {
         let config = Config::new().path(db_path);
         Ok(ArcDb {
             index: 0,
             db: config.open()?,
-            tx,
             ids: Default::default(),
         })
     }
 
-    pub fn read_app_data(&mut self) -> Result<App> {
+    pub fn read_app_data(&mut self, tx: Sender<AppEvent>) -> Result<App> {
         // let mut brokers = Vec::new();
         let brokers = if let Some(val) = self.db.get(BROKERS)? {
             let db_brokers_ids: Vec<usize> = serde_json::from_slice(&val)?;
@@ -44,7 +42,7 @@ impl ArcDb {
                 if let Some(val) = self.db.get(DbKey::broker_key(id).as_bytes()?)? {
                     let mut broker: BrokerDB = serde_json::from_slice(&val)?;
                     broker.id = id;
-                    let mut broker = broker.into_broker(self.tx.clone());
+                    let mut broker = broker.into_broker(tx.clone());
                     debug!("{:?}", broker);
                     brokers.push(broker);
                 } else {
@@ -59,43 +57,9 @@ impl ArcDb {
             brokers,
             db: self.clone(),
             hint: "".to_string().into(),
-            tx: self.tx.clone(),
+            tx: tx,
             mqtt_clients: Default::default(),
         })
-    }
-
-    pub fn new_broker(&mut self) -> Broker {
-        self.index += 1;
-        let id = self.index;
-        Broker {
-            id,
-            protocol: Protocol::V4,
-            client_id: Arc::new("".to_string()),
-            name: Arc::new("".to_string()),
-            addr: Arc::new("broker-cn.emqx.io".to_string()),
-            port: Some(1883),
-            params: Arc::new(OPTION.to_string()),
-            use_credentials: false,
-            user_name: Arc::new("".to_string()),
-            password: Arc::new("".to_string()),
-            stored: false,
-            tx: self.tx.clone(),
-            tls: false,
-            signed_ty: SignedTy::Ca,
-            self_signed_ca: Arc::new("".to_string()),
-            subscribe_hises: Default::default(),
-            subscribe_topics: Default::default(),
-            msgs: Default::default(),
-            subscribe_input: SubscribeInput::init(id),
-            public_input: PublicInput::default(id),
-            unsubscribe_ing: Default::default(),
-            tab_status: TabStatus {
-                id,
-                try_connect: false,
-                connected: false,
-            },
-            auto_connect: true,
-        }
     }
 
     pub fn save_broker(&mut self, broker: BrokerDB) -> Result<()> {
@@ -153,19 +117,46 @@ const OPTION: &str = r#"{
 
 #[cfg(test)]
 mod test {
+    use crate::data::common::{Protocol, SignedTy};
+    use crate::data::db::BrokerDB;
+    use crate::util::db::ArcDb;
+    use directories::UserDirs;
+    use sled::*;
+    use std::sync::Arc;
 
     #[test]
     fn insert_broker() {
-        // let db = Config::new().path("./resource/db").open().unwrap();
-        // let broker = vector![Broker {
-        //     id: 0,
-        //     client_id: Arc::new("id_5678".to_string()),
-        //     name: Arc::new("emq".to_string()),
-        //     addr: Arc::new("192.168.199.188".to_string()),
-        //     port: Arc::new("1883".to_string()),
-        //     params: Arc::new("{abc,jiofewki, iowoere}".to_string()),
-        // }];
-        // let broker = serde_json::to_vec(&broker).unwrap();
-        // db.insert(BROKERS, broker).unwrap();
+        let param = r#"
+        {
+	"keep_alive": 60,
+	"clean_session": true,
+	"max_incoming_packet_size": 10240,
+	"max_outgoing_packet_size": 10240,
+	"inflight": 100,
+	"conn_timeout": 5
+}
+        "#;
+        let user_dirs = UserDirs::new().unwrap();
+        let home_path = user_dirs.home_dir().to_path_buf().join(".for-mqttc");
+
+        let mut db = ArcDb::init_db(home_path.join("db")).unwrap();
+        let broker = BrokerDB {
+            id: 1,
+            protocol: Protocol::V4,
+            client_id: Arc::new("id_5678".to_string()),
+            name: Arc::new("emq".to_string()),
+            addr: Arc::new("broker-cn.emqx.io".to_string()),
+            port: Some(1883),
+            params: Arc::new(param.to_string()),
+            use_credentials: false,
+            auto_connect: true,
+            user_name: Arc::new("".to_string()),
+            password: Arc::new("".to_string()),
+            tls: false,
+            signed_ty: SignedTy::Ca,
+            self_signed_ca: Arc::new("".to_string()),
+            subscribe_hises: vec![],
+        };
+        db.save_broker(broker).unwrap();
     }
 }

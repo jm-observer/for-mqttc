@@ -38,14 +38,8 @@ pub async fn deal_event(
     event_sink: ExtEventSink,
     rx: Receiver<AppEvent>,
     tx: Sender<AppEvent>,
-    auto_retract: AutoRetract,
 ) -> Result<()> {
     let mut mqtt_clients: HashMap<usize, Client> = HashMap::new();
-    // let mut click_his: Option<ClickTy> = None;
-    let mut click_broker_info = CLICK_INFO.fetch_add(1, Relaxed);
-    let mut click_broker_list = CLICK_LIST.fetch_add(1, Relaxed);
-
-    debug!("{:?}", auto_retract);
     loop {
         // let event = ;
         // debug!("{:?}", event);
@@ -86,7 +80,7 @@ pub async fn deal_event(
                 }
             }
             AppEvent::ClientPubAck(id, ack) => pub_ack(&event_sink, id, ack),
-            AppEvent::ClientSubAck(id, ack) => sub_ack(&event_sink, id, ack),
+            // AppEvent::ClientSubAck(id, ack) => sub_ack(&event_sink, id, ack),
             AppEvent::UpdateToSelectTabs(id) => update_to_select_tabs(&event_sink, id),
             AppEvent::TouchReConnect => {
                 if let Err(e) = touch_reconnect(&event_sink).await {
@@ -94,6 +88,7 @@ pub async fn deal_event(
                 }
             }
             AppEvent::TouchDisconnect => {
+                debug!("TouchDisconnect");
                 if let Err(e) = disconnect(&event_sink).await {
                     error!("{}", e.to_string());
                 }
@@ -169,6 +164,9 @@ pub async fn deal_event(
                 // if let Err(e) = event_sink.submit_command(TIPS, (), WidgetId::reserved(0)) {
                 //     error!("{:?}", e);
                 // }
+            }
+            _ => {
+                todo!()
             }
         }
     }
@@ -327,7 +325,7 @@ async fn touch_subscribe_by_input(event_sink: &ExtEventSink, index: usize) {
     });
 }
 
-async fn to_subscribe(mqtt_clients: &HashMap<usize, Client>, input: SubscribeTopic) {
+pub async fn to_subscribe(mqtt_clients: &HashMap<usize, Client>, input: SubscribeTopic) {
     match mqtt_subscribe(input.broker_id, input.clone().into(), mqtt_clients).await {
         Ok(()) => {}
         Err(e) => {

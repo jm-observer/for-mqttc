@@ -33,7 +33,7 @@ impl From<SubscribeTopic> for MqttSubscribeInput {
     fn from(val: SubscribeTopic) -> Self {
         Self {
             trace_id: val.trace_id,
-            topic: val.topic.as_ref().clone(),
+            topic: val.topic.clone(),
             qos: val.qos,
         }
     }

@@ -13,6 +13,7 @@ use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
 use crate::util::general_id;
+use serde_repr::{Deserialize_repr, Serialize_repr};
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
 
@@ -37,9 +38,7 @@ impl Default for Id {
 pub struct SubscribeTopic {
     pub broker_id: usize,
     pub trace_id: u32,
-
-    pub topic: AString,
-
+    pub topic: String,
     /// 只针对通配符的topic
     // pub sub_topic: AString,
     pub qos: QoS,
@@ -53,7 +52,7 @@ pub struct SubscribeHis {
     pub(crate) broker_id: usize,
     #[serde(skip)]
     pub(crate) selected: bool,
-    pub(crate) topic: AString,
+    pub(crate) topic: String,
     pub(crate) qos: QoS,
     pub payload_ty: PayloadTy,
 }
@@ -115,24 +114,15 @@ pub struct SubscribeMsg {
     pub time: AString,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct SubscribeInput {
-    pub(crate) broker_id: usize,
-    pub(crate) topic: AString,
-    pub(crate) qos: QoS,
-    pub(crate) payload_ty: PayloadTy,
+    pub broker_id: usize,
+    pub trace_id: u32,
+    pub topic: String,
+    pub qos: QoS,
+    pub payload_ty: PayloadTy,
 }
 
-impl SubscribeInput {
-    pub fn init(broker_id: usize) -> Self {
-        Self {
-            broker_id,
-            topic: Arc::new("".to_string()),
-            qos: Default::default(),
-            payload_ty: Default::default(),
-        }
-    }
-}
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum SubscribeStatus {
     SubscribeIng,
@@ -153,7 +143,7 @@ pub enum TabKind {
     Connection,
     Broker,
 }
-#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize, Default)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize_repr, Serialize_repr, Default)]
 #[allow(clippy::enum_variant_names)]
 #[repr(u8)]
 pub enum QoS {
@@ -185,10 +175,7 @@ pub struct Broker {
     pub subscribe_hises: Vec<SubscribeHis>,
     pub subscribe_topics: Vec<SubscribeTopic>,
     pub msgs: Vec<Msg>,
-    pub subscribe_input: SubscribeInput,
-    pub public_input: PublicInput,
     pub unsubscribe_ing: Vec<UnsubcribeTracing>,
-    pub tab_status: TabStatus,
 }
 
 impl Broker {
@@ -213,7 +200,6 @@ impl Broker {
         {
             bail!("self signed ca not be empty");
         }
-        self.tab_status.try_connect = true;
         self.stored = true;
         Ok(())
     }
@@ -238,8 +224,6 @@ impl Broker {
     }
 
     pub fn disconnect(&mut self, clear: bool) {
-        self.tab_status.try_connect = false;
-        self.tab_status.connected = false;
         if !self.auto_connect {
             self.subscribe_topics.clear();
         }

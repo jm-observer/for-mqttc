@@ -132,9 +132,6 @@ impl App {
 
     pub fn update_to_connected(&mut self, id: usize, _retain: bool) -> Result<()> {
         let broker = self.find_mut_broker_by_id(id)?;
-        let status = &mut broker.tab_status;
-        status.try_connect = false;
-        status.connected = true;
         if !_retain {
             broker.subscribe_topics.clear();
         }
@@ -152,10 +149,7 @@ impl App {
         Ok(())
     }
     pub fn close_connection(&mut self, id: usize) -> Result<()> {
-        let status = &mut self.find_mut_broker_by_id(id)?.tab_status;
-        status.try_connect = false;
-        status.connected = false;
-        Ok(())
+        todo!()
     }
     pub fn unsubscribe(
         &mut self,
@@ -189,7 +183,7 @@ impl App {
                 .map(|(index, _x)| index)
             {
                 _broker.subscribe_topics.remove(index);
-                Ok(self.db.tx.send(AppEvent::UpdateScrollSubscribeWin)?)
+                Ok(())
             } else {
                 bail!("can't find broker's subscribe");
             }
@@ -198,23 +192,24 @@ impl App {
         }
     }
     pub fn touch_unsubscribe(&mut self, broker_id: usize, trace_id: u32) -> Result<()> {
-        let _broker = self.find_mut_broker_by_id(broker_id)?;
-        if let Some(index) = _broker
-            .subscribe_topics
-            .iter_mut()
-            .find(|his| his.trace_id == trace_id)
-        {
-            index.status = SubscribeStatus::UnSubscribeIng;
-            let event = EventUnSubscribe {
-                broke_id: broker_id,
-                subscribe_pk_id: index.trace_id,
-                topic: index.topic.as_ref().clone(),
-            };
-            self.send_event(AppEvent::ToUnsubscribeIng(event));
-            return Ok(());
-        }
-        warn!("can't find the subscribe to unsubscibe");
-        Ok(())
+        todo!()
+        // let _broker = self.find_mut_broker_by_id(broker_id)?;
+        // if let Some(index) = _broker
+        //     .subscribe_topics
+        //     .iter_mut()
+        //     .find(|his| his.trace_id == trace_id)
+        // {
+        //     index.status = SubscribeStatus::UnSubscribeIng;
+        //     let event = EventUnSubscribe {
+        //         broke_id: broker_id,
+        //         subscribe_pk_id: index.trace_id,
+        //         topic: index.topic.as_ref().clone(),
+        //     };
+        //     self.send_event(AppEvent::ToUnsubscribeIng(event));
+        //     return Ok(());
+        // }
+        // warn!("can't find the subscribe to unsubscibe");
+        // Ok(())
     }
 
     fn subscribe(&mut self, sub: SubscribeTopic) -> Result<()> {
@@ -238,9 +233,6 @@ impl App {
             let broker = broker.clone_to_db();
             self.db.save_broker(broker)?;
         }
-        self.db.tx.send(AppEvent::ToSubscribe(sub))?;
-        self.db.tx.send(AppEvent::UpdateScrollSubscribeWin)?;
-
         Ok(())
     }
     pub fn touch_subscribe_from_his(&mut self, input: SubscribeHis) -> Result<()> {
@@ -250,9 +242,7 @@ impl App {
     }
 
     pub fn touch_subscribe_by_input(&mut self, id: usize) -> Result<()> {
-        let input = self.find_broker_by_id(id)?.subscribe_input.clone();
-        self.subscribe(SubscribeTopic::from(input, Id::to_id()))?;
-        Ok(())
+        todo!()
     }
 
     // pub fn subscribe_by_input(
@@ -439,7 +429,7 @@ impl App {
     }
     pub fn clear_msg(&mut self, id: usize) -> Result<()> {
         self.find_mut_broker_by_id(id)?.msgs.clear();
-        Ok(self.db.tx.send(AppEvent::UpdateScrollMsgWin)?)
+        Ok(())
     }
 
     // pub fn msgs_ref_mut(&mut self, id: usize) -> &mut Vec<Msg> {

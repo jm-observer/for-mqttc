@@ -31,7 +31,7 @@ fn main() -> anyhow::Result<()> {
     let (tx, rx) = crossbeam_channel::bounded(1024);
 
     let user_dirs = UserDirs::new().unwrap();
-    let home_path = user_dirs.home_dir().to_path_buf().join(".for-mqtt");
+    let home_path = user_dirs.home_dir().to_path_buf().join(".for-mqttc");
 
     let fs_path = home_path.clone();
     let fs = FileSpec::default()
@@ -52,6 +52,7 @@ fn main() -> anyhow::Result<()> {
         home_path.clone(),
     )
     .module("sled", Info)
+    .module("for_event_bus", Info)
     .module("for_mqtt_client::protocol::packet", Info)
     .config(fs, criterion, naming, cleanup, append)
     .log_to_write(Box::new(CustomWriter(tx.clone())))
@@ -80,8 +81,8 @@ fn main() -> anyhow::Result<()> {
     // let win = WindowDesc::new(init_layout(tx.clone(), locale.clone())) //.background(B_WINDOW))
     //     .title("for-mqtt")
     //     .window_size((1200.0, 710.0)); //.menu(menu);
-    let mut db = ArcDb::init_db(tx.clone(), home_path.join("db"))?;
-    let mut data = db.read_app_data()?;
+    let mut db = ArcDb::init_db(home_path.join("db"))?;
+    let mut data = db.read_app_data(tx.clone())?;
 
     let config_clone = config.clone();
 
@@ -96,7 +97,11 @@ fn main() -> anyhow::Result<()> {
 
     tauri::Builder::default()
         .manage(RwLock::new(data))
-        .invoke_handler(tauri::generate_handler![broker_list, connect_to_broker])
+        .invoke_handler(tauri::generate_handler![
+            broker_list,
+            connect_to_broker,
+            subscribe
+        ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 
