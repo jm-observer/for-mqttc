@@ -147,11 +147,6 @@ pub async fn deal_event(
             //         }
             //     }
             // }
-            AppEvent::ToDisconnect(broker_id) => {
-                if let Err(e) = to_disconnect(&event_sink, &mut mqtt_clients, broker_id).await {
-                    error!("{:?}", e);
-                }
-            }
             AppEvent::ToSubscribe(input) => {
                 to_subscribe(&mqtt_clients, input).await;
             }
@@ -411,17 +406,10 @@ async fn touch_reconnect(event_sink: &ExtEventSink) -> Result<()> {
     Ok(())
 }
 
-async fn to_disconnect(
-    _event_sink: &ExtEventSink,
-    mqtt_clients: &mut HashMap<usize, Client>,
-    id: usize,
-) -> Result<()> {
+pub async fn to_disconnect(mqtt_clients: &mut HashMap<usize, Client>, id: usize) -> Result<()> {
     if let Some(client) = mqtt_clients.remove(&id) {
         client.disconnect().await?;
         info!("{}", DISCONNECT_SUCCESS);
-        // 未必有连接，因此无需报警
-        // } else {
-        //     warn!("could not find mqtt client!");
     }
     Ok(())
 }

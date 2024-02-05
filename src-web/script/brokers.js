@@ -100,6 +100,23 @@ function display_tab(tab_id) {
     }
 }
 
+
+async function close_tab(broker_id) {
+    console.log("close_tab: " + broker_id);
+    let tab_id = 'tab-' + broker_id;
+    var element = document.getElementById(tab_id);
+    if (element) {
+        element.parentNode.removeChild(element);
+    }
+    let tab_content_id = 'tab-content-' + broker_id;
+    var element = document.getElementById(tab_content_id);
+    if (element) {
+        element.parentNode.removeChild(element);
+    }
+    display_tab("brokers");
+    await get_invoke()("disconnect", { id : broker_id});
+}
+
 //
 window.addEventListener("DOMContentLoaded", () => {
     display_tab("brokers");

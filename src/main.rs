@@ -101,7 +101,8 @@ fn main() -> anyhow::Result<()> {
             broker_list,
             connect_to_broker,
             subscribe,
-            publish
+            publish,
+            disconnect
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

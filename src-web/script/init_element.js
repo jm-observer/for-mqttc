@@ -47,16 +47,16 @@
 }
 
  function init_tab(id, name) {
-    let template = "<li id='tab-#id#' class='mr-1 shadow rounded-md justify-center'>\n" +
+    let template = "<li id='tab-__id__' class='mr-1 shadow rounded-md justify-center'>\n" +
         "                            <div class='flex px-4'>\n" +
-        "                                <a onclick='display_tab(\"#id#\")' class='bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex' href='#'>\n" +
-        "                                    <span id='status-#id#' class='h-3 w-3 bg-gray-400 rounded-full mr-2 py-2 px-1 '></span>\n" +
+        "                                <a onclick='display_tab(\"__id__\")' class='bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex' href='#'>\n" +
+        "                                    <span id='status-__id__' class='h-3 w-3 bg-gray-400 rounded-full mr-2 py-2 px-1 '></span>\n" +
         "                                    #name#</a>\n" +
-        "                                <i class='layui-icon layui-icon-close py-2 px-1 '></i>\n" +
+        "                                <a onclick='close_tab(__id__)'<i class='layui-icon layui-icon-close py-2 px-1 '></i></a>\n" +
         "                            </div>\n" +
         "                        </li>";
 
-     const htmlString = template.replaceAll("#id#", id).replaceAll("#name#", name);
+     const htmlString = template.replaceAll("__id__", id).replaceAll("#name#", name);
 
      var tempDiv = document.createElement('div');
      tempDiv.innerHTML = htmlString;

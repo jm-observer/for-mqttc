@@ -6,7 +6,7 @@ use crate::command::view::{BrokerList, BrokerSimpleView, Page};
 use crate::data::common::{PublishInput, SubscribeInput, SubscribeTopic};
 use crate::data::hierarchy::App;
 use crate::data::AppEvent;
-use crate::logic::{connect, to_publish, to_subscribe};
+use crate::logic::{connect, to_disconnect, to_publish, to_subscribe};
 use crate::mqtt::data::MqttPublicInput;
 use log::{debug, error};
 use serde_json::Value;
@@ -63,6 +63,14 @@ pub async fn publish(datas: PublishInput, state: State<'_, ArcApp>) -> Result<()
     //         None::<()>
     //     });
     to_publish(&app.mqtt_clients, MqttPublicInput::from(datas)).await;
+    Ok(())
+}
+
+#[command]
+pub async fn disconnect(id: usize, state: State<'_, ArcApp>) -> Result<()> {
+    debug!("disconnect: {}", id);
+    let mut app = state.write().await;
+    to_disconnect(&mut app.mqtt_clients, id).await;
     Ok(())
 }
 

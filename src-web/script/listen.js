@@ -35,9 +35,10 @@ listen('ClientReceivePublic', (event) => {
     var utf8String = decoder.decode(byteStream);
 
     console.log(utf8String); // 输出: "Hello"
-    // let status = document.getElementById("status-" + event.payload.broker_id);
-    // status.classList.remove("bg-gray-400");
-    // status.classList.add("bg-green-400");
+});
+
+listen('ClientDisconnect', (event) => {
+    console.log("ClientDisconnect:" + event.payload.broker_id);
 });
 
 
