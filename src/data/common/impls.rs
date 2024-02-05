@@ -1,5 +1,5 @@
 use crate::data::common::{
-    Msg, PublicInput, PublicMsg, PublicStatus, QoS, SubscribeHis, SubscribeInput, SubscribeMsg,
+    Msg, PublicMsg, PublicStatus, PublishInput, QoS, SubscribeHis, SubscribeInput, SubscribeMsg,
     SubscribeStatus, SubscribeTopic,
 };
 use crate::data::AString;
@@ -57,20 +57,6 @@ impl SubscribeTopic {
     }
 }
 
-impl PublicMsg {
-    pub fn from(val: PublicInput, trace_id: u32) -> Self {
-        Self {
-            trace_id,
-            topic: val.topic.clone(),
-            msg: val.msg.clone(),
-            qos: val.qos.qos_to_string(),
-            status: PublicStatus::Ing,
-            payload_ty: val.payload_ty.to_arc_string(),
-            time: Arc::new(now_time()),
-        }
-    }
-}
-
 impl From<SubscribeInput> for SubscribeHis {
     fn from(val: SubscribeInput) -> Self {
         Self {
@@ -117,18 +103,6 @@ impl From<SubscribeMsg> for Msg {
 //         }
 //     }
 // }
-impl PublicInput {
-    pub(crate) fn default(broker_id: usize) -> Self {
-        Self {
-            broker_id,
-            topic: Arc::new("".to_string()),
-            msg: Arc::new("".to_string()),
-            qos: QoS::AtMostOnce,
-            retain: false,
-            payload_ty: Default::default(),
-        }
-    }
-}
 impl Msg {
     // pub fn qos(&self) -> &QoS {
     //     match self {
@@ -136,13 +110,13 @@ impl Msg {
     //         Msg::Public(msg) => &msg.qos,
     //     }
     // }
-    pub fn msg(&self) -> &AString {
+    pub fn msg(&self) -> &String {
         match self {
             Msg::Subscribe(msg) => &msg.msg,
             Msg::Public(msg) => &msg.msg,
         }
     }
-    pub fn topic(&self) -> &AString {
+    pub fn topic(&self) -> &String {
         match self {
             Msg::Subscribe(msg) => &msg.topic,
             Msg::Public(msg) => &msg.topic,

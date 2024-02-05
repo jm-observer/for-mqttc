@@ -54,29 +54,32 @@
                     <p class="text-xs text-right text-gray-600">2024-01-21 20:26:22:057</p>
                 </div>
             </div>
-            <form class="bg-white p-2 rounded shadow">
+            <form id="form-publish-__id__" class="bg-white p-2 rounded shadow">
                 <div class="mb-1">
-                    <label class="text-sm mb-2 p-2" for="qos">
+                    <label class="text-sm mb-2 p-2">
                         QoS
                     </label>
-                    <select class="shadow px-2 border rounded w-20 relative -left-12 text-right text-last-right bg-transparent z-10" id="qos">
+                    <select name="qos" class="shadow px-2 border rounded w-20 relative -left-12 text-right text-last-right bg-transparent z-10" >
                         <option class="text-center">0</option>
                         <option class="text-center">1</option>
                         <option class="text-center">2</option>
                     </select>
-                    <select class="shadow border rounded px-0.5" title="Payload Type" id="byteType">
+                    <select name="payload_ty" class="shadow border rounded px-0.5" title="Payload Type" >
                         <option>Text</option>
                         <option>Json</option>
                         <option>Hex</option>
                     </select>
+                    <label class="block text-gray-700 text-sm font-bold mr-2">
+                        retain<input class="toggle toggle-accent" name="retain" type="checkbox">
+                    </label>
                 </div>
 
                 <div class="mb-4">
-                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" id="topic" type="text" placeholder="topic">
-                    <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="message" placeholder="payload"></textarea>
+                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" name="topic" type="text" placeholder="topic">
+                    <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="msg" placeholder="payload"></textarea>
                 </div>
                 <div class="flex items-center justify-between">
-                    <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+                    <button onclick="publish(__id__)" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
                         发布
                     </button>
                 </div>

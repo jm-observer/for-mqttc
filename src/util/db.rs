@@ -4,7 +4,7 @@ use sled::{Config, Db};
 use std::path::PathBuf;
 use std::sync::Arc;
 
-use crate::data::common::{Broker, Protocol, PublicInput, SignedTy, SubscribeInput, TabStatus};
+use crate::data::common::{Broker, Protocol, PublishInput, SignedTy, SubscribeInput, TabStatus};
 use crate::data::db::{BrokerDB, DbKey};
 use crate::data::hierarchy::App;
 use crate::data::AppEvent;
@@ -57,7 +57,7 @@ impl ArcDb {
             brokers,
             db: self.clone(),
             hint: "".to_string().into(),
-            tx: tx,
+            tx,
             mqtt_clients: Default::default(),
         })
     }

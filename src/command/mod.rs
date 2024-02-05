@@ -3,10 +3,11 @@ mod view;
 
 use crate::command::error::Error;
 use crate::command::view::{BrokerList, BrokerSimpleView, Page};
-use crate::data::common::{SubscribeInput, SubscribeTopic};
+use crate::data::common::{PublishInput, SubscribeInput, SubscribeTopic};
 use crate::data::hierarchy::App;
 use crate::data::AppEvent;
-use crate::logic::{connect, to_subscribe};
+use crate::logic::{connect, to_publish, to_subscribe};
+use crate::mqtt::data::MqttPublicInput;
 use log::{debug, error};
 use serde_json::Value;
 use tauri::AppHandle;
@@ -45,17 +46,23 @@ pub async fn subscribe(datas: SubscribeInput, state: State<'_, ArcApp>) -> Resul
             None::<()>
         });
     to_subscribe(&app.mqtt_clients, SubscribeTopic::from(datas)).await;
+    Ok(())
+}
 
-    // let total = app.brokers.len();
-    // let brokers = app.brokers.iter();
-    // let brokers = brokers.skip(page.start);
-    // let brokers: Vec<BrokerSimpleView> = brokers
-    //     .take(page.size)
-    //     .map(BrokerSimpleView::from)
-    //     .collect();
-    // let rs = BrokerList { brokers, total };
-    // let rs = serde_json::to_string(&rs)?;
-
+#[command]
+pub async fn publish(datas: PublishInput, state: State<'_, ArcApp>) -> Result<()> {
+    debug!("publish: {:?}", datas);
+    let mut app = state.write().await;
+    // todo history
+    // app.brokers
+    //     .iter_mut()
+    //     .find(|x| x.id == datas.broker_id)
+    //     .and_then(|x| {
+    //         x.subscribe_topics.push(SubscribeTopic::from(datas.clone()));
+    //         x.subscribe_hises.push(datas.clone().into());
+    //         None::<()>
+    //     });
+    to_publish(&app.mqtt_clients, MqttPublicInput::from(datas)).await;
     Ok(())
 }
 

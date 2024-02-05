@@ -15,7 +15,7 @@ use for_mqtt_client::protocol::packet::SubscribeReasonCode;
 use for_mqtt_client::{SubscribeAck, UnsubscribeAck};
 use log::{debug, error, warn};
 use serde::Serialize;
-use serde_json::{Map, Value};
+use serde_json::{Map, Number, Value};
 use std::sync::Arc;
 
 pub type AString = Arc<String>;
@@ -64,7 +64,12 @@ pub enum AppEvent {
     ClientConnectedErr(usize, String),
     ClientDisconnect(usize),
     TouchPublic(usize),
-    ClientReceivePublic(usize, Arc<String>, Arc<Bytes>, QoS),
+    ClientReceivePublic {
+        broker_id: usize,
+        topic: Arc<String>,
+        payload: Arc<Bytes>,
+        qos: QoS,
+    },
     ClientPubAck(usize, u32),
     ClientSubAck {
         broker_id: usize,
@@ -120,7 +125,7 @@ impl AppEvent {
             ClientPubAck(id, packet_id) => {
                 let event = EventBuilder::default()
                     .with_param("broker_id", id)
-                    .with_param("packet_id", packet_id as usize)
+                    .with_param("trace_id", packet_id as usize)
                     .build();
                 ("ClientPubAck", Some(event))
             }
@@ -141,8 +146,24 @@ impl AppEvent {
             ClientUnSubAck(_id, _ack) => {
                 todo!()
             }
-            ClientReceivePublic(_id, _ack, ..) => {
-                todo!()
+            ClientReceivePublic {
+                broker_id,
+                topic,
+                payload,
+                qos,
+            } => {
+                let payload = payload
+                    .iter()
+                    .copied()
+                    .map(|x| Value::Number(Number::from(x)))
+                    .collect::<Vec<Value>>();
+                let event = EventBuilder::default()
+                    .with_param("broker_id", broker_id)
+                    .with_param("topic", topic.as_ref().clone())
+                    .with_param("payload", payload)
+                    .with_param("qos", qos as usize)
+                    .build();
+                ("ClientReceivePublic", Some(event))
             }
             ClientConnectedErr(id, msg) => {
                 let event = EventBuilder::default()

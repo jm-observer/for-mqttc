@@ -100,7 +100,8 @@ fn main() -> anyhow::Result<()> {
         .invoke_handler(tauri::generate_handler![
             broker_list,
             connect_to_broker,
-            subscribe
+            subscribe,
+            publish
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

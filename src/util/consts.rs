@@ -22,32 +22,32 @@ lazy_static! {
 }
 
 pub trait QosToString {
-    fn qos_to_string(&self) -> Arc<String>;
+    fn qos_to_string(&self) -> String;
 }
 impl QosToString for QoS {
-    fn qos_to_string(&self) -> Arc<String> {
+    fn qos_to_string(&self) -> String {
         match self {
-            QoS::AtMostOnce => QOS_0.clone(),
-            QoS::AtLeastOnce => QOS_1.clone(),
-            QoS::ExactlyOnce => QOS_2.clone(),
+            QoS::AtMostOnce => "0".to_string(),
+            QoS::AtLeastOnce => "1".to_string(),
+            QoS::ExactlyOnce => "2".to_string(),
         }
     }
 }
 impl QosToString for for_mqtt_client::QoS {
-    fn qos_to_string(&self) -> Arc<String> {
+    fn qos_to_string(&self) -> String {
         match self {
-            for_mqtt_client::QoS::AtMostOnce => QOS_0.clone(),
-            for_mqtt_client::QoS::AtLeastOnce => QOS_1.clone(),
-            for_mqtt_client::QoS::ExactlyOnce => QOS_2.clone(),
+            for_mqtt_client::QoS::AtMostOnce => "0".to_string(),
+            for_mqtt_client::QoS::AtLeastOnce => "1".to_string(),
+            for_mqtt_client::QoS::ExactlyOnce => "2".to_string(),
         }
     }
 }
 impl QosToString for QoSWithPacketId {
-    fn qos_to_string(&self) -> Arc<String> {
+    fn qos_to_string(&self) -> String {
         match self {
-            QoSWithPacketId::AtMostOnce => QOS_0.clone(),
-            QoSWithPacketId::AtLeastOnce(_) => QOS_1.clone(),
-            QoSWithPacketId::ExactlyOnce(_) => QOS_2.clone(),
+            QoSWithPacketId::AtMostOnce => "0".to_string(),
+            QoSWithPacketId::AtLeastOnce(_) => "1".to_string(),
+            QoSWithPacketId::ExactlyOnce(_) => "2".to_string(),
         }
     }
 }

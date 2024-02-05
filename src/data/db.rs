@@ -1,5 +1,5 @@
 use crate::data::common::{
-    Broker, Protocol, PublicInput, SignedTy, SubscribeHis, SubscribeInput, TabStatus,
+    Broker, Protocol, PublishInput, SignedTy, SubscribeHis, SubscribeInput, TabStatus,
 };
 use crate::data::{AString, AppEvent};
 use anyhow::Result;

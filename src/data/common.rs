@@ -82,12 +82,12 @@ impl Msg {
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct PublicMsg {
     pub trace_id: u32,
-    pub topic: AString,
-    pub msg: AString,
-    pub qos: AString,
+    pub topic: String,
+    pub msg: String,
+    pub qos: String,
     pub status: PublicStatus,
-    pub payload_ty: AString,
-    pub time: AString,
+    pub payload_ty: String,
+    pub time: String,
 }
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub enum PublicStatus {
@@ -95,13 +95,14 @@ pub enum PublicStatus {
     Success,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub struct PublicInput {
+#[derive(Debug, Clone, Deserialize)]
+pub struct PublishInput {
     pub broker_id: usize,
-    pub topic: AString,
-    pub msg: AString,
+    pub topic: String,
+    pub msg: String,
     pub qos: QoS,
     pub retain: bool,
+    pub trace_id: u32,
     pub payload_ty: PayloadTy,
 }
 
@@ -269,11 +270,11 @@ pub enum PayloadTy {
 }
 
 impl PayloadTy {
-    pub fn to_arc_string(&self) -> Arc<String> {
+    pub fn to_arc_string(&self) -> String {
         match self {
-            PayloadTy::Text => TY_TEXT.clone(),
-            PayloadTy::Json => TY_JSON.clone(),
-            PayloadTy::Hex => TY_HEX.clone(),
+            PayloadTy::Text => "T".to_string(),
+            PayloadTy::Json => "J".to_string(),
+            PayloadTy::Hex => "H".to_string(),
         }
     }
     pub fn format(&self, data: Arc<Bytes>) -> String {

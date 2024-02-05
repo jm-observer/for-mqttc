@@ -82,12 +82,12 @@ pub async fn init_connect(broker: Broker, tx: AppHandle) -> Result<Client> {
                     debug!("recv publish: {} payload len = {}", topic, payload.len());
                     send_event(
                         tx,
-                        AppEvent::ClientReceivePublic(
-                            id,
-                            topic.clone(),
-                            payload.clone(),
-                            (*qos).into(),
-                        ),
+                        AppEvent::ClientReceivePublic {
+                            broker_id: id,
+                            topic: topic.clone(),
+                            payload: payload.clone(),
+                            qos: (*qos).into(),
+                        },
                     );
                 }
                 MqttEvent::PublishFail(reason) => {

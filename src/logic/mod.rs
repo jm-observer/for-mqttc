@@ -74,11 +74,11 @@ pub async fn deal_event(
                     error!("{:?}", e);
                 }
             }
-            AppEvent::ClientReceivePublic(index, topic, payload, qos) => {
-                if let Err(e) = receive_public(&event_sink, index, topic, payload, qos).await {
-                    error!("{:?}", e);
-                }
-            }
+            // AppEvent::ClientReceivePublic(index, topic, payload, qos) => {
+            //     if let Err(e) = receive_public(&event_sink, index, topic, payload, qos).await {
+            //         error!("{:?}", e);
+            //     }
+            // }
             AppEvent::ClientPubAck(id, ack) => pub_ack(&event_sink, id, ack),
             // AppEvent::ClientSubAck(id, ack) => sub_ack(&event_sink, id, ack),
             AppEvent::UpdateToSelectTabs(id) => update_to_select_tabs(&event_sink, id),
@@ -351,7 +351,10 @@ async fn touch_publish(event_sink: &ExtEventSink, broker_id: usize) -> Result<()
     Ok(())
 }
 
-async fn to_publish(mqtt_clients: &HashMap<usize, Client>, publish: MqttPublicInput) -> Result<()> {
+pub async fn to_publish(
+    mqtt_clients: &HashMap<usize, Client>,
+    publish: MqttPublicInput,
+) -> Result<()> {
     mqtt_public(publish.broker_id, publish, mqtt_clients).await?;
     Ok(())
 }
