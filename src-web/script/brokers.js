@@ -24,6 +24,11 @@ async function broker_list() {
         console.log(rs);
         var jsonObj = JSON.parse(rs);
         var tableBody = document.getElementById("brokers").getElementsByTagName('tbody')[0];
+
+        while (tableBody.firstChild) {
+            tableBody.removeChild(tableBody.firstChild);
+        }
+
         jsonObj.brokers.forEach(function(item) {
             var newRow = tableBody.insertRow();
             init_version_cell(newRow, item["protocol"]);
@@ -67,8 +72,10 @@ async function connect_to_broker(id, name) {
 
     await get_invoke()("connect_to_broker", { id : id});
 }
-function delete_broker(id) {
-    console.log("delete_broker" + id);
+async function delete_broker(id) {
+    console.log("delete_broker " + id);
+    await get_invoke()("delete_broker", { id : id});
+    await broker_list()
 }
 
 function edit_broker(id) {

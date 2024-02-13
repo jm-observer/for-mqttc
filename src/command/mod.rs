@@ -10,6 +10,7 @@ use crate::logic::{connect, to_disconnect, to_publish, to_subscribe};
 use crate::mqtt::data::MqttPublicInput;
 use log::{debug, error};
 use serde_json::Value;
+use std::mem::{replace, swap};
 use tauri::AppHandle;
 use tauri::{command, State};
 use tokio::io::AsyncReadExt;
@@ -20,6 +21,7 @@ type Result<T> = std::result::Result<T, Error>;
 
 #[command]
 pub async fn broker_list(page: Page, state: State<'_, ArcApp>) -> Result<String> {
+    debug!("broker_list");
     let app = state.read().await;
     let total = app.brokers.len();
     let brokers = app.brokers.iter();
@@ -71,6 +73,18 @@ pub async fn disconnect(id: usize, state: State<'_, ArcApp>) -> Result<()> {
     debug!("disconnect: {}", id);
     let mut app = state.write().await;
     to_disconnect(&mut app.mqtt_clients, id).await;
+    Ok(())
+}
+
+#[command]
+pub async fn delete_broker(id: usize, state: State<'_, ArcApp>) -> Result<()> {
+    debug!("disconnect: {}", id);
+    let mut app = state.write().await;
+    to_disconnect(&mut app.mqtt_clients, id).await;
+    let mut brokers = Vec::with_capacity(0);
+    swap(&mut brokers, &mut app.brokers);
+    app.brokers = brokers.into_iter().filter(|x| x.id != id).collect();
+    app.db.delete_broker(id)?;
     Ok(())
 }
 
