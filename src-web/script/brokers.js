@@ -46,31 +46,35 @@ async function broker_list() {
 async function connect_to_broker(id, name) {
     console.log("connect_to_broker" + id);
     const tableBody = document.getElementById("tabs");
-    const tab = init_tab(id, name);
-    tableBody.appendChild(tab);
 
-    fetch('connecting_template.html')
-        .then(response => {
-            if (!response.ok) {
-                throw new Error('Network response was not ok');
-            }
-            return response.text();
-        })
-        .then(htmlString => {
-            var parser = new DOMParser();
-            let content = htmlString.replaceAll("__id__", id);
-            var doc = parser.parseFromString(content, 'text/html');
-            return doc.body.children[0]; // 或者 doc.documentElement，视情况而定
-        })
-        .then(htmlElement => {
-            var targetElement = document.getElementById('tabs-content'); // 目标元素
-            targetElement.appendChild(htmlElement);
-        })
-        .catch(error => {
-            console.error('There has been a problem with your fetch operation:', error);
-        });
+    const tab = document.getElementById("tab-" + id);
+    if(!tab) {
+        const tab = init_tab(id, name);
+        tableBody.appendChild(tab);
+        fetch('connecting_template.html')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.text();
+            })
+            .then(htmlString => {
+                var parser = new DOMParser();
+                let content = htmlString.replaceAll("__id__", id);
+                var doc = parser.parseFromString(content, 'text/html');
+                return doc.body.children[0]; // 或者 doc.documentElement，视情况而定
+            })
+            .then(htmlElement => {
+                var targetElement = document.getElementById('tabs-content'); // 目标元素
+                targetElement.appendChild(htmlElement);
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
 
-    await get_invoke()("connect_to_broker", { id : id});
+        await get_invoke()("connect_to_broker", { id : id});
+    }
+    display_tab(id);
 }
 async function delete_broker(id) {
     console.log("delete_broker " + id);

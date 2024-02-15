@@ -30,10 +30,9 @@ listen('ClientReceivePublic', (event) => {
 
     var byteStream = new Uint8Array(event.payload.payload);
     console.log(byteStream);
-
     var decoder = new TextDecoder('utf-8');
     var utf8String = decoder.decode(byteStream);
-
+    init_receive_publish_item(next_trace_id(), event.payload.topic, utf8String, event.payload.qos, "todo", event.payload.broker_id, get_time())
     console.log(utf8String); // 输出: "Hello"
 });
 

@@ -60,7 +60,7 @@
         <div class="items-center">
 <!--            <img src="https://placehold.co/50x50" alt="TailwindCSS logo placeholder" class="mr-2">-->
 <!--            <span class="text-xl font-normal">for-mqttc</span>-->
-            <span class="text-xs bg-blue-200 text-blue-800 ml-2 px-1 rounded-full">v0.0.1</span>
+<!--            <span class="text-xs bg-blue-200 text-blue-800 ml-2 px-1 rounded-full">v0.0.1</span>-->
         </div>
         <div class="flex px-2">
             <i class="layui-icon layui-icon-tips"></i>
@@ -72,9 +72,9 @@
     <main class="h-full block flex-grow">
         <div class="flex h-full">
             <section class="w-full pl-1 h-full flex-grow">
-                <div class="bg-white p-2 rounded shadow  h-inherit flex flex-col" >
+                <div class="bg-white p-1 rounded shadow  h-inherit flex flex-col" >
                     <!-- Tabs -->
-                    <ul id="tabs" class="flex border-b">
+                    <ul id="tabs" class="flex border-b py-1">
                         <li id="tab-brokers" class="mr-1 shadow rounded-md justify-center">
                             <div class="flex px-4">
                                 <a onclick="display_tab('brokers')" class="bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex" href="#">
@@ -94,18 +94,18 @@
                     <div id="tabs-content" class="text-xs tab-content p-0.5 block bg-gray-100 flex-grow">
                         <div id="tab-content-brokers" class="tab-pane active block bg-white h-full">
                             <div>
-                                <button id="new" class="bg-yellow-500 hover:bg-yellow-700 font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline mr-1">
+                                <button id="new" class="m-1 bg-yellow-500 hover:bg-yellow-700 font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline mr-1">
                                     新增
                                 </button>
                             </div>
                             <table id="brokers" class="table table-xs table-pin-rows table-pin-cols">
                                 <thead>
                                 <tr>
-                                    <th class="w-12 text-center">Version</th>
-                                    <th class="w-36 text-center">Name</th>
-                                    <th>Tls</th>
-                                    <th>Addr</th>
-                                    <th>Action</th>
+                                    <th class="w-12 text-center">version</th>
+                                    <th class="w-36 text-center">name</th>
+                                    <th>tls</th>
+                                    <th>addr</th>
+                                    <th>action</th>
                                 </tr>
                                 </thead>
                                 <tbody>
