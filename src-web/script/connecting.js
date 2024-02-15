@@ -6,20 +6,27 @@ function next_trace_id() {
 }
 function subscribe(broker_id)  {
     try {
+        let trace_id = next_trace_id();
         var form = document.getElementById('form-subscribe-' + broker_id);
         var formData = new FormData(form);
         var formObject = {};
         formData.forEach(function(value, key){
             formObject[key] = value;
         });
-        formObject["trace_id"] = next_trace_id();
+        formObject["trace_id"] = trace_id;
         formObject["broker_id"] = broker_id;
         formObject["qos"] = get_qos(formObject["qos"]);
+
+        init_subscribe_item(trace_id, formObject["topic"], formObject["qos"], formObject["payload_ty"], broker_id, get_time());
         let rs = get_invoke()("subscribe", { datas : formObject});
         console.log(rs);
     } catch(e) {
         console.error("Parsing error:", e);
     }
+}
+
+function unsubscribe(subscribe_id)  {
+    console.log("unsubscribe:" + subscribe_id);
 }
 
 
@@ -37,6 +44,9 @@ function publish(broker_id)  {
         formObject["retain"] = check_to_bool(formObject["retain"]);
         var json = JSON.stringify(formObject);
         console.log("publish:" + json);
+
+        init_publish_item(formObject["trace_id"], formObject["topic"], formObject["msg"]
+            , formObject["qos"], formObject["payload_ty"], broker_id, get_time())
         let rs = get_invoke()("publish", { datas : formObject});
         console.log(rs);
     } catch(e) {

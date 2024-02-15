@@ -14,6 +14,7 @@
     <script src="script/listen.js"></script>
     <script src="script/connecting.js"></script>
     <script src="script/common.js"></script>
+    <script src="script/init_connecting_element.js"></script>
     <style>
         /* Ensure the font is Inter */
         /** 图标字体 **/
@@ -44,21 +45,28 @@
         .layui-icon-tips:before{content:"\e702"}
         .layui-icon-github:before{content:"\e6a7"}
         .layui-icon-close:before{content:"\1006"}
+
+        .clamp-2 {
+            display: -webkit-box;
+            -webkit-box-orient: vertical;
+            -webkit-line-clamp: 2;
+            overflow: hidden;
+        }
     </style>
 </head>
 <body class="bg-gray-100 h-screen">
 <div id="main" class="container px-4 max-w-full h-full flex flex-col">
-    <header class="items-center justify-between py-4 flex">
+    <header class="items-center justify-between py-2 flex">
         <div class="items-center">
 <!--            <img src="https://placehold.co/50x50" alt="TailwindCSS logo placeholder" class="mr-2">-->
-            <span class="text-xl font-normal block">for-mqttc</span>
-            <span class="text-sm bg-blue-200 text-blue-800 ml-2 px-1 rounded-full">v0.0.1</span>
+<!--            <span class="text-xl font-normal">for-mqttc</span>-->
+            <span class="text-xs bg-blue-200 text-blue-800 ml-2 px-1 rounded-full">v0.0.1</span>
         </div>
         <div class="flex px-2">
             <i class="layui-icon layui-icon-tips"></i>
-            <a href="#" class="ml-6 block text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
+            <a id="github" href="#" class="ml-6 block text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
                 <span class="sr-only">for-mqttc on GitHub</span>
-                <i class="layui-icon layui-icon-github" id="github"></i></a>
+                <i class="layui-icon layui-icon-github"></i></a>
         </div>
     </header>
     <main class="h-full block flex-grow">
@@ -67,27 +75,29 @@
                 <div class="bg-white p-2 rounded shadow  h-inherit flex flex-col" >
                     <!-- Tabs -->
                     <ul id="tabs" class="flex border-b">
-                        <li id="tab-brokers" class="mr-1 shadow rounded-md">
-                            <a onclick="display_tab('brokers')" class="bg-white inline-block py-2 px-4 text-teal-500 hover:text-teal-800 font-semibold" href="#">Brokers</a>
+                        <li id="tab-brokers" class="mr-1 shadow rounded-md justify-center">
+                            <div class="flex px-4">
+                                <a onclick="display_tab('brokers')" class="bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex" href="#">
+                                    Brokers</a>
+                            </div>
                         </li>
                         <li id="tab-demo" class="mr-1 shadow rounded-md justify-center">
                             <div class="flex px-4">
-                                <a onclick="display_tab('demo')" class="bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex" href="#">
-                                    <span class="h-3 w-3 bg-green-400 rounded-full mr-2 py-2 px-1 "></span>
+                                <a onclick="display_tab('demo')" class="items-center bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex" href="#">
+                                    <span class="h-3 w-3 bg-green-400 rounded-full mr-2"></span>
                                     Tab 2</a>
                                 <i class="layui-icon layui-icon-close py-2 px-1 "></i>
                             </div>
                         </li>
                     </ul>
                     <!-- Tab Content -->
-                    <div id="tabs-content" class="tab-content p-4 block bg-amber-50 flex-grow">
+                    <div id="tabs-content" class="text-xs tab-content p-0.5 block bg-gray-100 flex-grow">
                         <div id="tab-content-brokers" class="tab-pane active block bg-white h-full">
-                            <button id="new" class="bg-yellow-500 hover:bg-yellow-700 font-bold py-2 px-2 rounded focus:outline-none focus:shadow-outline" type="submit">
-                                新增
-                            </button>
-                            <button id="connect" onclick="connect_to_broker(Math.random()*100, 'emq')" class="bg-yellow-500 hover:bg-yellow-700 font-bold py-2 px-2 rounded focus:outline-none focus:shadow-outline" type="submit">
-                                连接测试
-                            </button>
+                            <div>
+                                <button id="new" class="bg-yellow-500 hover:bg-yellow-700 font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline mr-1">
+                                    新增
+                                </button>
+                            </div>
                             <table id="brokers" class="table table-xs table-pin-rows table-pin-cols">
                                 <thead>
                                 <tr>
@@ -116,12 +126,14 @@
                                 <div class="min-w-0 p-2 bg-white rounded-lg shadow-xs flex flex-col">
                                     <div class="flex-grow">
                                             <!-- First Topic -->
-                                            <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-md mb-4">
-                                                <div class="flex items-center">
+                                            <div class="items-center justify-between p-2 bg-white rounded-lg shadow-md mb-4">
+                                                <div class="flex items-center pb-1">
                                                     <span class="h-3 w-3 bg-gray-400 rounded-full mr-2"></span>
-                                                    <span class="text-gray-800">testtopic/#</span>
+                                                    <span id="right-click" class="flex-grow text-gray-800">testtopic/#</span>
+                                                    <i class="ml-auto layui-icon layui-icon-close py-2 px-1 "></i>
                                                 </div>
-                                                <span class="text-gray-500">QoS 0</span>
+                                                <span class="px-2 py-1 text-xs text-green-800 bg-green-200 rounded-full">QoS 0</span>
+                                                <span class="px-2 py-1 text-xs text-green-800 bg-green-200 rounded-full">Text</span>
                                             </div>
                                             <!-- Second Topic -->
                                             <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-md">
@@ -312,6 +324,27 @@
         if (event.target != modal && modal.style.display == 'block') {
             modal.style.display = 'none';
         }
+    });
+
+    document.getElementById('github').addEventListener('click', function() {
+        // 使用 Tauri 的 shell.open API 打开外部链接
+        window.__TAURI__.shell.open('https://github.com/jm-observer/for-mqttc').catch(console.error);
+    });
+
+    // 测试
+    document.getElementById('right-click').addEventListener('contextmenu', function(event) {
+        event.preventDefault();
+        // 获取要复制的文本内容
+        var text = 'fbakiodowwwwww';
+
+        // 使用 Clipboard API 复制文本
+        // todo 提示
+        navigator.clipboard.writeText(text).then(function() {
+            console.log('文本已复制到剪贴板');
+            // 可选：显示一个提示信息，告诉用户文本已被复制
+        }).catch(function(error) {
+            console.error('复制文本失败:', error);
+        });
     });
 
 </script>
