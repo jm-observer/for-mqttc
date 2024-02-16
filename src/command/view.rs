@@ -23,6 +23,31 @@ pub struct BrokerSimpleView<'a> {
     pub tls: bool,
 }
 
+#[derive(Serialize, Deserialize)]
+struct Root {
+    pub name: String,
+    pub client_id: String,
+    pub addr: String,
+    pub port: u16,
+    pub auto_connect: bool,
+    pub credential: bool,
+    pub user_name: String,
+    pub password: String,
+    pub version: Protocol,
+    pub tls: Tls,
+    pub self_signed_ca: String,
+    pub params: String,
+}
+
+#[derive(Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum Tls {
+    None,
+    Ca,
+    Insecurity,
+    SelfSigned,
+}
+
 impl<'a> From<&'a Broker> for BrokerSimpleView<'a> {
     fn from(value: &'a Broker) -> Self {
         let Broker {

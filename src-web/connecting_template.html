@@ -6,33 +6,27 @@
     <div class="grid gap-2 mb-8 h-full w-full grid-cols-content">
         <!-- Replace with actual content -->
         <div class="min-w-0 p-2 bg-white rounded-lg shadow-xs flex flex-col">
-            <div id="__id__subs" class="flex-grow">
-                <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-md mb-4">
-                    <div class="flex items-center">
-                        <span class="h-3 w-3 bg-gray-400 rounded-full mr-2"></span>
-                        <span class="text-gray-800">testtopic/#</span>
-                    </div>
-                    <span class="text-gray-500">QoS 0</span>
-                </div>
+            <div id="__id__subs" class="flex-grow h-80 overflow-y-auto">
             </div>
             <form id="form-subscribe-__id__" class="bg-white p-2 rounded shadow">
-                <div class="mb-1">
-                    <label class="text-sm mb-2 p-2" for="qos">
-                        QoS
-                    </label>
-                    <select name="qos" class="shadow px-2 border rounded w-20 relative -left-12 text-right text-last-right bg-transparent z-10">
+                <div class="mb-2">
+                    <label class="mb-2 p-2">
+                        QoS<select name="qos" class="shadow px-2 rounded w-16 relative -left-8 text-right text-last-right bg-transparent z-10" >
                         <option class="text-center">0</option>
                         <option class="text-center">1</option>
                         <option class="text-center">2</option>
                     </select>
-                    <select  name="payload_ty" class="shadow border rounded px-0.5" title="Payload Type">
+                    </label>
+                    <select name="payload_ty" class="shadow rounded px-0.5" title="Payload Type" >
                         <option>Text</option>
                         <option>Json</option>
                         <option>Hex</option>
                     </select>
                 </div>
-                <div class="mb-4">
-                    <input name="topic"  class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" type="text" placeholder="topic">
+                <div class="mb-2 flex items-end">
+                    <input name="topic"  class="flex-grow shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight" type="text" placeholder="topic">
+                    <a  href="#" class="ml-2 block text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
+                        <i class="layui-icon layui-icon-history"></i></a>
                 </div>
                 <div class="flex items-center justify-between">
                     <button onclick="subscribe(__id__)" type="button" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
@@ -42,31 +36,34 @@
             </form>
         </div>
         <div class="min-w-0 p-2 bg-white rounded-lg shadow-xs flex flex-col">
-            <div id="__id__publish" class="flex-grow h-96 overflow-y-auto">
-            </div>
+            <div id="__id__publish" class="flex-grow h-80 overflow-y-auto"></div>
             <form id="form-publish-__id__" class="bg-white p-2 rounded shadow">
-                <div class="mb-1">
-                    <label class="text-sm mb-2 p-2">
-                        QoS
-                    </label>
-                    <select name="qos" class="shadow px-2 border rounded w-20 relative -left-12 text-right text-last-right bg-transparent z-10" >
+                <div class="mb-2">
+                    <label class="mb-2 p-2">
+                        QoS<select name="qos" class="shadow px-2 rounded w-16 relative -left-8 text-right text-last-right bg-transparent z-10" >
                         <option class="text-center">0</option>
                         <option class="text-center">1</option>
                         <option class="text-center">2</option>
                     </select>
-                    <select name="payload_ty" class="shadow border rounded px-0.5" title="Payload Type" >
+                    </label>
+                    <select name="payload_ty" class="shadow rounded px-0.5" title="Payload Type" >
                         <option>Text</option>
                         <option>Json</option>
                         <option>Hex</option>
                     </select>
-                    <label class="block text-gray-700 text-sm font-bold mr-2">
-                        retain<input class="toggle toggle-accent" name="retain" type="checkbox">
+                    <label class="text-gray-700 ml-10">
+                        retain
+                        <input type="checkbox" class="checkbox checkbox-xs ml-1" name="retain"/>
                     </label>
                 </div>
 
-                <div class="mb-4">
-                    <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" name="topic" type="text" placeholder="topic">
-                    <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="msg" placeholder="payload"></textarea>
+                <div class="mb-2">
+                    <div class="flex items-end mb-2">
+                    <input class="flex-grow shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight" name="topic" type="text" placeholder="topic">
+                        <a  href="#" class="ml-2 block text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
+                            <i class="layui-icon layui-icon-history"></i></a>
+                    </div>
+                    <textarea class="shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="msg" placeholder="payload"></textarea>
                 </div>
                 <div class="flex items-center justify-between">
                     <button onclick="publish(__id__)" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">

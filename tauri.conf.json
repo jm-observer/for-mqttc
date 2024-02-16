@@ -13,8 +13,7 @@
   "tauri": {
     "allowlist": {
       "all": false,
-      "shell": {
-        "all": false,
+      "dialog": {
         "open": true
       }
     },
@@ -38,8 +37,8 @@
         "fullscreen": false,
         "resizable": true,
         "title": "for-mqttc",
-          "width": 900,
-        "height": 700
+          "width": 800,
+        "height": 600
       }
     ]
   }

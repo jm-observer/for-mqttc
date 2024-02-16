@@ -14,6 +14,7 @@
     <script src="script/listen.js"></script>
     <script src="script/connecting.js"></script>
     <script src="script/common.js"></script>
+    <script src="script/broker.js"></script>
     <script src="script/init_connecting_element.js"></script>
     <style>
         /* Ensure the font is Inter */
@@ -45,6 +46,9 @@
         .layui-icon-tips:before{content:"\e702"}
         .layui-icon-github:before{content:"\e6a7"}
         .layui-icon-close:before{content:"\1006"}
+        .layui-icon-history:before{
+            content:"\e68d";
+            font-size: 22px;}
 
         .clamp-2 {
             display: -webkit-box;
@@ -58,14 +62,10 @@
 <div id="main" class="container px-4 max-w-full h-full flex flex-col">
     <header class="items-center justify-between py-2 flex">
         <div class="items-center">
-<!--            <img src="https://placehold.co/50x50" alt="TailwindCSS logo placeholder" class="mr-2">-->
-<!--            <span class="text-xl font-normal">for-mqttc</span>-->
-<!--            <span class="text-xs bg-blue-200 text-blue-800 ml-2 px-1 rounded-full">v0.0.1</span>-->
         </div>
         <div class="flex px-2">
             <i class="layui-icon layui-icon-tips"></i>
             <a id="github" href="#" class="ml-6 block text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
-                <span class="sr-only">for-mqttc on GitHub</span>
                 <i class="layui-icon layui-icon-github"></i></a>
         </div>
     </header>
@@ -78,15 +78,7 @@
                         <li id="tab-brokers" class="mr-1 shadow rounded-md justify-center">
                             <div class="flex px-4">
                                 <a onclick="display_tab('brokers')" class="bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex" href="#">
-                                    Brokers</a>
-                            </div>
-                        </li>
-                        <li id="tab-demo" class="mr-1 shadow rounded-md justify-center">
-                            <div class="flex px-4">
-                                <a onclick="display_tab('demo')" class="items-center bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex" href="#">
-                                    <span class="h-3 w-3 bg-green-400 rounded-full mr-2"></span>
-                                    Tab 2</a>
-                                <i class="layui-icon layui-icon-close py-2 px-1 "></i>
+                                    brokers</a>
                             </div>
                         </li>
                     </ul>
@@ -120,176 +112,106 @@
 <!--                                </tfoot>-->
                             </table>
                         </div>
-                        <div id="tab-content-demo" class="tab-pane block h-full w-full">
-                            <div class="grid gap-2 mb-8 h-full w-full grid-cols-content">
-                                <!-- Replace with actual content -->
-                                <div class="min-w-0 p-2 bg-white rounded-lg shadow-xs flex flex-col">
-                                    <div class="flex-grow">
-                                            <!-- First Topic -->
-                                            <div class="items-center justify-between p-2 bg-white rounded-lg shadow-md mb-4">
-                                                <div class="flex items-center pb-1">
-                                                    <span class="h-3 w-3 bg-gray-400 rounded-full mr-2"></span>
-                                                    <span id="right-click" class="flex-grow text-gray-800">testtopic/#</span>
-                                                    <i class="ml-auto layui-icon layui-icon-close py-2 px-1 "></i>
-                                                </div>
-                                                <span class="px-2 py-1 text-xs text-green-800 bg-green-200 rounded-full">QoS 0</span>
-                                                <span class="px-2 py-1 text-xs text-green-800 bg-green-200 rounded-full">Text</span>
-                                            </div>
-                                            <!-- Second Topic -->
-                                            <div class="flex items-center justify-between p-4 bg-white rounded-lg shadow-md">
-                                                <div class="flex items-center">
-                                                    <span class="h-3 w-3 bg-green-500 rounded-full mr-2"></span>
-                                                    <span class="text-gray-800">testtopic/232232</span>
-                                                </div>
-                                                <span class="text-gray-500">QoS 1</span>
-                                            </div>
-                                    </div>
-                                    <form class="bg-white p-2 rounded shadow">
-                                        <div class="mb-1">
-                                            <label class="text-sm mb-2 p-2" for="qos">
-                                                QoS
-                                            </label>
-                                            <select class="shadow px-2 border rounded w-20 relative -left-12 text-right text-last-right bg-transparent z-10" id="sub-qos">
-                                                <option class="text-center">0</option>
-                                                <option class="text-center">1</option>
-                                                <option class="text-center">2</option>
-                                            </select>
-                                            <select class="shadow border rounded px-0.5" title="Payload Type" id="sub-type">
-                                                <option>Text</option>
-                                                <option>Json</option>
-                                                <option>Hex</option>
-                                            </select>
-                                        </div>
-                                        <div class="mb-4">
-                                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" id="sub-topic" type="text" placeholder="topic">
-                                        </div>
-                                        <div class="flex items-center justify-between">
-                                            <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-                                                订阅
-                                            </button>
-                                        </div>
-                                    </form>
-                                </div>
-                                <div class="min-w-0 p-2 bg-white rounded-lg shadow-xs flex flex-col">
-                                    <div class="flex-grow">
-                                        <div class="rounded-lg p-4 max-w-sm shadow-lg">
-                                            <div class="flex items-center justify-between mb-4">
-                                                <h2 class="text-lg font-medium text-gray-700">Topic: gateway</h2>
-                                                <span class="px-2 py-1 text-xs text-green-800 bg-green-200 rounded-full">QoS: 0</span>
-                                            </div>
-                                            <div class="mb-4 bg-green-100 p-4 rounded">
-                                                <pre class="text-green-700">{ "msg": "hellodddd" }</pre>
-                                            </div>
-                                            <p class="text-xs text-right text-gray-600">2024-01-21 20:26:22:057</p>
-                                        </div>
-                                        <div class="rounded-lg p-4 max-w-sm shadow-lg">
-                                            <div class="flex items-center justify-between mb-4">
-                                                <h2 class="text-lg font-medium text-gray-700">Topic: gateway</h2>
-                                                <span class="px-2 py-1 text-xs text-green-800 bg-green-200 rounded-full">QoS: 0</span>
-                                            </div>
-                                            <div class="mb-4 bg-green-100 p-4 rounded">
-                                                <pre class="text-green-700">{ "msg": "hellodddd" }</pre>
-                                            </div>
-                                            <p class="text-xs text-right text-gray-600">2024-01-21 20:26:22:057</p>
-                                        </div>
-                                    </div>
-                                    <form class="bg-white p-2 rounded shadow">
-                                        <div class="mb-1">
-                                            <label class="text-sm mb-2 p-2" for="qos">
-                                                QoS
-                                            </label>
-                                            <select class="shadow px-2 border rounded w-20 relative -left-12 text-right text-last-right bg-transparent z-10" id="qos">
-                                                <option class="text-center">0</option>
-                                                <option class="text-center">1</option>
-                                                <option class="text-center">2</option>
-                                            </select>
-                                            <select class="shadow border rounded px-0.5" title="Payload Type" id="byteType">
-                                                <option>Text</option>
-                                                <option>Json</option>
-                                                <option>Hex</option>
-                                            </select>
-                                        </div>
-
-                                        <div class="mb-4">
-                                            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight" id="topic" type="text" placeholder="topic">
-                                            <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="message" placeholder="payload"></textarea>
-                                        </div>
-                                        <div class="flex items-center justify-between">
-                                            <button class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
-                                                发布
-                                            </button>
-                                        </div>
-                                    </form>
-                                    <!-- Additional content -->
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 悬浮页面 -->
                     </div>
                 </div>
             </section>
         </div>
     </main>
 </div>
-<div id="modal" class="hidden fixed right-0 w-1/3 h-full z-50">
+
+<div id="modal" class="fixed right-0 w-96 h-full z-50">
     <!-- 表单内容 -->
-    <form class="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4 h-5/6 overflow-y-auto">
-        <div class="mb-4">
-            <label class="text-gray-700 text-sm font-bold mb-2" for="name">
-                name
+    <form id="broker" class="p-2 bg-white shadow-md rounded h-5/6 overflow-y-auto text-xs">
+        <div class="flex mb-2">
+            <label class="w-24" for="name">
+                alias
             </label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-1 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="name" type="text" value="fwfew">
+            <input class="input input-bordered input-xs flex-grow" name="name" id="name" type="text">
         </div>
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="client-id">
-                client id
+        <div class="flex mb-2">
+            <label class="w-24" for="name">
+                client-id
             </label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="client-id" type="text" value="eBDokRYe/idfwewfe">
+            <input class="input input-bordered input-xs flex-grow" name="client_id" id="client_id" type="text">
         </div>
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="addr">
+        <div class="flex mb-2">
+            <label class="w-24" for="addr">
                 addr
             </label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="addr" type="text" value="broker-cn.emqx.io">
+            <input class="input input-bordered input-xs flex-grow" name="addr" id="addr" type="text">
         </div>
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="port">
+        <div class="flex mb-2">
+            <label class="w-24" for="port">
                 port
             </label>
-            <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="port" type="text" value="1883">
+            <input class="input input-bordered input-xs flex-grow" name="port" id="port" type="text" value="1883">
         </div>
-        <div class="flex items-center mb-4">
-            <label class="block text-gray-700 text-sm font-bold mr-2" for="auto-connect">
+        <div class="flex items-center mb-2">
+            <label class="w-24" for="auto_connect">
                 auto connect
             </label>
-            <input class="toggle toggle-accent" id="auto-connect" type="checkbox" checked>
+            <input class="checkbox checkbox-xs" id="auto_connect" name="auto_connect" type="checkbox" checked>
         </div>
-        <div class="flex items-center mb-4">
-            <label class="block text-gray-700 text-sm font-bold mr-2" for="credential">
+        <div class="flex items-center mb-2">
+            <label class="w-24" for="credential">
                 credential
             </label>
-            <input class="toggle toggle-accent" id="credential" type="checkbox">
+            <input class="checkbox checkbox-xs" id="credential" name="credential" type="checkbox">
         </div>
-        <div class="flex items-center mb-4">
-            <label class="block text-gray-700 text-sm font-bold mr-2">
+        <div class="flex mb-2 hidden" id="user_name_div" >
+            <label class="w-24" for="user_name">
+                user name
+            </label>
+            <input id="user_name" name="user_name"  class="input input-bordered input-xs flex-grow" type="text">
+        </div>
+        <div class="flex mb-2 hidden" id="password_div" >
+            <label class="w-24" for="password">
+                password
+            </label>
+            <input id="password" name="password"  class="input input-bordered input-xs flex-grow" type="text">
+        </div>
+        <div class="flex items-center mb-2">
+            <label class="w-24">
                 version
             </label>
-            <input class="radio radio-accent" id="version-v3" type="radio" name="version" value="v3" checked>
-            <label for="version-v3" class="mr-2">v3</label>
-            <input class="radio radio-accent" id="version-v5" type="radio" name="version" value="v5">
-            <label for="version-v5">v5</label>
+            <input class="radio radio-xs" id="version-v3" type="radio" name="version" value="v4" checked>
+            <label id="version-v3-label" for="version-v3" class="mr-2 px-2">v4</label>
+            <input class="radio radio-xs" id="version-v5" type="radio" name="version" value="v5">
+            <label id="version-v5-label" for="version-v5" class="mr-2 px-2">v5</label>
         </div>
-        <div class="flex items-center mb-4">
-            <label class="block text-gray-700 text-sm font-bold mr-2" for="tls">
+        <div class="flex items-center mb-2">
+            <label class="w-24">
                 tls
             </label>
-            <input class="toggle toggle-accent" id="tls" type="checkbox">
+            <div class="flex-grow">
+                <div class="flex items-center mb-2">
+                    <input id="tls-none" class="radio radio-xs" type="radio" name="tls" value="none" checked>
+                    <label id="tls-none-label" class="mr-2 px-2 w-full" for="tls-none">none</label>
+                </div>
+                <div class="flex items-center mb-2">
+                    <input id="tls-ca" class="radio radio-xs"  type="radio" name="tls" value="ca">
+                    <label id="tls-ca-label" class="mr-2 px-2 w-full" for="tls-ca">ca</label>
+                </div>
+                <div class="flex items-center mb-2">
+                    <input id="tls-insecurity" class="radio radio-xs" type="radio" name="tls" value="insecurity">
+                    <label id="tls-insecurity-label" class="mr-2 px-2 w-full" for="tls-insecurity">insecurity</label>
+                </div>
+                <div class="flex items-center mb-2">
+                    <input id="tls-self-signed" class="radio radio-xs" type="radio" name="tls" value="self_signed">
+                    <label id="tls-self-signed-label" class="mr-2 px-2 w-full" for="tls-self-signed">self-signed</label>
+                </div>
+            </div>
         </div>
-        <div class="mb-4">
-            <label class="block text-gray-700 text-sm font-bold mb-2" for="params">
+        <div class="flex items-center mb-2 hidden" id="self_signed_ca_div">
+            <label class="w-24">self-signed-ca</label>
+            <input readonly id="self_signed_ca" name="self_signed_ca"  class="input input-bordered input-xs flex-grow" type="text">
+        </div>
+
+        <div class="flex items-center mb-2">
+            <label class="w-24">
                 params
             </label>
-            <textarea class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="params" rows="6">{
+            <textarea class="textarea textarea-bordered textarea-xs h-56  flex-grow" name="params" id="params" rows="6">{
   "keep_alive": 60,
   "clean_session": true,
   "max_incoming_packet_size": 10240,
@@ -299,53 +221,21 @@
 }</textarea>
         </div>
         <div class="flex items-center justify-between">
-            <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="submit">
+            <button onclick="check_values()" type="button" id="save" class="m-1 bg-yellow-500 hover:bg-yellow-700 py-1 px-2 rounded focus:outline-none focus:shadow-outline mr-1">
                 保存
             </button>
         </div>
     </form>
 </div>
+
 </body>
 <script>
-    document.getElementById('new').addEventListener('click', function(event) {
-        var modal = document.getElementById('modal');
-        var triggerButton = document.getElementById('tabs-content');
-        // 获取触发按钮的位置
-        var rect = triggerButton.getBoundingClientRect();
-
-        // 设置模态窗口的位置
-        modal.style.display = 'block';
-        modal.style.top = rect.top + 'px'; // 或者使用 rect.bottom + 'px'，取决于需要
-        event.stopPropagation();
-    });
-
-    document.getElementById('main').addEventListener('click', function(event) {
-        var modal = document.getElementById('modal');
-        if (event.target != modal && modal.style.display == 'block') {
-            modal.style.display = 'none';
-        }
-    });
-
     document.getElementById('github').addEventListener('click', function() {
         // 使用 Tauri 的 shell.open API 打开外部链接
         window.__TAURI__.shell.open('https://github.com/jm-observer/for-mqttc').catch(console.error);
     });
 
-    // 测试
-    document.getElementById('right-click').addEventListener('contextmenu', function(event) {
-        event.preventDefault();
-        // 获取要复制的文本内容
-        var text = 'fbakiodowwwwww';
-
-        // 使用 Clipboard API 复制文本
-        // todo 提示
-        navigator.clipboard.writeText(text).then(function() {
-            console.log('文本已复制到剪贴板');
-            // 可选：显示一个提示信息，告诉用户文本已被复制
-        }).catch(function(error) {
-            console.error('复制文本失败:', error);
-        });
-    });
+    init_broker_model()
 
 </script>
 </html>

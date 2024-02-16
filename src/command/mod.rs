@@ -111,3 +111,16 @@ pub async fn connect_to_broker(
     // })?;
     Ok(())
 }
+
+#[command]
+pub async fn select_and_process_file() -> Result<String> {
+    // let file_path = tauri::dialog::open_file(None).expect("failed to open file dialog");
+    // if let Some(path) = file_path {
+    //     // 在这里处理文件，例如读取或者修改
+    //     println!("Selected file: {:?}", path);
+    //     Ok("文件处理成功".into())
+    // } else {
+    //     Err("未选择文件".into())
+    // }
+    Ok("".to_string())
+}

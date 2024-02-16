@@ -362,6 +362,7 @@ impl Default for PayloadTy {
 
 /// Protocol type
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Deserialize, Serialize)]
+#[serde(rename_all = "lowercase")]
 pub enum Protocol {
     V4,
     V5,
