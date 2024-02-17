@@ -98,8 +98,14 @@ impl App {
             .ok_or(anyhow!("could not find broker:{}", id))
     }
     pub fn save_broker(&mut self, data: BrokerDB) -> Result<()> {
-        self.db.save_broker(&data)?;
-        self.brokers.push(data.into_broker(self.tx.clone()));
+        if self.db.save_broker(&data)? {
+            self.brokers.push(data.into_broker(self.tx.clone()));
+        } else {
+            let Some(broker) = self.brokers.iter_mut().find(|x| x.data.id == data.id) else {
+                bail!("could not find broker");
+            };
+            broker.data = data;
+        }
         Ok(())
     }
     pub fn touch_reconnect(&mut self) -> Result<()> {

@@ -401,7 +401,6 @@ async fn touch_reconnect(event_sink: &ExtEventSink) -> Result<()> {
 pub async fn to_disconnect(mqtt_clients: &mut HashMap<usize, Client>, id: usize) -> Result<()> {
     if let Some(client) = mqtt_clients.remove(&id) {
         client.disconnect().await?;
-        info!("{}", DISCONNECT_SUCCESS);
     }
     Ok(())
 }

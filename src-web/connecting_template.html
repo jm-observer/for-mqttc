@@ -3,10 +3,10 @@
 <head></head>
 <body>
 <div id="tab-content-__id__" class="tab-pane block h-full w-full">
-    <div class="grid gap-2 mb-8 h-full w-full grid-cols-content">
+    <div class="grid gap-1 mb-2 h-full w-full grid-cols-content">
         <!-- Replace with actual content -->
         <div class="min-w-0 p-2 bg-white rounded-lg shadow-xs flex flex-col">
-            <div id="__id__subs" class="flex-grow h-80 overflow-y-auto">
+            <div id="__id__subs" class="flex-grow h-72 overflow-y-auto">
             </div>
             <form id="form-subscribe-__id__" class="bg-white p-2 rounded shadow">
                 <div class="mb-2">
@@ -24,22 +24,22 @@
                     </select>
                 </div>
                 <div class="mb-2 flex items-end">
-                    <input name="topic"  class="flex-grow shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight" type="text" placeholder="topic">
+                    <input name="topic"  class="flex-grow shadow appearance-none border rounded w-full py-1 px-2  leading-tight" type="text" placeholder="topic">
                     <a  href="#" class="ml-2 block text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
                         <i class="layui-icon layui-icon-history"></i></a>
                 </div>
                 <div class="flex items-center justify-between">
-                    <button onclick="subscribe(__id__)" type="button" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline">
+                    <button onclick="subscribe(__id__)" type="button" class="m-1 bg-yellow-500 py-1 px-2 rounded mr-1">
                         订阅
                     </button>
                 </div>
             </form>
         </div>
         <div class="min-w-0 p-2 bg-white rounded-lg shadow-xs flex flex-col">
-            <div id="__id__publish" class="flex-grow h-80 overflow-y-auto"></div>
+            <div id="__id__publish" class="flex-grow h-72 overflow-y-auto"></div>
             <form id="form-publish-__id__" class="bg-white p-2 rounded shadow">
                 <div class="mb-2">
-                    <label class="mb-2 p-2">
+                    <label class="px-2">
                         QoS<select name="qos" class="shadow px-2 rounded w-16 relative -left-8 text-right text-last-right bg-transparent z-10" >
                         <option class="text-center">0</option>
                         <option class="text-center">1</option>
@@ -51,22 +51,21 @@
                         <option>Json</option>
                         <option>Hex</option>
                     </select>
-                    <label class="text-gray-700 ml-10">
+                    <label class=" ml-10">
                         retain
-                        <input type="checkbox" class="checkbox checkbox-xs ml-1" name="retain"/>
                     </label>
+                    <input type="checkbox" class="checkbox checkbox-xs ml-1" name="retain"/>
                 </div>
-
+                <div class="flex items-end mb-2">
+                    <input class="py-1 px-2 flex-grow shadow appearance-none border rounded w-full  leading-tight" name="topic" type="text" placeholder="topic">
+                    <a  href="#" class="ml-2 block text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
+                        <i class="layui-icon layui-icon-history"></i></a>
+                </div>
                 <div class="mb-2">
-                    <div class="flex items-end mb-2">
-                    <input class="flex-grow shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight" name="topic" type="text" placeholder="topic">
-                        <a  href="#" class="ml-2 block text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
-                            <i class="layui-icon layui-icon-history"></i></a>
-                    </div>
-                    <textarea class="shadow appearance-none border rounded w-full py-1 px-2 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" name="msg" placeholder="payload"></textarea>
+                    <textarea class="py-1 px-2 shadow appearance-none border rounded w-full" name="msg" placeholder="payload"></textarea>
                 </div>
                 <div class="flex items-center justify-between">
-                    <button onclick="publish(__id__)" class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline" type="button">
+                    <button onclick="publish(__id__)" class="m-1 bg-yellow-500 py-1 px-2 rounded mr-1" type="button">
                         发布
                     </button>
                 </div>

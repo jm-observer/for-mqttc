@@ -13,7 +13,7 @@ edition = "2021"
 tauri-build = { version = "1.5", features = [] }
 
 [dependencies]
-tauri = { version = "1.5", features = ["dialog-open"] }
+tauri = { version = "1.5", features = ["dialog-open", "shell-open"] }
 chrono = "0.4.26"
 custom-utils = "0.10.13"
 log = "0.4.17"

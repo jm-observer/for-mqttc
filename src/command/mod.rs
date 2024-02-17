@@ -114,7 +114,10 @@ pub async fn connect_to_broker(
 }
 
 #[command]
-pub async fn update_or_new_broker(mut broker: BrokerView, state: State<'_, ArcApp>) -> Result<()> {
+pub async fn update_or_new_broker(
+    mut broker: BrokerView,
+    state: State<'_, ArcApp>,
+) -> Result<usize> {
     debug!("{:?}", broker);
     let mut app = state.write().await;
     if broker.id == 0 {
@@ -137,7 +140,18 @@ pub async fn update_or_new_broker(mut broker: BrokerView, state: State<'_, ArcAp
             .ok_or(Error::init("self signed ca copied fail"))?
             .to_string();
     }
+    let id = broker.id;
     let data: BrokerDB = broker.into();
     app.save_broker(data)?;
+    Ok(id)
+}
+
+#[command]
+pub async fn loading(state: State<'_, ArcApp>) -> Result<()> {
+    let mut app = state.write().await;
+    let clients = std::mem::take(&mut app.mqtt_clients);
+    for client in clients.values() {
+        let _ = client.disconnect().await;
+    }
     Ok(())
 }

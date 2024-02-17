@@ -1,10 +1,10 @@
  async function init_subscribe_item(id, topic, qos, ty, connect_id, time) {
-    let template = "        <div class=\"flex items-center pb-1\">\n" +
+    let template = "        <div class=\"flex items-center pb-1 mb-2\">\n" +
         "            <span id=\"subcribe-status-__id__\" class=\"h-3 w-3 bg-gray-400 rounded-full mr-2\"></span>\n" +
         "            <span id=\"copy-subcribe-topic-__id__\" class=\"flex-grow text-gray-800\">__topic__</span>\n" +
         "        <a onclick='unsubscribe(__id__)'><i class=\"ml-auto layui-icon layui-icon-close py-2 px-1 \"></i></a>\n" +
         "        </div>\n" +
-        "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">Qos __qos__</span>\n" +
+        "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">QoS __qos__</span>\n" +
         "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">__ty__</span>\n"
      "        <span class=\"px-2 py-1 ml-auto\">__time__</span>\n"
      ;
@@ -40,7 +40,7 @@
          "        </div>\n" +
          "        <div id=\"copy-publish-payload-__id__\" class=\"mb-2 px-2 py-1 flex-grow rounded-lg bg-green-200 text-gray-800\">" +
          "          <p class='clamp-2 break-words'>__payload__</p></div>\n" +
-         "        <div class=\"flex justify-end\"><span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full mr-2\">Qos __qos__</span>\n" +
+         "        <div class=\"flex justify-end\"><span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full mr-2\">QoS __qos__</span>\n" +
          "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">__ty__</span>\n" +
          "        <span class=\"px-2 py-1 ml-auto\">__time__</span></div>\n"
      ;
@@ -83,12 +83,10 @@
 
 
  async function init_receive_publish_item(id, topic, payload, qos, ty, connect_id, time) {
-     let template = "        <div class=\"flex items-center pb-1  \">\n" +
-         "            <span id=\"copy-publish-topic-__id__\" class=\"flex-grow text-gray-800\">__topic__</span>\n" +
-         "        </div>\n" +
+     let template = "<div></div><span id=\"copy-publish-topic-__id__\" class=\"mb-2 px-2 py-1 text-gray-800\">__topic__</span></div>\n" +
          "        <div id=\"copy-publish-payload-__id__\" class=\"mb-2 px-2 py-1 flex-grow rounded-lg bg-green-200 text-gray-800\">" +
          "          <p class='clamp-2 break-words'>__payload__</p></div>\n" +
-         "        <div class=\"flex justify-end\"><span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full mr-2\">Qos __qos__</span>\n" +
+         "        <div class=\"flex justify-end\"><span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full mr-2\">QoS __qos__</span>\n" +
          "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">__ty__</span>\n" +
          "        <span class=\"px-2 py-1 ml-auto\">__time__</span></div>\n"
      ;

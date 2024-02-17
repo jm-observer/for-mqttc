@@ -68,10 +68,12 @@ impl ArcDb {
         })
     }
 
-    pub fn save_broker(&mut self, broker: &BrokerDB) -> Result<()> {
+    pub fn save_broker(&mut self, broker: &BrokerDB) -> Result<bool> {
         debug!("save broker: {:?}", broker);
         let id = broker.id;
+        let mut is_new = false;
         if !self.ids.iter().any(|x| *x == id) {
+            is_new = true;
             self.ids.push(id);
             self.db.insert(BROKERS, serde_json::to_vec(&self.ids)?)?;
         }
@@ -79,7 +81,7 @@ impl ArcDb {
             DbKey::broker_key(id).as_bytes()?,
             serde_json::to_vec(broker)?,
         )?;
-        Ok(())
+        Ok(is_new)
     }
     pub fn delete_broker(&mut self, id: usize) -> Result<()> {
         let mut selected_index = None;

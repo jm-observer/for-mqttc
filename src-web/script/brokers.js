@@ -13,14 +13,16 @@ function get_invoke() {
     }
 }
 
+
+async function loading() {
+    await get_invoke()("loading");
+}
+
 function isTauriEnvironment() {
     return typeof window.__TAURI__ !== 'undefined';
 }
 
 
-//
-// let greetInputEl;
-// let greetMsgEl;
 async function broker_list() {
     try {
         let rs = await get_invoke()("broker_list");
@@ -40,18 +42,21 @@ async function broker_list() {
             init_name_cell(newRow, item["name"]);
             init_common_cell(newRow, item["tls"]);
             init_common_cell(newRow, item["addr"] + ":" + item["port"]);
-            init_buttons(newRow, item["id"], item["name"])
+            init_buttons(newRow, item["id"], item["name"]);
+            newRow.addEventListener('dblclick', function (event) {
+                event.stopPropagation();
+                connect_to_broker(item["id"], item["name"]);
+            });
         });
     } catch (e) {
         console.error("Parsing error:", e);
     }
-
 }
 
 async function connect_to_broker(id, name) {
     console.log("connect_to_broker" + id);
+    await close_tab(id);
     const tableBody = document.getElementById("tabs");
-
     const tab = document.getElementById("tab-" + id);
     if(!tab) {
         const tab = init_tab(id, name);
@@ -84,7 +89,8 @@ async function connect_to_broker(id, name) {
 async function delete_broker(id) {
     console.log("delete_broker " + id);
     await get_invoke()("delete_broker", { id : id});
-    await broker_list()
+    await close_tab(id);
+    await broker_list();
 }
 
 function edit_broker(id) {

@@ -60,7 +60,7 @@
 </head>
 <body class="bg-gray-100 h-screen">
 <div id="main" class="container px-4 max-w-full h-full flex flex-col">
-    <header class="items-center justify-between py-2 flex">
+    <header class="items-center justify-between py-1 flex">
         <div class="items-center">
         </div>
         <div class="flex px-2">
@@ -77,7 +77,7 @@
                     <ul id="tabs" class="flex border-b py-1">
                         <li id="tab-brokers" class="mr-1 shadow rounded-md justify-center">
                             <div class="flex px-4">
-                                <a onclick="display_tab('brokers')" class="bg-white inline-block py-2 px-1 text-gray-500 hover:text-teal-800 font-semibold flex" href="#">
+                                <a onclick="display_tab('brokers')" class="bg-white inline-block py-2 px-1 flex" href="#">
                                     brokers</a>
                             </div>
                         </li>
@@ -86,7 +86,7 @@
                     <div id="tabs-content" class="text-xs tab-content p-0.5 block bg-gray-100 flex-grow">
                         <div id="tab-content-brokers" class="tab-pane active block bg-white h-full">
                             <div>
-                                <button id="new" class="m-1 bg-yellow-500 hover:bg-yellow-700 font-bold py-1 px-2 rounded focus:outline-none focus:shadow-outline mr-1">
+                                <button id="new" class="m-1 bg-yellow-500 py-1 px-2 rounded mr-1">
                                     新增
                                 </button>
                             </div>
@@ -102,14 +102,6 @@
                                 </thead>
                                 <tbody>
                                 </tbody>
-<!--                                <tfoot>-->
-<!--                                <tr>-->
-<!--                                    <th class="w-12 text-center">Version</th>-->
-<!--                                    <th class="w-36 text-center">Name</th>-->
-<!--                                    <th>Addr</th>-->
-<!--                                    <th>Action</th>-->
-<!--                                </tr>-->
-<!--                                </tfoot>-->
                             </table>
                         </div>
                     </div>
@@ -212,18 +204,14 @@
             <label class="w-24">
                 params
             </label>
-            <textarea class="textarea textarea-bordered textarea-xs h-56  flex-grow" name="params" id="params" rows="6">{
-  "keep_alive": 60,
-  "clean_session": true,
-  "max_incoming_packet_size": 10240,
-  "max_outgoing_packet_size": 10240,
-  "inflight": 100,
-  "conn_timeout": 5
-}</textarea>
+            <textarea class="textarea textarea-bordered textarea-xs h-56  flex-grow" name="params" id="params" rows="6"></textarea>
         </div>
-        <div class="flex items-center justify-between">
-            <button onclick="check_values()" type="button" id="save" class="m-1 bg-yellow-500 hover:bg-yellow-700 py-1 px-2 rounded focus:outline-none focus:shadow-outline mr-1">
+        <div class="flex items-center justify-center">
+            <button onclick="check_then_save()" type="button" id="save" class="m-1 bg-yellow-500 py-1 px-2 rounded mr-1">
                 保存
+            </button>
+            <button onclick="check_then_save_then_connect()" type="button" id="save_and_connect" class="m-1 bg-yellow-500 py-1 px-2 rounded mr-1">
+                保存并连接
             </button>
         </div>
     </form>
@@ -236,7 +224,8 @@
         window.__TAURI__.shell.open('https://github.com/jm-observer/for-mqttc').catch(console.error);
     });
 
-    init_broker_model()
+    init_broker_model();
+    loading();
 
 </script>
 </html>

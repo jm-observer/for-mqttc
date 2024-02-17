@@ -73,7 +73,11 @@ async function init_broker_model() {
     document.getElementById('self_signed_ca_div').classList.add('hidden');
 }
 
-async function check_values() {
+async function check_then_save_then_connect() {
+    const { broker_id, name } = await check_then_save();
+    await connect_to_broker(broker_id, name)
+}
+async function check_then_save() {
     var form = document.getElementById('broker');
     var formData = new FormData(form);
     var formObject = {};
@@ -150,8 +154,12 @@ async function check_values() {
 
     if (result) {
         try {
-            let rs = await window.__TAURI__.tauri.invoke("update_or_new_broker", { broker : formObject});
+            let name = formObject["name"];
+            let broker_id = await window.__TAURI__.tauri.invoke("update_or_new_broker", { broker : formObject});
+            console.log("broker_id: " + broker_id);
+            document.getElementById('modal').style.display = 'none';
             broker_list();
+            return {broker_id, name};
         } catch (e) {
             console.error("Parsing error:", e);
         }
@@ -187,14 +195,13 @@ async function init_new_broker() {
     if (document.getElementById('id').value === '0') {
         return
     }
-    const params_obj = {"keep_alive": 60,
-        "clean_session": true,
-        "max_incoming_packet_size": 10240,
-        "max_outgoing_packet_size": 10240,
-        "inflight": 100,
-        "conn_timeout": 5
-    };
-    let params = JSON.stringify(params_obj);
+    const params = '{\n\t"keep_alive": 60, \n' +
+        '\t"clean_session": true,\n' +
+        '\t"max_incoming_packet_size": 10240,\n' +
+        '\t"max_outgoing_packet_size": 10240,\n' +
+        '\t"inflight": 100,\n' +
+        '\t"conn_timeout": 5\n' +
+        '}';
     init_broker_value(0, '', '', '',1883, true, false, '', '', 'v4', 'none', '',  params)
 }
 
@@ -235,4 +242,5 @@ async function init_broker_value(id, name, client_id, addr, port, auto_connect, 
         document.getElementById('self_signed_ca').value = self_signed_ca;
         document.getElementById('self_signed_ca_div').classList.remove('hidden');
     }
+    document.getElementById('self_signed_ca_div').classList.add('hidden');
 }
