@@ -1,4 +1,5 @@
 use crate::data::common::{Broker, Protocol};
+use crate::data::db::BrokerDB;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -19,8 +20,8 @@ pub struct BrokerSimpleView<'a> {
     pub protocol: Protocol,
     pub name: &'a String,
     pub addr: &'a String,
-    pub port: Option<u16>,
-    pub tls: bool,
+    pub port: u16,
+    pub tls: String,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -50,7 +51,7 @@ pub enum Tls {
 
 impl<'a> From<&'a Broker> for BrokerSimpleView<'a> {
     fn from(value: &'a Broker) -> Self {
-        let Broker {
+        let BrokerDB {
             id,
             protocol,
             name,
@@ -58,14 +59,14 @@ impl<'a> From<&'a Broker> for BrokerSimpleView<'a> {
             port,
             tls,
             ..
-        } = value;
+        } = &value.data;
         Self {
             id: *id,
             protocol: *protocol,
-            name: name.as_ref(),
+            name,
             port: *port,
-            tls: *tls,
-            addr: addr.as_ref(),
+            tls: tls.to_string(),
+            addr,
         }
     }
 }

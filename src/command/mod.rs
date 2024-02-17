@@ -41,10 +41,10 @@ pub async fn subscribe(datas: SubscribeInput, state: State<'_, ArcApp>) -> Resul
     let mut app = state.write().await;
     app.brokers
         .iter_mut()
-        .find(|x| x.id == datas.broker_id)
+        .find(|x| x.data.id == datas.broker_id)
         .and_then(|x| {
             x.subscribe_topics.push(SubscribeTopic::from(datas.clone()));
-            x.subscribe_hises.push(datas.clone().into());
+            x.data.subscribe_hises.push(datas.clone().into());
             None::<()>
         });
     to_subscribe(&app.mqtt_clients, SubscribeTopic::from(datas)).await;
@@ -83,7 +83,7 @@ pub async fn delete_broker(id: usize, state: State<'_, ArcApp>) -> Result<()> {
     to_disconnect(&mut app.mqtt_clients, id).await;
     let mut brokers = Vec::with_capacity(0);
     swap(&mut brokers, &mut app.brokers);
-    app.brokers = brokers.into_iter().filter(|x| x.id != id).collect();
+    app.brokers = brokers.into_iter().filter(|x| x.data.id != id).collect();
     app.db.delete_broker(id)?;
     Ok(())
 }
@@ -96,11 +96,13 @@ pub async fn connect_to_broker(
 ) -> Result<()> {
     debug!("connect_to_broker: {id}");
     let mut app = state.write().await;
-    let Some(broker) = app
-        .brokers
-        .iter()
-        .find_map(|x| if x.id == id { Some(x.clone()) } else { None })
-    else {
+    let Some(broker) = app.brokers.iter().find_map(|x| {
+        if x.data.id == id {
+            Some(x.clone())
+        } else {
+            None
+        }
+    }) else {
         //todo to notify frontend
         return Ok(());
     };

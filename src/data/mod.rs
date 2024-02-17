@@ -1,4 +1,3 @@
-pub mod click_ty;
 pub mod common;
 pub mod db;
 pub mod hierarchy;
@@ -17,8 +16,6 @@ use log::{debug, error, warn};
 use serde::Serialize;
 use serde_json::{Map, Number, Value};
 use std::sync::Arc;
-
-pub type AString = Arc<String>;
 
 #[derive(Debug)]
 pub enum AppEvent {

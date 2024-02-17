@@ -208,7 +208,7 @@ async fn scroll_msg_win(event_sink: &ExtEventSink) {
 }
 fn update_status_bar(event_sink: &ExtEventSink, msg: String) {
     event_sink.add_idle_callback(move |data: &mut App| {
-        data.hint = msg.into();
+        data.hint = msg;
     });
 }
 fn touch_add_broker(event_sink: &ExtEventSink) {
@@ -296,7 +296,7 @@ async fn touch_connect_by_button(event_sink: &ExtEventSink) {
 }
 
 pub async fn connect(mqtt_clients: &mut HashMap<usize, Client>, tx: AppHandle, broker: Broker) {
-    let id = broker.id;
+    let id = broker.data.id;
     if let Some(old_client) = mqtt_clients.remove(&id) {
         if let Err(err) = old_client.disconnect().await {
             error!("diconnect fail: {:?}", err);

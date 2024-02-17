@@ -2,7 +2,6 @@ use crate::data::common::{
     Msg, PublicMsg, PublicStatus, PublishInput, QoS, SubscribeHis, SubscribeInput, SubscribeMsg,
     SubscribeStatus, SubscribeTopic,
 };
-use crate::data::AString;
 use crate::mqtt;
 use crate::util::consts::QosToString;
 use crate::util::now_time;
@@ -40,14 +39,15 @@ impl SubscribeTopic {
         }
     }
     pub fn from_his(val: SubscribeHis, trace_id: u32) -> Self {
-        Self {
-            broker_id: val.broker_id,
-            trace_id,
-            topic: val.topic.clone(),
-            qos: val.qos.clone(),
-            status: SubscribeStatus::SubscribeIng,
-            payload_ty: val.payload_ty,
-        }
+        todo!()
+        // Self {
+        //     broker_id: val.broker_id,
+        //     trace_id,
+        //     topic: val.topic.clone(),
+        //     qos: val.qos.clone(),
+        //     status: SubscribeStatus::SubscribeIng,
+        //     payload_ty: val.payload_ty,
+        // }
     }
     pub fn is_sucess(&self) -> bool {
         self.status == SubscribeStatus::SubscribeSuccess
@@ -60,9 +60,6 @@ impl SubscribeTopic {
 impl From<SubscribeInput> for SubscribeHis {
     fn from(val: SubscribeInput) -> Self {
         Self {
-            // id: Id::default(),
-            broker_id: val.broker_id,
-            selected: false,
             topic: val.topic.clone(),
             qos: val.qos.clone(),
             payload_ty: val.payload_ty,
@@ -73,9 +70,6 @@ impl From<SubscribeInput> for SubscribeHis {
 impl From<SubscribeTopic> for SubscribeHis {
     fn from(val: SubscribeTopic) -> Self {
         Self {
-            // id: Id::default(),
-            broker_id: val.broker_id,
-            selected: false,
             topic: val.topic.clone(),
             qos: val.qos.clone(),
             payload_ty: val.payload_ty,

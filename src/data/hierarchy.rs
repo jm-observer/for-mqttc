@@ -2,7 +2,7 @@ use crate::data::common::{Broker, Id, PayloadTy, QoS};
 use crate::data::common::{
     Msg, PublicMsg, PublicStatus, SubscribeHis, SubscribeMsg, SubscribeStatus, SubscribeTopic,
 };
-use crate::data::{AString, AppEvent, EventUnSubscribe};
+use crate::data::{AppEvent, EventUnSubscribe};
 use crate::mqtt::data::MqttPublicInput;
 use crate::util::consts::QosToString;
 use crate::util::db::ArcDb;
@@ -23,7 +23,7 @@ use tokio::sync::RwLock;
 pub struct App {
     pub brokers: Vec<Broker>,
     pub db: ArcDb,
-    pub hint: AString,
+    pub hint: String,
     pub tx: Sender<AppEvent>,
     pub mqtt_clients: HashMap<usize, Client>,
 }
@@ -75,13 +75,13 @@ impl App {
     pub fn find_broker_by_id(&self, id: usize) -> Result<&Broker> {
         self.brokers
             .iter()
-            .find(|x| x.id == id)
+            .find(|x| x.data.id == id)
             .ok_or(anyhow!("could not find broker:{}", id))
     }
     pub fn find_mut_broker_by_id(&mut self, id: usize) -> Result<&mut Broker> {
         self.brokers
             .iter_mut()
-            .find(|x| x.id == id)
+            .find(|x| x.data.id == id)
             .ok_or(anyhow!("could not find broker:{}", id))
     }
     pub fn find_broker_by_index(&self, id: usize) -> Result<&Broker> {
@@ -124,7 +124,7 @@ impl App {
     fn init_connection_by_broker(&mut self, broker: Broker) -> Result<()> {
         let broker_db = broker.clone_to_db();
         let broker = broker.clone();
-        self.init_broker_tab(broker.id);
+        self.init_broker_tab(broker.data.id);
         self.db.save_broker(broker_db)?;
         self.send_event(AppEvent::ToConnect(broker));
         Ok(())
@@ -228,8 +228,8 @@ impl App {
         }
 
         let his: SubscribeHis = sub.clone().into();
-        if !broker.subscribe_hises.iter().any(|x| *x == his) {
-            broker.subscribe_hises.push(his);
+        if !broker.data.subscribe_hises.iter().any(|x| *x == his) {
+            broker.data.subscribe_hises.push(his);
             let broker = broker.clone_to_db();
             self.db.save_broker(broker)?;
         }
@@ -261,21 +261,7 @@ impl App {
     // }
 
     pub fn touch_remove_subscribe_his(&mut self, id: usize) -> Result<()> {
-        let broker = self.find_mut_broker_by_id(id)?;
-        if let Some(index) = broker
-            .subscribe_hises
-            .iter()
-            .enumerate()
-            .find(|(_index, his)| his.selected)
-            .map(|(index, _his)| index)
-        {
-            broker.subscribe_hises.remove(index);
-            let broker = broker.clone_to_db();
-            self.db.save_broker(broker)?;
-            return Ok(());
-        }
-        warn!("{}", DELETE_SUBSCRIBE_NO_SELECTED);
-        Ok(())
+        todo!()
     }
 
     pub fn sub_ack(&mut self, id: usize, input: SubscribeAck) -> Result<()> {
@@ -360,7 +346,7 @@ impl App {
         broker.disconnect(false);
         broker.init_connection()?;
         let broker = broker.clone();
-        self.disconnect(broker.id)?;
+        self.disconnect(broker.data.id)?;
         self.init_connection_by_broker(broker)?;
         // if self.init_broker_tab(id) {
         //     self.db.tx.send(AppEvent::ReConnect(id))?;

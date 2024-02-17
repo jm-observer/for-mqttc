@@ -11,6 +11,7 @@ use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
+use crate::data::db::{Credentials, Tls};
 use for_mqtt_client::protocol::packet::Publish;
 use for_mqtt_client::protocol::MqttOptions;
 use for_mqtt_client::tls::TlsConfig;
@@ -19,26 +20,28 @@ pub use for_mqtt_client::{Client, QoS, QoSWithPacketId};
 use tauri::{AppHandle, Manager};
 
 pub async fn init_connect(broker: Broker, tx: AppHandle) -> Result<Client> {
-    let Some(port) = broker.port else {
-        // error!("port is none");
-        bail!("port is none");
-    };
-    let mut mqttoptions = MqttOptions::new(broker.client_id.clone(), broker.addr.as_str(), port)?;
-    if broker.use_credentials {
-        mqttoptions =
-            mqttoptions.set_credentials(broker.user_name.clone(), broker.password.clone());
+    let broker_db = broker.data.clone();
+    let port = broker_db.port;
+    let mut mqttoptions =
+        MqttOptions::new(broker_db.client_id.clone(), broker_db.addr.as_str(), port)?;
+    if let Credentials::Credentials {
+        user_name,
+        password,
+    } = broker_db.credentials
+    {
+        mqttoptions = mqttoptions.set_credentials(user_name, password);
     }
-    let some = serde_json::from_str(broker.params.as_str())?;
+    let some = serde_json::from_str(broker_db.params.as_str())?;
     mqttoptions = update_tls_option(update_option(mqttoptions.clone(), some), broker.clone());
-    if broker.auto_connect {
+    if broker_db.auto_connect {
         mqttoptions = mqttoptions.auto_reconnect();
     }
     debug!("{:?}", mqttoptions);
-    let (client, mut eventloop) = match broker.protocol {
+    let (client, mut eventloop) = match broker_db.protocol {
         Protocol::V4 => mqttoptions.connect_to_v4().await?,
         Protocol::V5 => mqttoptions.connect_to_v5().await?,
     };
-    let id = broker.id;
+    let id = broker_db.id;
     tokio::spawn(async move {
         let tx = &tx;
         while let Ok(event) = eventloop.recv().await {
@@ -212,18 +215,15 @@ impl Default for SomeMqttOption {
 }
 
 fn update_tls_option(option: MqttOptions, value: Broker) -> MqttOptions {
-    if value.tls {
-        let tls_config = match value.signed_ty {
-            SignedTy::Ca => TlsConfig::default(),
-            SignedTy::SelfSigned => {
-                TlsConfig::default().set_server_ca_pem_file(value.self_signed_ca.as_str().into())
-            }
-            SignedTy::Insecurity => TlsConfig::default().insecurity(),
-        };
-        option.set_tls(tls_config)
-    } else {
-        option
-    }
+    let tls_config = match value.data.tls {
+        Tls::None => return option,
+        Tls::Ca => TlsConfig::default(),
+        Tls::Insecurity => TlsConfig::default().insecurity(),
+        Tls::SelfSigned { self_signed_ca } => {
+            TlsConfig::default().set_server_ca_pem_file(self_signed_ca.as_str().into())
+        }
+    };
+    option.set_tls(tls_config)
 }
 
 #[cfg(test)]

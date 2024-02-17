@@ -56,7 +56,7 @@ impl ArcDb {
         Ok(App {
             brokers,
             db: self.clone(),
-            hint: "".to_string().into(),
+            hint: "".to_string(),
             tx,
             mqtt_clients: Default::default(),
         })
@@ -118,7 +118,7 @@ const OPTION: &str = r#"{
 #[cfg(test)]
 mod test {
     use crate::data::common::{Protocol, SignedTy};
-    use crate::data::db::BrokerDB;
+    use crate::data::db::{BrokerDB, Credentials, Tls};
     use crate::util::db::ArcDb;
     use directories::UserDirs;
     use sled::*;
@@ -143,18 +143,14 @@ mod test {
         let broker = BrokerDB {
             id: 1,
             protocol: Protocol::V4,
-            client_id: Arc::new("id_5678".to_string()),
-            name: Arc::new("emq".to_string()),
-            addr: Arc::new("broker-cn.emqx.io".to_string()),
-            port: Some(1883),
-            params: Arc::new(param.to_string()),
-            use_credentials: false,
+            client_id: "id_5678".to_string(),
+            name: "emq".to_string(),
+            addr: "broker-cn.emqx.io".to_string(),
+            port: 1883,
+            params: param.to_string(),
+            credentials: Credentials::None,
             auto_connect: true,
-            user_name: Arc::new("".to_string()),
-            password: Arc::new("".to_string()),
-            tls: false,
-            signed_ty: SignedTy::Ca,
-            self_signed_ca: Arc::new("".to_string()),
+            tls: Tls::None,
             subscribe_hises: vec![],
         };
         db.save_broker(broker).unwrap();

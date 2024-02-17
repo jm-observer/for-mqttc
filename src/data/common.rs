@@ -2,7 +2,7 @@ mod impls;
 
 use crate::data::db::BrokerDB;
 use crate::data::hierarchy::UnsubcribeTracing;
-use crate::data::{AString, AppEvent};
+use crate::data::AppEvent;
 use crate::util::consts::{TY_HEX, TY_JSON, TY_TEXT};
 use anyhow::bail;
 use bytes::Bytes;
@@ -40,18 +40,13 @@ pub struct SubscribeTopic {
     pub trace_id: u32,
     pub topic: String,
     /// 只针对通配符的topic
-    // pub sub_topic: AString,
+    // pub sub_topic: String,
     pub qos: QoS,
     pub status: SubscribeStatus,
     pub payload_ty: PayloadTy,
 }
-#[derive(Debug, Clone, Eq, Deserialize, Serialize)]
+#[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
 pub struct SubscribeHis {
-    // #[serde(skip)]
-    // pub(crate) id: Id,
-    pub(crate) broker_id: usize,
-    #[serde(skip)]
-    pub(crate) selected: bool,
     pub(crate) topic: String,
     pub(crate) qos: QoS,
     pub payload_ty: PayloadTy,
@@ -108,11 +103,11 @@ pub struct PublishInput {
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct SubscribeMsg {
-    pub topic: AString,
-    pub msg: AString,
-    pub qos: AString,
-    pub payload_ty: AString,
-    pub time: AString,
+    pub topic: String,
+    pub msg: String,
+    pub qos: String,
+    pub payload_ty: String,
+    pub time: String,
 }
 
 #[derive(Debug, Deserialize, Clone)]
@@ -156,24 +151,8 @@ pub enum QoS {
 
 #[derive(Debug, Clone)]
 pub struct Broker {
-    pub id: usize,
-    pub protocol: Protocol,
-    pub client_id: AString,
-    pub name: AString,
-    pub addr: AString,
-    pub port: Option<u16>,
-    pub params: AString,
-    pub use_credentials: bool,
-    pub auto_connect: bool,
-    pub user_name: AString,
-    pub password: AString,
-    pub stored: bool,
+    pub data: BrokerDB,
     pub tx: Sender<AppEvent>,
-    pub tls: bool,
-    pub signed_ty: SignedTy,
-    pub self_signed_ca: AString,
-
-    pub subscribe_hises: Vec<SubscribeHis>,
     pub subscribe_topics: Vec<SubscribeTopic>,
     pub msgs: Vec<Msg>,
     pub unsubscribe_ing: Vec<UnsubcribeTracing>,
@@ -181,66 +160,27 @@ pub struct Broker {
 
 impl Broker {
     pub fn init_connection(&mut self) -> anyhow::Result<()> {
-        if self.client_id.as_str().is_empty() {
-            self.client_id = general_id().into();
+        if self.data.client_id.is_empty() {
+            self.data.client_id = general_id();
         }
 
-        if self.addr.is_empty() {
+        if self.data.addr.is_empty() {
             bail!("addr not be empty");
-        } else if self.port.is_none() {
-            bail!("port not be empty");
-        } else if self.use_credentials {
-            if self.user_name.is_empty() {
-                bail!("user name not be empty");
-            } else if self.password.is_empty() {
-                bail!("password not be empty");
-            }
-        } else if self.tls
-            && self.signed_ty == SignedTy::SelfSigned
-            && self.self_signed_ca.is_empty()
-        {
-            bail!("self signed ca not be empty");
         }
-        self.stored = true;
         Ok(())
     }
     pub fn clone_to_db(&self) -> BrokerDB {
-        BrokerDB {
-            id: self.id,
-            protocol: self.protocol,
-            client_id: self.client_id.clone(),
-            name: self.name.clone(),
-            addr: self.addr.clone(),
-            port: self.port,
-            params: self.params.clone(),
-            use_credentials: self.use_credentials,
-            user_name: self.user_name.clone(),
-            password: self.password.clone(),
-            tls: self.tls,
-            signed_ty: self.signed_ty,
-            self_signed_ca: self.self_signed_ca.clone(),
-            subscribe_hises: self.subscribe_hises.clone(),
-            auto_connect: self.auto_connect,
-        }
+        self.data.clone()
     }
 
     pub fn disconnect(&mut self, clear: bool) {
-        if !self.auto_connect {
+        if !self.data.auto_connect {
             self.subscribe_topics.clear();
         }
         if clear {
             self.msgs.clear();
         }
         self.unsubscribe_ing.clear();
-    }
-}
-
-impl PartialEq for SubscribeHis {
-    fn eq(&self, other: &Self) -> bool {
-        self.broker_id == other.broker_id
-            && self.topic == other.topic
-            && self.qos == other.qos
-            && self.payload_ty == other.payload_ty
     }
 }
 impl ToString for QoS {
