@@ -28,7 +28,12 @@ impl ArcDb {
         })
     }
 
-    pub fn read_app_data(&mut self, tx: Sender<AppEvent>) -> Result<App> {
+    pub fn next_broker_id(&mut self) -> usize {
+        self.index += 1;
+        self.index
+    }
+
+    pub fn read_app_data(&mut self, tx: Sender<AppEvent>, home_path: PathBuf) -> Result<App> {
         // let mut brokers = Vec::new();
         let brokers = if let Some(val) = self.db.get(BROKERS)? {
             let db_brokers_ids: Vec<usize> = serde_json::from_slice(&val)?;
@@ -59,10 +64,11 @@ impl ArcDb {
             hint: "".to_string(),
             tx,
             mqtt_clients: Default::default(),
+            home_path,
         })
     }
 
-    pub fn save_broker(&mut self, broker: BrokerDB) -> Result<()> {
+    pub fn save_broker(&mut self, broker: &BrokerDB) -> Result<()> {
         debug!("save broker: {:?}", broker);
         let id = broker.id;
         if !self.ids.iter().any(|x| *x == id) {
@@ -71,7 +77,7 @@ impl ArcDb {
         }
         self.db.insert(
             DbKey::broker_key(id).as_bytes()?,
-            serde_json::to_vec(&broker)?,
+            serde_json::to_vec(broker)?,
         )?;
         Ok(())
     }

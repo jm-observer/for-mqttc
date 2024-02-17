@@ -82,7 +82,7 @@ fn main() -> anyhow::Result<()> {
     //     .title("for-mqtt")
     //     .window_size((1200.0, 710.0)); //.menu(menu);
     let mut db = ArcDb::init_db(home_path.join("db"))?;
-    let mut data = db.read_app_data(tx.clone())?;
+    let mut data = db.read_app_data(tx.clone(), home_path)?;
 
     let config_clone = config.clone();
 
@@ -103,7 +103,8 @@ fn main() -> anyhow::Result<()> {
             subscribe,
             publish,
             disconnect,
-            delete_broker
+            delete_broker,
+            update_or_new_broker
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

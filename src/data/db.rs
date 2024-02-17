@@ -1,3 +1,4 @@
+use crate::command::view::{BrokerView, TlsView};
 use crate::data::common::{
     Broker, Protocol, PublishInput, SignedTy, SubscribeHis, SubscribeInput, TabStatus,
 };
@@ -51,6 +52,54 @@ impl BrokerDB {
         }
     }
 }
+
+impl From<BrokerView> for BrokerDB {
+    fn from(value: BrokerView) -> Self {
+        let BrokerView {
+            id,
+            name,
+            client_id,
+            addr,
+            port,
+            auto_connect,
+            credential,
+            user_name,
+            password,
+            version,
+            tls,
+            self_signed_ca,
+            params,
+        } = value;
+        let credentials = if credential {
+            Credentials::Credentials {
+                user_name,
+                password,
+            }
+        } else {
+            Credentials::None
+        };
+        let tls = match tls {
+            TlsView::None => Tls::None,
+            TlsView::Ca => Tls::Ca,
+            TlsView::Insecurity => Tls::Insecurity,
+            TlsView::SelfSigned => Tls::SelfSigned { self_signed_ca },
+        };
+        Self {
+            id,
+            protocol: version,
+            client_id,
+            name,
+            addr,
+            port,
+            params,
+            credentials,
+            auto_connect,
+            tls,
+            subscribe_hises: vec![],
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum Credentials {
     None,

@@ -24,24 +24,24 @@ async function init_broker_model() {
         });
     });
 
-    document.getElementById('new').addEventListener('click', function(event) {
-        var modal = document.getElementById('modal');
-        var triggerButton = document.getElementById('tabs-content');
-        // 获取触发按钮的位置
-        var rect = triggerButton.getBoundingClientRect();
+    const new_button = document.getElementById('new');
+    if (new_button) {
+        new_button.addEventListener('click', function(event) {
+            event.stopPropagation();
+            display_broker_info();
+            init_new_broker();
+        });
+    }
+    const main = document.getElementById('main');
+    if (main) {
+        main.addEventListener('click', function(event) {
+            var modal = document.getElementById('modal');
+            if (event.target != modal && modal.style.display == 'block') {
+                modal.style.display = 'none';
+            }
+        });
+    }
 
-        // 设置模态窗口的位置
-        modal.style.display = 'block';
-        modal.style.top = rect.top + 'px'; // 或者使用 rect.bottom + 'px'，取决于需要
-        event.stopPropagation();
-    });
-
-    document.getElementById('main').addEventListener('click', function(event) {
-        var modal = document.getElementById('modal');
-        if (event.target != modal && modal.style.display == 'block') {
-            modal.style.display = 'none';
-        }
-    });
 
     document.getElementById('self_signed_ca').addEventListener('click', function(event) {
         select_file()
@@ -56,23 +56,24 @@ async function init_broker_model() {
 
     document.getElementById('tls-none-label').addEventListener('click', function(event) {
         document.getElementById('tls-none').checked = true;
-        document.getElementById('self_signed_ca_div').add('hidden');
+        document.getElementById('self_signed_ca_div').classList.add('hidden');
     });
     document.getElementById('tls-ca-label').addEventListener('click', function(event) {
         document.getElementById('tls-ca').checked = true;
-        document.getElementById('self_signed_ca_div').add('hidden');
+        document.getElementById('self_signed_ca_div').classList.add('hidden');
     });
     document.getElementById('tls-insecurity-label').addEventListener('click', function(event) {
         document.getElementById('tls-insecurity').checked = true;
-        document.getElementById('self_signed_ca_div').add('hidden');
+        document.getElementById('self_signed_ca_div').classList.add('hidden');
     });
     document.getElementById('tls-self-signed-label').addEventListener('click', function(event) {
         document.getElementById('tls-self-signed').checked = true;
-        document.getElementById('self_signed_ca_div').remove('hidden');
+        document.getElementById('self_signed_ca_div').classList.remove('hidden');
     });
+    document.getElementById('self_signed_ca_div').classList.add('hidden');
 }
 
-function check_values() {
+async function check_values() {
     var form = document.getElementById('broker');
     var formData = new FormData(form);
     var formObject = {};
@@ -126,12 +127,19 @@ function check_values() {
     if (formObject["tls"] === "self_signed") {
         if (formObject["self_signed_ca"] === "" ) {
             result = false;
-            document.getElementById('tls-self-signed').classList.add('file-input-error')
+            document.getElementById('self_signed_ca').classList.add('file-input-error')
         } else {
-            document.getElementById('tls-self-signed').classList.remove('file-input-error')
+            document.getElementById('self_signed_ca').classList.remove('file-input-error')
         }
     }
-
+    formObject["port"] = Number(formObject["port"]);
+    formObject["id"] = Number(formObject["id"]);
+    if (!formObject["port"]) {
+        result = false;
+        document.getElementById('port').classList.add('input-error')
+    } else {
+        document.getElementById('port').classList.remove('input-error')
+    }
     try {
         const _ = JSON.parse(formObject["params"]);
         document.getElementById('params').classList.remove('textarea-error')
@@ -141,6 +149,12 @@ function check_values() {
     }
 
     if (result) {
+        try {
+            let rs = await window.__TAURI__.tauri.invoke("update_or_new_broker", { broker : formObject});
+            broker_list();
+        } catch (e) {
+            console.error("Parsing error:", e);
+        }
     }
 }
 
@@ -159,3 +173,66 @@ async function select_file() {
     }
 }
 
+async function display_broker_info() {
+    var modal = document.getElementById('modal');
+    var triggerButton = document.getElementById('tabs-content');
+    // 获取触发按钮的位置
+    var rect = triggerButton.getBoundingClientRect();
+    // 设置模态窗口的位置
+    modal.style.display = 'block';
+    modal.style.top = rect.top + 'px'; // 或者使用 rect.bottom + 'px'，取决于需要
+}
+
+async function init_new_broker() {
+    if (document.getElementById('id').value === '0') {
+        return
+    }
+    const params_obj = {"keep_alive": 60,
+        "clean_session": true,
+        "max_incoming_packet_size": 10240,
+        "max_outgoing_packet_size": 10240,
+        "inflight": 100,
+        "conn_timeout": 5
+    };
+    let params = JSON.stringify(params_obj);
+    init_broker_value(0, '', '', '',1883, true, false, '', '', 'v4', 'none', '',  params)
+}
+
+async function init_broker_value(id, name, client_id, addr, port, auto_connect, credential, user_name, password, version, tls, self_signed_ca, params) {
+    document.getElementById('id').value = id;
+    document.getElementById('name').value = name;
+    document.getElementById('client_id').value = client_id;
+    document.getElementById('addr').value = addr;
+    document.getElementById('port').value = port;
+
+    document.getElementById('auto_connect').checked = auto_connect;
+    document.getElementById('credential').checked = credential;
+    document.getElementById('user_name').value = user_name;
+    document.getElementById('password').value = password;
+
+    document.getElementById('params').value = params;
+
+    if (version === "v4") {
+        document.getElementById('version-v3').checked = true;
+    } else if (version === "v5") {
+        document.getElementById('version-v5').checked = true;
+    }
+
+    if (tls === "none") {
+        document.getElementById('tls-none').checked = true;
+        document.getElementById('self_signed_ca').value = '';
+        document.getElementById('self_signed_ca_div').classList.add('hidden');
+    } else if (tls === "ca") {
+        document.getElementById('tls-ca').checked = true;
+        document.getElementById('self_signed_ca').value = '';
+        document.getElementById('self_signed_ca_div').classList.add('hidden');
+    } else if (tls === "insecurity") {
+        document.getElementById('tls-insecurity').checked = true;
+        document.getElementById('self_signed_ca').value = '';
+        document.getElementById('self_signed_ca_div').classList.add('hidden');
+    } else if (tls === "self_signed") {
+        document.getElementById('tls-self-signed').checked = true;
+        document.getElementById('self_signed_ca').value = self_signed_ca;
+        document.getElementById('self_signed_ca_div').classList.remove('hidden');
+    }
+}

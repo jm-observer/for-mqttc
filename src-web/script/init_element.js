@@ -12,8 +12,9 @@
     var button = document.createElement('button');
     button.innerHTML = '编辑'; // 设置按钮文本
     button.className = className; // 设置类名
-    button.addEventListener('click', function () {
+    button.addEventListener('click', function (event) {
         edit_broker(id);
+        event.stopPropagation();
     });
     cell.appendChild(button);
 

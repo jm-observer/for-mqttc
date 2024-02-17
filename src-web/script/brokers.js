@@ -1,3 +1,6 @@
+let brokers;
+
+
 function get_invoke() {
     if (isTauriEnvironment()) {
         // Tauri特有的API
@@ -20,7 +23,7 @@ function isTauriEnvironment() {
 // let greetMsgEl;
 async function broker_list() {
     try {
-        let rs = await get_invoke()("broker_list", { page : {start: 0, size: 10 }});
+        let rs = await get_invoke()("broker_list");
         console.log(rs);
         var jsonObj = JSON.parse(rs);
         var tableBody = document.getElementById("brokers").getElementsByTagName('tbody')[0];
@@ -29,9 +32,11 @@ async function broker_list() {
             tableBody.removeChild(tableBody.firstChild);
         }
 
-        jsonObj.brokers.forEach(function(item) {
+        brokers = jsonObj.brokers;
+
+        brokers.forEach(function(item) {
             var newRow = tableBody.insertRow();
-            init_version_cell(newRow, item["protocol"]);
+            init_version_cell(newRow, item["version"]);
             init_name_cell(newRow, item["name"]);
             init_common_cell(newRow, item["tls"]);
             init_common_cell(newRow, item["addr"] + ":" + item["port"]);
@@ -83,6 +88,18 @@ async function delete_broker(id) {
 }
 
 function edit_broker(id) {
+    for (const item of brokers) {
+        if(item.id === id) {
+            init_broker_value(item.id, item.name, item.client_id, item.addr, item.port, item.auto_connect
+                , item.credential
+                , item.user_name
+                , item.password
+                , item.version
+                , item.tls
+                , item.self_signed_ca, item.params);
+            display_broker_info()
+        }
+    }
     console.log("edit_broker" + id);
 }
 

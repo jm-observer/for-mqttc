@@ -2,6 +2,7 @@ use crate::data::common::{Broker, Id, PayloadTy, QoS};
 use crate::data::common::{
     Msg, PublicMsg, PublicStatus, SubscribeHis, SubscribeMsg, SubscribeStatus, SubscribeTopic,
 };
+use crate::data::db::BrokerDB;
 use crate::data::{AppEvent, EventUnSubscribe};
 use crate::mqtt::data::MqttPublicInput;
 use crate::util::consts::QosToString;
@@ -17,6 +18,7 @@ use for_mqtt_client::protocol::packet::SubscribeReasonCode;
 use for_mqtt_client::{Client, SubscribeAck};
 use log::{debug, error, warn};
 use std::collections::HashMap;
+use std::path::PathBuf;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
@@ -26,6 +28,7 @@ pub struct App {
     pub hint: String,
     pub tx: Sender<AppEvent>,
     pub mqtt_clients: HashMap<usize, Client>,
+    pub home_path: PathBuf,
 }
 
 impl App {
@@ -94,13 +97,10 @@ impl App {
             .get_mut(id)
             .ok_or(anyhow!("could not find broker:{}", id))
     }
-    pub fn touch_save_broker(&mut self) -> Result<()> {
-        todo!()
-        // let broker = self.get_selected_mut_broker()?;
-        // broker.stored = true;
-        // let broker = broker.clone_to_db();
-        // self.db.save_broker(broker)?;
-        // Ok(())
+    pub fn save_broker(&mut self, data: BrokerDB) -> Result<()> {
+        self.db.save_broker(&data)?;
+        self.brokers.push(data.into_broker(self.tx.clone()));
+        Ok(())
     }
     pub fn touch_reconnect(&mut self) -> Result<()> {
         todo!()
@@ -125,7 +125,7 @@ impl App {
         let broker_db = broker.clone_to_db();
         let broker = broker.clone();
         self.init_broker_tab(broker.data.id);
-        self.db.save_broker(broker_db)?;
+        self.db.save_broker(&broker_db)?;
         self.send_event(AppEvent::ToConnect(broker));
         Ok(())
     }
@@ -231,7 +231,7 @@ impl App {
         if !broker.data.subscribe_hises.iter().any(|x| *x == his) {
             broker.data.subscribe_hises.push(his);
             let broker = broker.clone_to_db();
-            self.db.save_broker(broker)?;
+            self.db.save_broker(&broker)?;
         }
         Ok(())
     }

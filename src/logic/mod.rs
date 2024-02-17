@@ -225,15 +225,7 @@ fn touch_connect_broker_selected(event_sink: &ExtEventSink) {
     });
 }
 
-fn touch_save_broker(event_sink: &ExtEventSink) {
-    event_sink.add_idle_callback(move |data: &mut App| {
-        if let Err(e) = data.touch_save_broker() {
-            error!("{:?}", e);
-        } else {
-            info!("{}", SAVE_BROKER_SUCCESS);
-        }
-    });
-}
+fn touch_save_broker(event_sink: &ExtEventSink) {}
 
 fn touch_delete_subscribe_his(event_sink: &ExtEventSink, id: usize) {
     event_sink.add_idle_callback(move |data: &mut App| {

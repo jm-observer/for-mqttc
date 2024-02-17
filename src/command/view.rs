@@ -1,31 +1,15 @@
 use crate::data::common::{Broker, Protocol};
-use crate::data::db::BrokerDB;
+use crate::data::db::{BrokerDB, Credentials, Tls};
 use serde::{Deserialize, Serialize};
 
+#[derive(Debug, Clone, Serialize)]
+pub struct BrokerList {
+    pub brokers: Vec<BrokerView>,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
-pub struct Page {
-    pub start: usize,
-    pub size: usize,
-}
-
-#[derive(Debug, Clone, Serialize)]
-pub struct BrokerList<'a> {
-    pub brokers: Vec<BrokerSimpleView<'a>>,
-    pub total: usize,
-}
-
-#[derive(Debug, Clone, Serialize)]
-pub struct BrokerSimpleView<'a> {
+pub struct BrokerView {
     pub id: usize,
-    pub protocol: Protocol,
-    pub name: &'a String,
-    pub addr: &'a String,
-    pub port: u16,
-    pub tls: String,
-}
-
-#[derive(Serialize, Deserialize)]
-struct Root {
     pub name: String,
     pub client_id: String,
     pub addr: String,
@@ -35,38 +19,62 @@ struct Root {
     pub user_name: String,
     pub password: String,
     pub version: Protocol,
-    pub tls: Tls,
+    pub tls: TlsView,
     pub self_signed_ca: String,
     pub params: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 #[serde(rename_all = "snake_case")]
-pub enum Tls {
+pub enum TlsView {
     None,
     Ca,
     Insecurity,
     SelfSigned,
 }
 
-impl<'a> From<&'a Broker> for BrokerSimpleView<'a> {
-    fn from(value: &'a Broker) -> Self {
+impl From<BrokerDB> for BrokerView {
+    fn from(value: BrokerDB) -> Self {
         let BrokerDB {
             id,
             protocol,
+            client_id,
             name,
             addr,
             port,
+            params,
+            credentials,
+            auto_connect,
             tls,
-            ..
-        } = &value.data;
+            subscribe_hises,
+        } = value;
+        let (credential, user_name, password) = match credentials {
+            Credentials::None => (false, "".to_string(), "".to_string()),
+            Credentials::Credentials {
+                user_name,
+                password,
+            } => (true, user_name, password),
+        };
+        let (tls, self_signed_ca) = match tls {
+            Tls::None => (TlsView::None, "".to_string()),
+            Tls::Ca => (TlsView::Ca, "".to_string()),
+            Tls::Insecurity => (TlsView::Insecurity, "".to_string()),
+            Tls::SelfSigned { self_signed_ca } => (TlsView::SelfSigned, self_signed_ca),
+        };
         Self {
-            id: *id,
-            protocol: *protocol,
+            id,
+            version: protocol,
             name,
-            port: *port,
-            tls: tls.to_string(),
+            port,
+            auto_connect,
+            credential,
+            user_name,
+            password,
+            tls,
+            self_signed_ca,
             addr,
+            client_id,
+            params,
         }
     }
 }
