@@ -1,13 +1,11 @@
 use anyhow::Result;
-use crossbeam_channel::Sender;
+
 use sled::{Config, Db};
 use std::path::PathBuf;
-use std::sync::Arc;
 
-use crate::data::common::{Broker, Protocol, PublishInput, SignedTy, SubscribeInput, TabStatus};
 use crate::data::db::{BrokerDB, DbKey};
 use crate::data::hierarchy::App;
-use crate::data::AppEvent;
+
 use log::{debug, warn};
 
 #[derive(Clone, Debug)]
@@ -33,7 +31,7 @@ impl ArcDb {
         self.index
     }
 
-    pub fn read_app_data(&mut self, tx: Sender<AppEvent>, home_path: PathBuf) -> Result<App> {
+    pub fn read_app_data(&mut self, home_path: PathBuf) -> Result<App> {
         // let mut brokers = Vec::new();
         let brokers = if let Some(val) = self.db.get(BROKERS)? {
             let db_brokers_ids: Vec<usize> = serde_json::from_slice(&val)?;
@@ -47,7 +45,7 @@ impl ArcDb {
                 if let Some(val) = self.db.get(DbKey::broker_key(id).as_bytes()?)? {
                     let mut broker: BrokerDB = serde_json::from_slice(&val)?;
                     broker.id = id;
-                    let mut broker = broker.into_broker(tx.clone());
+                    let broker = broker.into_broker();
                     debug!("{:?}", broker);
                     brokers.push(broker);
                 } else {
@@ -62,7 +60,6 @@ impl ArcDb {
             brokers,
             db: self.clone(),
             hint: "".to_string(),
-            tx,
             mqtt_clients: Default::default(),
             home_path,
         })
@@ -105,32 +102,14 @@ impl ArcDb {
         self.db.insert(BROKERS, serde_json::to_vec(&self.ids)?)?;
         Ok(())
     }
-    // pub fn update_subscribe_his(&self, id: usize, hises: &Vec<SubscribeHis>) -> Result<()> {
-    //     let key = DbKey::subscribe_his_key(id);
-    //     self.db
-    //         .insert(key.as_bytes()?, serde_json::to_vec(hises)?)?;
-    //     Ok(())
-    // }
 }
-
-const OPTION: &str = r#"{
-	"keep_alive": 60,
-	"clean_session": true,
-	"max_incoming_packet_size": 10240,
-	"max_outgoing_packet_size": 10240,
-	"inflight": 100,
-	"conn_timeout": 5
-}
-        "#;
 
 #[cfg(test)]
 mod test {
-    use crate::data::common::{Protocol, SignedTy};
+    use crate::data::common::Protocol;
     use crate::data::db::{BrokerDB, Credentials, Tls};
     use crate::util::db::ArcDb;
     use directories::UserDirs;
-    use sled::*;
-    use std::sync::Arc;
 
     #[test]
     fn insert_broker() {
@@ -161,6 +140,6 @@ mod test {
             tls: Tls::None,
             subscribe_hises: vec![],
         };
-        db.save_broker(broker).unwrap();
+        db.save_broker(&broker).unwrap();
     }
 }

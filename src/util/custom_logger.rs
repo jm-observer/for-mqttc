@@ -10,14 +10,11 @@ impl LogWriter for CustomWriter {
     fn write(&self, _now: &mut DeferredNow, record: &Record) -> std::io::Result<()> {
         let level = record.level();
         if level <= self.max_log_level() {
-            let msg = if level <= Level::Warn {
+            let _msg = if level <= Level::Warn {
                 format!("{}: {}", level, record.args())
             } else {
                 record.args().to_string()
             };
-            if self.0.send(AppEvent::UpdateStatusBar(msg)).is_err() {
-                // todo
-            }
         }
         Ok(())
     }

@@ -1,5 +1,4 @@
 use anyhow::Result;
-use log::error;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
@@ -36,17 +35,6 @@ impl Config {
         let content = std::fs::read_to_string(file_path)?;
         let config: Config = serde_json::from_str(content.as_str())?;
         Ok(config)
-    }
-
-    pub fn is_ligth(&self) -> bool {
-        self.theme == Theme::Light
-    }
-
-    pub fn update(self, home_path: PathBuf) {
-        let file_path = home_path.join("config.json");
-        if let Err(e) = self._update(file_path) {
-            error!("update config fail: {:?}", e);
-        };
     }
 
     fn _update(self, file_path: PathBuf) -> Result<()> {

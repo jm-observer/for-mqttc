@@ -1,12 +1,7 @@
 use crate::data::common::{
-    Msg, PublicMsg, PublicStatus, PublishInput, QoS, SubscribeHis, SubscribeInput, SubscribeMsg,
-    SubscribeStatus, SubscribeTopic,
+    Msg, PublicMsg, QoS, SubscribeHis, SubscribeInput, SubscribeMsg, SubscribeTopic,
 };
 use crate::mqtt;
-use crate::util::consts::QosToString;
-use crate::util::now_time;
-
-use std::sync::Arc;
 
 impl SubscribeTopic {
     pub fn match_topic(&self, topic: &str) -> bool {
@@ -34,11 +29,10 @@ impl SubscribeTopic {
             trace_id: val.trace_id,
             topic: val.topic.clone(),
             qos: val.qos.clone(),
-            status: SubscribeStatus::SubscribeIng,
             payload_ty: val.payload_ty,
         }
     }
-    pub fn from_his(val: SubscribeHis, trace_id: u32) -> Self {
+    pub fn from_his(_val: SubscribeHis, _trace_id: u32) -> Self {
         todo!()
         // Self {
         //     broker_id: val.broker_id,
@@ -48,9 +42,6 @@ impl SubscribeTopic {
         //     status: SubscribeStatus::SubscribeIng,
         //     payload_ty: val.payload_ty,
         // }
-    }
-    pub fn is_sucess(&self) -> bool {
-        self.status == SubscribeStatus::SubscribeSuccess
     }
     pub fn is_equal(&self, other: &Self) -> bool {
         self.topic == other.topic
@@ -97,26 +88,6 @@ impl From<SubscribeMsg> for Msg {
 //         }
 //     }
 // }
-impl Msg {
-    // pub fn qos(&self) -> &QoS {
-    //     match self {
-    //         Msg::Subscribe(msg) => &msg.qos,
-    //         Msg::Public(msg) => &msg.qos,
-    //     }
-    // }
-    pub fn msg(&self) -> &String {
-        match self {
-            Msg::Subscribe(msg) => &msg.msg,
-            Msg::Public(msg) => &msg.msg,
-        }
-    }
-    pub fn topic(&self) -> &String {
-        match self {
-            Msg::Subscribe(msg) => &msg.topic,
-            Msg::Public(msg) => &msg.topic,
-        }
-    }
-}
 
 impl From<mqtt::QoS> for QoS {
     fn from(qos: mqtt::QoS) -> Self {

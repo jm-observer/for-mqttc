@@ -51,12 +51,3 @@ impl QosToString for QoSWithPacketId {
         }
     }
 }
-
-// pub const TIPS_CONTENT: &str = r#"1. github: https://github.com/jm-observer/for-mqtt
-// 2. 左键双击broker记录，即可进行连接
-// 3. 左键双击历史订阅记录，即可进行订阅
-// 4. 左键双击订阅记录，即可取消订阅
-// 5. 右键双击订阅topic、发布topic、发布payload，即复制对应内容
-// 6. 当前版本"#;
-
-pub const GITHUB_ADDR: &str = "https://github.com/jm-observer/for-mqtt";

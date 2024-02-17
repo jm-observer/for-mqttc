@@ -2,17 +2,15 @@ mod impls;
 
 use crate::data::db::BrokerDB;
 use crate::data::hierarchy::UnsubcribeTracing;
-use crate::data::AppEvent;
-use crate::util::consts::{TY_HEX, TY_JSON, TY_TEXT};
+
 use anyhow::bail;
 use bytes::Bytes;
-use crossbeam_channel::Sender;
+
 use log::{debug, error};
 use pretty_hex::simple_hex;
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 
-use crate::util::general_id;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use std::sync::atomic::{AtomicU32, Ordering};
 use std::sync::Arc;
@@ -21,12 +19,6 @@ static U32: AtomicU32 = AtomicU32::new(0);
 
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub struct Id(u32);
-
-impl Id {
-    pub fn to_id() -> u32 {
-        Self::default().0
-    }
-}
 
 impl Default for Id {
     fn default() -> Self {
@@ -42,7 +34,6 @@ pub struct SubscribeTopic {
     /// 只针对通配符的topic
     // pub sub_topic: String,
     pub qos: QoS,
-    pub status: SubscribeStatus,
     pub payload_ty: PayloadTy,
 }
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize, Serialize)]
@@ -58,36 +49,14 @@ pub enum Msg {
     Subscribe(SubscribeMsg),
 }
 
-impl Msg {
-    pub fn is_public(&self) -> bool {
-        if let Msg::Public(_) = self {
-            return true;
-        }
-        false
-    }
-    pub fn is_sucess(&self) -> bool {
-        if let Msg::Public(msg) = self {
-            msg.status == PublicStatus::Success
-        } else {
-            true
-        }
-    }
-}
-
 #[derive(Debug, Clone, Eq, PartialEq)]
 pub struct PublicMsg {
     pub trace_id: u32,
     pub topic: String,
     pub msg: String,
     pub qos: String,
-    pub status: PublicStatus,
     pub payload_ty: String,
     pub time: String,
-}
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub enum PublicStatus {
-    Ing,
-    Success,
 }
 
 #[derive(Debug, Clone, Deserialize)]
@@ -119,26 +88,6 @@ pub struct SubscribeInput {
     pub payload_ty: PayloadTy,
 }
 
-#[derive(Debug, Clone, Eq, PartialEq)]
-pub enum SubscribeStatus {
-    SubscribeIng,
-    SubscribeSuccess,
-    SubscribeFail,
-    UnSubscribeIng,
-}
-
-#[derive(Debug, Clone)]
-pub struct TabStatus {
-    pub(crate) id: usize,
-    pub(crate) try_connect: bool,
-    pub(crate) connected: bool,
-}
-
-#[derive(Clone, Copy, Eq, PartialEq, Debug, Hash)]
-pub enum TabKind {
-    Connection,
-    Broker,
-}
 #[derive(Debug, Clone, Eq, PartialEq, Deserialize_repr, Serialize_repr, Default)]
 #[allow(clippy::enum_variant_names)]
 #[repr(u8)]
@@ -152,37 +101,11 @@ pub enum QoS {
 #[derive(Debug, Clone)]
 pub struct Broker {
     pub data: BrokerDB,
-    pub tx: Sender<AppEvent>,
     pub subscribe_topics: Vec<SubscribeTopic>,
     pub msgs: Vec<Msg>,
     pub unsubscribe_ing: Vec<UnsubcribeTracing>,
 }
 
-impl Broker {
-    pub fn init_connection(&mut self) -> anyhow::Result<()> {
-        if self.data.client_id.is_empty() {
-            self.data.client_id = general_id();
-        }
-
-        if self.data.addr.is_empty() {
-            bail!("addr not be empty");
-        }
-        Ok(())
-    }
-    pub fn clone_to_db(&self) -> BrokerDB {
-        self.data.clone()
-    }
-
-    pub fn disconnect(&mut self, clear: bool) {
-        if !self.data.auto_connect {
-            self.subscribe_topics.clear();
-        }
-        if clear {
-            self.msgs.clear();
-        }
-        self.unsubscribe_ing.clear();
-    }
-}
 impl ToString for QoS {
     fn to_string(&self) -> String {
         match self {
@@ -210,13 +133,6 @@ pub enum PayloadTy {
 }
 
 impl PayloadTy {
-    pub fn to_arc_string(&self) -> String {
-        match self {
-            PayloadTy::Text => "T".to_string(),
-            PayloadTy::Json => "J".to_string(),
-            PayloadTy::Hex => "H".to_string(),
-        }
-    }
     pub fn format(&self, data: Arc<Bytes>) -> String {
         match self {
             PayloadTy::Text => String::from_utf8_lossy(data.as_ref()).to_string(),
@@ -247,7 +163,7 @@ impl PayloadTy {
                 to_pretty_json_from_str(msg.as_str())?,
             ),
             PayloadTy::Hex => {
-                let mut chars = msg.chars();
+                let chars = msg.chars();
                 let mut hex_datas = Vec::with_capacity(chars.clone().count());
                 let mut data_str = String::with_capacity(msg.len());
                 // 去除非16进制字符，且暂时将16进制转成8进制
@@ -283,11 +199,6 @@ impl PayloadTy {
         })
     }
 }
-
-// fn to_pretty_json(data: &Arc<Bytes>) -> anyhow::Result<String> {
-//     let json = serde_json::from_slice::<Value>(data.as_ref())?;
-//     serde_json::Ok(serde_json::to_string_pretty(&json)?)
-// }
 
 fn to_pretty_json_from_str(data: &str) -> anyhow::Result<String> {
     let json = serde_json::from_str::<Value>(data)?;

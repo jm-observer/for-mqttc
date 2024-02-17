@@ -1,10 +1,8 @@
 use crate::command::view::{BrokerView, TlsView};
-use crate::data::common::{
-    Broker, Protocol, PublishInput, SignedTy, SubscribeHis, SubscribeInput, TabStatus,
-};
-use crate::data::AppEvent;
+use crate::data::common::{Broker, Protocol, SubscribeHis};
+
 use anyhow::Result;
-use crossbeam_channel::Sender;
+
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -16,9 +14,6 @@ pub enum DbKey {
 impl DbKey {
     pub fn broker_key(id: usize) -> Self {
         Self::Broker(id)
-    }
-    pub fn subscribe_his_key(id: usize) -> Self {
-        Self::SubscribeHis(id)
     }
     pub fn as_bytes(&self) -> Result<Vec<u8>> {
         Ok(serde_json::to_vec(self)?)
@@ -42,10 +37,9 @@ pub struct BrokerDB {
 }
 
 impl BrokerDB {
-    pub fn into_broker(self, tx: Sender<AppEvent>) -> Broker {
+    pub fn into_broker(self) -> Broker {
         Broker {
             data: self,
-            tx,
             subscribe_topics: Default::default(),
             msgs: Default::default(),
             unsubscribe_ing: Default::default(),

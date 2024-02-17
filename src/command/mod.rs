@@ -6,18 +6,17 @@ use crate::command::view::{BrokerList, BrokerView, TlsView};
 use crate::data::common::{PublishInput, SubscribeInput, SubscribeTopic};
 use crate::data::db::BrokerDB;
 use crate::data::hierarchy::App;
-use crate::data::AppEvent;
+
 use crate::logic::{connect, to_disconnect, to_publish, to_subscribe};
 use crate::mqtt::data::MqttPublicInput;
-use anyhow::bail;
-use log::{debug, error};
-use serde_json::Value;
-use std::mem::{replace, swap};
+
+use log::debug;
+
+use std::mem::swap;
 use std::path::PathBuf;
 use tauri::AppHandle;
 use tauri::{command, State};
 use tokio::fs;
-use tokio::io::AsyncReadExt;
 use tokio::sync::RwLock;
 
 type ArcApp = RwLock<App>;
@@ -53,7 +52,7 @@ pub async fn subscribe(datas: SubscribeInput, state: State<'_, ArcApp>) -> Resul
 #[command]
 pub async fn publish(datas: PublishInput, state: State<'_, ArcApp>) -> Result<()> {
     debug!("publish: {:?}", datas);
-    let mut app = state.write().await;
+    let app = state.write().await;
     // todo history
     // app.brokers
     //     .iter_mut()
@@ -63,7 +62,7 @@ pub async fn publish(datas: PublishInput, state: State<'_, ArcApp>) -> Result<()
     //         x.subscribe_hises.push(datas.clone().into());
     //         None::<()>
     //     });
-    to_publish(&app.mqtt_clients, MqttPublicInput::from(datas)).await;
+    to_publish(&app.mqtt_clients, MqttPublicInput::from(datas)).await?;
     Ok(())
 }
 
@@ -71,7 +70,7 @@ pub async fn publish(datas: PublishInput, state: State<'_, ArcApp>) -> Result<()
 pub async fn disconnect(id: usize, state: State<'_, ArcApp>) -> Result<()> {
     debug!("disconnect: {}", id);
     let mut app = state.write().await;
-    to_disconnect(&mut app.mqtt_clients, id).await;
+    to_disconnect(&mut app.mqtt_clients, id).await?;
     Ok(())
 }
 
@@ -79,7 +78,7 @@ pub async fn disconnect(id: usize, state: State<'_, ArcApp>) -> Result<()> {
 pub async fn delete_broker(id: usize, state: State<'_, ArcApp>) -> Result<()> {
     debug!("disconnect: {}", id);
     let mut app = state.write().await;
-    to_disconnect(&mut app.mqtt_clients, id).await;
+    to_disconnect(&mut app.mqtt_clients, id).await?;
     let mut brokers = Vec::with_capacity(0);
     swap(&mut brokers, &mut app.brokers);
     app.brokers = brokers.into_iter().filter(|x| x.data.id != id).collect();
@@ -131,7 +130,7 @@ pub async fn update_or_new_broker(
         };
         let broker_ca_path = broker_path.join(file_name);
         if parent != broker_path.as_path() {
-            fs::create_dir_all(broker_path).await;
+            fs::create_dir_all(broker_path).await?;
             // copy to home_path/id
             fs::copy(ca_path, broker_ca_path.as_path()).await?;
         }

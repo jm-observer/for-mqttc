@@ -1,12 +1,11 @@
 pub mod data;
 
-use crate::data::common::SignedTy;
 use crate::data::common::{Broker, Protocol};
 use crate::data::AppEvent;
 use crate::mqtt::data::{MqttPublicInput, MqttSubscribeInput};
 
 use anyhow::{bail, Result};
-use crossbeam_channel::Sender;
+
 use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
@@ -50,29 +49,29 @@ pub async fn init_connect(broker: Broker, tx: AppHandle) -> Result<Client> {
                 MqttEvent::ConnectSuccess(retain) => {
                     send_event(
                         tx,
-                        AppEvent::ClientConnectAckSuccess {
+                        AppEvent::ConnectAckSuccess {
                             broker_id: id,
                             retain: *retain,
                         },
                     );
                 }
                 MqttEvent::ConnectFail(err) => {
-                    send_event(tx, AppEvent::ClientConnectAckFail(id, format!("{:?}", err)));
+                    send_event(tx, AppEvent::ConnectAckFail(id, format!("{:?}", err)));
                 }
                 MqttEvent::PublishSuccess(packet_id) => {
-                    send_event(tx, AppEvent::ClientPubAck(id, *packet_id));
+                    send_event(tx, AppEvent::PubAck(id, *packet_id));
                 }
                 MqttEvent::SubscribeAck(packet) => {
                     send_event(
                         tx,
-                        AppEvent::ClientSubAck {
+                        AppEvent::SubAck {
                             broker_id: id,
                             ack: packet.clone(),
                         },
                     );
                 }
                 MqttEvent::UnsubscribeAck(packet) => {
-                    send_event(tx, AppEvent::ClientUnSubAck(id, packet.clone()));
+                    send_event(tx, AppEvent::UnSubAck(id, packet.clone()));
                 }
                 MqttEvent::Publish(msg) => {
                     let Publish {
@@ -84,7 +83,7 @@ pub async fn init_connect(broker: Broker, tx: AppHandle) -> Result<Client> {
                     debug!("recv publish: {} payload len = {}", topic, payload.len());
                     send_event(
                         tx,
-                        AppEvent::ClientReceivePublic {
+                        AppEvent::ReceivePublic {
                             broker_id: id,
                             topic: topic.clone(),
                             payload: payload.clone(),
@@ -100,13 +99,13 @@ pub async fn init_connect(broker: Broker, tx: AppHandle) -> Result<Client> {
                 }
                 MqttEvent::ConnectedErr(reason) => {
                     error!("{}", reason);
-                    send_event(tx, AppEvent::ClientConnectedErr(id, reason.clone()));
+                    send_event(tx, AppEvent::ConnectedErr(id, reason.clone()));
                 }
                 MqttEvent::UnsubscribeFail(reason) => {
                     error!("{}", reason);
                 }
                 MqttEvent::Disconnected => {
-                    send_event(tx, AppEvent::ClientDisconnect(id));
+                    send_event(tx, AppEvent::Disconnect(id));
                     info!("Disconnected");
                 }
             }

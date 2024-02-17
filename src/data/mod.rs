@@ -4,86 +4,37 @@ pub mod hierarchy;
 // pub mod lens;
 pub mod localized;
 
-use crate::data::common::{QoS, SubscribeHis, SubscribeStatus, SubscribeTopic};
+use crate::data::common::QoS;
 use bytes::Bytes;
-use common::Broker;
 
-use crate::mqtt::data::MqttPublicInput;
-use anyhow::bail;
 use for_mqtt_client::protocol::packet::SubscribeReasonCode;
 use for_mqtt_client::{SubscribeAck, UnsubscribeAck};
-use log::{debug, error, warn};
-use serde::Serialize;
+use log::{debug, error};
+
 use serde_json::{Map, Number, Value};
 use std::sync::Arc;
 
 #[derive(Debug)]
 pub enum AppEvent {
-    /// 展示tips
-    OtherDisplayTips,
-    /// 点击了某个连接tab(broker_id)
-    // TouchClickTab(usize),
-    /// broker列表的新增图标。新增broker
-    TouchAddBroker,
-    /// broker列表的编辑图标。编辑选择的broker
-    TouchConnectBrokerSelected,
-    /// broker列表的删除图标。删除选择的broker
-    // TouchDeleteBrokerSelected,
-    /// 根据输入进行订阅
-    TouchSubscribeByInput(usize),
-    TouchSubscribeFromHis(SubscribeHis),
-    // e.g: delete broker; close tab; click button "disconnect"
-    TouchDisconnect,
-    TouchSaveBroker,
-    TouchReConnect,
-    /// broker信息界面中连接按钮。
-    TouchConnectByButton,
-    /// 调用第三方库连接broker
-    ToConnect(Broker),
-    /// 调用第三方库断开连接
-    ToDisconnect(usize),
-    // select brokers tab
-    UpdateToSelectTabs(usize),
-    TouchRemoveSubscribeHis(usize),
-    /// 通知client进行订阅
-    ToSubscribe(SubscribeTopic),
-    TouchUnSubscribe {
-        broker_id: usize,
-        trace_id: u32,
-    },
-    ToPublish(MqttPublicInput),
-    ToUnsubscribeIng(EventUnSubscribe),
-    ClientConnectAckSuccess {
+    ConnectAckSuccess {
         broker_id: usize,
         retain: bool,
     },
-    ClientConnectAckFail(usize, String),
-    ClientConnectedErr(usize, String),
-    ClientDisconnect(usize),
-    TouchPublic(usize),
-    ClientReceivePublic {
+    ConnectAckFail(usize, String),
+    ConnectedErr(usize, String),
+    Disconnect(usize),
+    ReceivePublic {
         broker_id: usize,
         topic: Arc<String>,
         payload: Arc<Bytes>,
         qos: QoS,
     },
-    ClientPubAck(usize, u32),
-    ClientSubAck {
+    PubAck(usize, u32),
+    SubAck {
         broker_id: usize,
         ack: SubscribeAck,
     },
-    ClientUnSubAck(usize, UnsubscribeAck),
-    // TouchClick(ClickTy),
-    // OtherClickLifeDead(ClickTy),
-    TouchCloseBrokerTab(usize),
-    // CloseConnectionTab(usize),
-    UpdateStatusBar(String),
-    /// 清空消息
-    TouchClearMsg(usize),
-    /// 滚动消息窗口
-    UpdateScrollMsgWin,
-    /// 滚动订阅窗口
-    UpdateScrollSubscribeWin,
+    UnSubAck(usize, UnsubscribeAck),
 }
 
 #[derive(Default)]
@@ -105,28 +56,28 @@ impl AppEvent {
         use AppEvent::*;
         debug!("build event: {:?}", self);
         Some(match self {
-            ClientConnectAckSuccess { broker_id, retain } => {
+            ConnectAckSuccess { broker_id, retain } => {
                 let event = EventBuilder::default()
                     .with_param("broker_id", broker_id)
                     .with_param("retain", retain)
                     .build();
                 ("ClientConnectAckSuccess", Some(event))
             }
-            ClientConnectAckFail(id, msg) => {
+            ConnectAckFail(id, msg) => {
                 let event = EventBuilder::default()
                     .with_param("broker_id", id)
                     .with_param("msg", msg)
                     .build();
                 ("ClientConnectAckFail", Some(event))
             }
-            ClientPubAck(id, packet_id) => {
+            PubAck(id, packet_id) => {
                 let event = EventBuilder::default()
                     .with_param("broker_id", id)
                     .with_param("trace_id", packet_id as usize)
                     .build();
                 ("ClientPubAck", Some(event))
             }
-            ClientSubAck { broker_id, mut ack } => {
+            SubAck { broker_id, mut ack } => {
                 let Some(reason) = ack.acks.pop() else {
                     error!("get subscribe reason fail");
                     return None;
@@ -140,10 +91,10 @@ impl AppEvent {
                 .build();
                 ("ClientSubAck", Some(event))
             }
-            ClientUnSubAck(_id, _ack) => {
+            UnSubAck(_id, _ack) => {
                 todo!()
             }
-            ClientReceivePublic {
+            ReceivePublic {
                 broker_id,
                 topic,
                 payload,
@@ -162,21 +113,18 @@ impl AppEvent {
                     .build();
                 ("ClientReceivePublic", Some(event))
             }
-            ClientConnectedErr(id, msg) => {
+            ConnectedErr(id, msg) => {
                 let event = EventBuilder::default()
                     .with_param("broker_id", id)
                     .with_param("msg", msg)
                     .build();
                 ("ClientConnectedErr", Some(event))
             }
-            ClientDisconnect(broker_id) => {
+            Disconnect(broker_id) => {
                 let event = EventBuilder::default()
                     .with_param("broker_id", broker_id)
                     .build();
                 ("ClientDisconnect", Some(event))
-            }
-            _ => {
-                todo!()
             }
         })
     }
