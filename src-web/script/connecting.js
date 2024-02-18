@@ -31,7 +31,7 @@ function unsubscribe(subscribe_id)  {
 
 async function display_subscribe_his(event, broker_id){
     try {
-        let jsonObj = await get_invoke()("subscribe_his", { broker_id : broker_id, brokerId : broker_id});
+        let jsonObj = await get_invoke()("subscribe_his", { brokerId : broker_id});
         // var jsonObj = JSON.parse(rs);
         var tableBody = document.getElementById("subs_his");
         while (tableBody.firstChild) {
@@ -54,6 +54,34 @@ async function display_subscribe_his(event, broker_id){
         console.error("Parsing error:", e);
     }
 }
+
+
+async function display_publish_his(event, broker_id){
+    try {
+        let jsonObj = await get_invoke()("publish_his", { brokerId : broker_id});
+        // var jsonObj = JSON.parse(rs);
+        var tableBody = document.getElementById("publish_his");
+        while (tableBody.firstChild) {
+            tableBody.removeChild(tableBody.firstChild);
+        }
+        jsonObj.forEach(function(item) {
+            let div = init_publish_his_item(broker_id, item["topic"], item["qos"], item["payload_ty"]
+                , item["msg"], item["retain"]);
+            tableBody.appendChild(div);
+        });
+        var triggerButton = document.getElementById('tabs-content');
+        // 获取触发按钮的位置
+        var rect = triggerButton.getBoundingClientRect();
+        var tableBody = document.getElementById("publish_his_modal");
+
+        // 设置模态窗口的位置
+        tableBody.style.display = 'block';
+        tableBody.style.top = rect.top + 'px'; // 或者使用 rect.bottom + 'px'，取决于需要
+    } catch(e) {
+        console.error("Parsing error:", e);
+    }
+}
+
 function publish(broker_id)  {
     try {
         var form = document.getElementById('form-publish-' + broker_id);

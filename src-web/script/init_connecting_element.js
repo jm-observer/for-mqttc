@@ -156,3 +156,47 @@
      });
      return tempDiv
  }
+
+
+
+
+ function init_publish_his_item(broker_id, topic, qos, ty, payload, retain) {
+     let template = "        <div class=\"flex items-center pb-1  \">\n" +
+         "            <span class=\"flex-grow text-gray-800\">__topic__</span>\n" +
+         "        <a onclick='delete_publish_his(__topic__, __qos__, __ty__, __payload__)'><i class=\"ml-auto layui-icon layui-icon-close py-2 px-1 \"></i></a>\n" +
+         "        </div>\n" +
+         "        <div class=\"mb-2 px-2 py-1 flex-grow rounded-lg bg-green-200 text-gray-800\">" +
+         "          <p class='clamp-2 break-words'>__payload__</p></div>\n" +
+         "        <div class=\"flex\"><span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full mr-2\">QoS __qos__</span>\n" +
+         "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full mr-2\">__ty__</span>\n"
+     ;
+     if(retain) {
+         template += "<span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">retain</span></div>\n";
+     } else {
+         template += "</div>\n";
+     }
+
+     const htmlString = template.replaceAll("__topic__", topic)
+         .replaceAll("__payload__", payload)
+         .replaceAll("__qos__", qos).replaceAll("__ty__", ty);
+
+
+     var tempDiv = document.createElement('div');
+     tempDiv.innerHTML = htmlString;
+     tempDiv.className = "items-center justify-between p-2 bg-white rounded-lg shadow-md mb-4";
+     tempDiv.addEventListener('dblclick', async function () {
+         let trace_id = next_trace_id();
+         init_publish_item(trace_id, topic, payload, qos, ty, broker_id, get_time());
+         var formObject = {};
+         formObject["trace_id"] = trace_id;
+         formObject["broker_id"] = broker_id;
+         formObject["qos"] = get_qos(qos);
+         formObject["topic"] = topic;
+         formObject["payload_ty"] = ty;
+         formObject["retain"] = retain;
+         formObject["msg"] = payload;
+         let rs = await get_invoke()("publish", { datas : formObject});
+         console.log(rs);
+     });
+     return tempDiv
+ }

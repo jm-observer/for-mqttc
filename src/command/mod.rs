@@ -54,12 +54,13 @@ pub async fn publish(datas: PublishInput, state: State<'_, ArcApp>) -> Result<()
 #[command]
 pub async fn publish_his(broker_id: usize, state: State<'_, ArcApp>) -> Result<Vec<PublishHis>> {
     let app = state.read().await;
-    let rs = app
+    let mut rs = app
         .brokers
         .iter()
         .find(|x| x.data.id == broker_id)
         .map(|x| x.data.publish_his.clone())
         .unwrap_or_default();
+    rs.reverse();
     Ok(rs)
 }
 #[command]
@@ -68,12 +69,13 @@ pub async fn subscribe_his(
     state: State<'_, ArcApp>,
 ) -> Result<Vec<SubscribeHis>> {
     let app = state.read().await;
-    let rs = app
+    let mut rs = app
         .brokers
         .iter()
         .find(|x| x.data.id == broker_id)
         .map(|x| x.data.subscribe_his.clone())
         .unwrap_or_default();
+    rs.reverse();
     Ok(rs)
 }
 

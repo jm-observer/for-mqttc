@@ -44,6 +44,10 @@ async function init_broker_model() {
             if (event.target != modal && modal.style.display == 'block') {
                 modal.style.display = 'none';
             }
+            var modal = document.getElementById('publish_his_modal');
+            if (event.target != modal && modal.style.display == 'block') {
+                modal.style.display = 'none';
+            }
         });
     }
 
