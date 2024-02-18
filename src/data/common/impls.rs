@@ -4,25 +4,6 @@ use crate::data::common::{
 use crate::mqtt;
 
 impl SubscribeTopic {
-    pub fn match_topic(&self, topic: &str) -> bool {
-        if self.topic.as_str() == "#" {
-            true
-        } else if self.topic.ends_with("/#") {
-            topic.starts_with(self.topic.split_at(self.topic.len() - 2).0)
-        } else if self.topic.as_str() == "+" {
-            !topic.contains('/')
-        } else if self.topic.ends_with("/+") {
-            let sub_topic = self.topic.split_at(self.topic.len() - 2).0;
-            if topic.starts_with(sub_topic) {
-                topic.split_at(sub_topic.len()).1.contains('/')
-            } else {
-                false
-            }
-        } else {
-            self.topic.as_str() == topic
-        }
-    }
-
     pub fn from(val: SubscribeInput) -> Self {
         Self {
             broker_id: val.broker_id,
@@ -31,20 +12,6 @@ impl SubscribeTopic {
             qos: val.qos.clone(),
             payload_ty: val.payload_ty,
         }
-    }
-    pub fn from_his(_val: SubscribeHis, _trace_id: u32) -> Self {
-        todo!()
-        // Self {
-        //     broker_id: val.broker_id,
-        //     trace_id,
-        //     topic: val.topic.clone(),
-        //     qos: val.qos.clone(),
-        //     status: SubscribeStatus::SubscribeIng,
-        //     payload_ty: val.payload_ty,
-        // }
-    }
-    pub fn is_equal(&self, other: &Self) -> bool {
-        self.topic == other.topic
     }
 }
 

@@ -129,12 +129,6 @@ impl AppEvent {
         })
     }
 }
-#[derive(Debug, Clone)]
-pub struct EventUnSubscribe {
-    pub broke_id: usize,
-    pub subscribe_pk_id: u32,
-    pub topic: String,
-}
 
 fn get_subscribe_rs(ack: SubscribeReasonCode, builder: EventBuilder) -> EventBuilder {
     match ack {

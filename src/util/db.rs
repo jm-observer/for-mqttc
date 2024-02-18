@@ -45,7 +45,7 @@ impl ArcDb {
                 if let Some(val) = self.db.get(DbKey::broker_key(id).as_bytes()?)? {
                     let mut broker: BrokerDB = serde_json::from_slice(&val)?;
                     broker.id = id;
-                    let broker = broker.into_broker();
+                    let broker = broker.into_broker(self.clone());
                     debug!("{:?}", broker);
                     brokers.push(broker);
                 } else {
@@ -138,7 +138,7 @@ mod test {
             credentials: Credentials::None,
             auto_connect: true,
             tls: Tls::None,
-            subscribe_hises: vec![],
+            subscribe_his: vec![],
         };
         db.save_broker(&broker).unwrap();
     }

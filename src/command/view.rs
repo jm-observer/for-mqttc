@@ -1,4 +1,4 @@
-use crate::data::common::{Protocol};
+use crate::data::common::Protocol;
 use crate::data::db::{BrokerDB, Credentials, Tls};
 use serde::{Deserialize, Serialize};
 
@@ -46,7 +46,7 @@ impl From<BrokerDB> for BrokerView {
             credentials,
             auto_connect,
             tls,
-            subscribe_hises: _,
+            ..
         } = value;
         let (credential, user_name, password) = match credentials {
             Credentials::None => (false, "".to_string(), "".to_string()),

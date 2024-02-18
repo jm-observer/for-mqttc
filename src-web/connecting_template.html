@@ -24,8 +24,8 @@
                     </select>
                 </div>
                 <div class="mb-2 flex items-end">
-                    <input name="topic"  class="flex-grow shadow appearance-none border rounded w-full py-1 px-2  leading-tight" type="text" placeholder="topic">
-                    <a  href="#" class="ml-2 block text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
+                    <input name="topic"  class="flex-grow shadow appearance-none border rounded w-full py-1 px-2  leading-tight" type="text" placeholder="topic" autocomplete="off">
+                    <a onclick="display_subscribe_his(event, __id__)" href="#" class="ml-2 block text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
                         <i class="layui-icon layui-icon-history"></i></a>
                 </div>
                 <div class="flex items-center justify-between">
@@ -57,7 +57,7 @@
                     <input type="checkbox" class="checkbox checkbox-xs ml-1" name="retain"/>
                 </div>
                 <div class="flex items-end mb-2">
-                    <input class="py-1 px-2 flex-grow shadow appearance-none border rounded w-full  leading-tight" name="topic" type="text" placeholder="topic">
+                    <input class="py-1 px-2 flex-grow shadow appearance-none border rounded w-full  leading-tight" name="topic" type="text" placeholder="topic" autocomplete="off">
                     <a  href="#" class="ml-2 block text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
                         <i class="layui-icon layui-icon-history"></i></a>
                 </div>

@@ -32,10 +32,15 @@ async function init_broker_model() {
             init_new_broker();
         });
     }
+    // 隐藏新增div和订阅历史div
     const main = document.getElementById('main');
     if (main) {
         main.addEventListener('click', function(event) {
             var modal = document.getElementById('modal');
+            if (event.target != modal && modal.style.display == 'block') {
+                modal.style.display = 'none';
+            }
+            var modal = document.getElementById('subs_his_modal');
             if (event.target != modal && modal.style.display == 'block') {
                 modal.style.display = 'none';
             }

@@ -3,14 +3,12 @@
 
 use crate::config::Config;
 
-
 use crate::util::custom_logger::CustomWriter;
 use crate::util::db::ArcDb;
 use directories::UserDirs;
 use flexi_logger::{Age, Cleanup, Criterion, FileSpec, Naming};
 
 use log::LevelFilter::{Debug, Info};
-
 
 use tokio::sync::RwLock;
 
@@ -103,7 +101,9 @@ fn main() -> anyhow::Result<()> {
             disconnect,
             delete_broker,
             update_or_new_broker,
-            loading
+            loading,
+            publish_his,
+            subscribe_his
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

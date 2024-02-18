@@ -29,7 +29,31 @@ function unsubscribe(subscribe_id)  {
     console.log("unsubscribe:" + subscribe_id);
 }
 
+async function display_subscribe_his(event, broker_id){
+    try {
+        let jsonObj = await get_invoke()("subscribe_his", { broker_id : broker_id, brokerId : broker_id});
+        // var jsonObj = JSON.parse(rs);
+        var tableBody = document.getElementById("subs_his");
+        while (tableBody.firstChild) {
+            tableBody.removeChild(tableBody.firstChild);
+        }
+        jsonObj.forEach(function(item) {
+            let div = init_subscribe_his_item(broker_id, item["topic"], item["qos"], item["payload_ty"]);
+            tableBody.appendChild(div);
+        });
+        var triggerButton = document.getElementById('tabs-content');
+        // 获取触发按钮的位置
+        var rect = triggerButton.getBoundingClientRect();
+        var tableBody = document.getElementById("subs_his_modal");
 
+        // 设置模态窗口的位置
+        tableBody.style.display = 'block';
+        tableBody.style.top = rect.top + 'px'; // 或者使用 rect.bottom + 'px'，取决于需要
+        tableBody.style.left = event.target.getBoundingClientRect().left + 'px';
+    } catch(e) {
+        console.error("Parsing error:", e);
+    }
+}
 function publish(broker_id)  {
     try {
         var form = document.getElementById('form-publish-' + broker_id);
@@ -58,7 +82,9 @@ function get_qos(qos) {
         return 0
     } else if (qos === "1") {
         return 1
-    } else {
+    } else if (qos === "2"){
         return 2
+    } else {
+        return qos
     }
 }

@@ -1,8 +1,9 @@
 use crate::command::view::{BrokerView, TlsView};
-use crate::data::common::{Broker, Protocol, SubscribeHis};
+use crate::data::common::{Broker, Protocol, PublishHis, SubscribeHis};
 
 use anyhow::Result;
 
+use crate::util::db::ArcDb;
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -33,17 +34,14 @@ pub struct BrokerDB {
     pub auto_connect: bool,
     pub tls: Tls,
     #[serde(default)]
-    pub subscribe_hises: Vec<SubscribeHis>,
+    pub subscribe_his: Vec<SubscribeHis>,
+    #[serde(default)]
+    pub publish_his: Vec<PublishHis>,
 }
 
 impl BrokerDB {
-    pub fn into_broker(self) -> Broker {
-        Broker {
-            data: self,
-            subscribe_topics: Default::default(),
-            msgs: Default::default(),
-            unsubscribe_ing: Default::default(),
-        }
+    pub fn into_broker(self, db: ArcDb) -> Broker {
+        Broker { data: self, db }
     }
 }
 
@@ -89,7 +87,8 @@ impl From<BrokerView> for BrokerDB {
             credentials,
             auto_connect,
             tls,
-            subscribe_hises: vec![],
+            subscribe_his: vec![],
+            publish_his: vec![],
         }
     }
 }

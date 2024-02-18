@@ -3,7 +3,7 @@ pub mod view;
 
 use crate::command::error::Error;
 use crate::command::view::{BrokerList, BrokerView, TlsView};
-use crate::data::common::{PublishInput, SubscribeInput, SubscribeTopic};
+use crate::data::common::{PublishHis, PublishInput, SubscribeHis, SubscribeInput, SubscribeTopic};
 use crate::data::db::BrokerDB;
 use crate::data::hierarchy::App;
 
@@ -37,14 +37,7 @@ pub async fn broker_list(state: State<'_, ArcApp>) -> Result<String> {
 pub async fn subscribe(datas: SubscribeInput, state: State<'_, ArcApp>) -> Result<()> {
     debug!("subscribe: {:?}", datas);
     let mut app = state.write().await;
-    app.brokers
-        .iter_mut()
-        .find(|x| x.data.id == datas.broker_id)
-        .and_then(|x| {
-            x.subscribe_topics.push(SubscribeTopic::from(datas.clone()));
-            x.data.subscribe_hises.push(datas.clone().into());
-            None::<()>
-        });
+    app.update_subscribe_his(datas.clone())?;
     to_subscribe(&app.mqtt_clients, SubscribeTopic::from(datas)).await;
     Ok(())
 }
@@ -52,18 +45,36 @@ pub async fn subscribe(datas: SubscribeInput, state: State<'_, ArcApp>) -> Resul
 #[command]
 pub async fn publish(datas: PublishInput, state: State<'_, ArcApp>) -> Result<()> {
     debug!("publish: {:?}", datas);
-    let app = state.write().await;
-    // todo history
-    // app.brokers
-    //     .iter_mut()
-    //     .find(|x| x.id == datas.broker_id)
-    //     .and_then(|x| {
-    //         x.subscribe_topics.push(SubscribeTopic::from(datas.clone()));
-    //         x.subscribe_hises.push(datas.clone().into());
-    //         None::<()>
-    //     });
+    let mut app = state.write().await;
+    app.update_publish_his(datas.clone())?;
     to_publish(&app.mqtt_clients, MqttPublicInput::from(datas)).await?;
     Ok(())
+}
+
+#[command]
+pub async fn publish_his(broker_id: usize, state: State<'_, ArcApp>) -> Result<Vec<PublishHis>> {
+    let app = state.read().await;
+    let rs = app
+        .brokers
+        .iter()
+        .find(|x| x.data.id == broker_id)
+        .map(|x| x.data.publish_his.clone())
+        .unwrap_or_default();
+    Ok(rs)
+}
+#[command]
+pub async fn subscribe_his(
+    broker_id: usize,
+    state: State<'_, ArcApp>,
+) -> Result<Vec<SubscribeHis>> {
+    let app = state.read().await;
+    let rs = app
+        .brokers
+        .iter()
+        .find(|x| x.data.id == broker_id)
+        .map(|x| x.data.subscribe_his.clone())
+        .unwrap_or_default();
+    Ok(rs)
 }
 
 #[command]

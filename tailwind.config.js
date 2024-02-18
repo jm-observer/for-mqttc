@@ -6,6 +6,7 @@ module.exports = {
     extend: {
       height: {
         inherit: 'inherit',
+        84: '21rem',
       },
       gridTemplateColumns: {
         content: '1fr 2fr',

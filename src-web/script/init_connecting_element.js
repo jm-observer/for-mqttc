@@ -5,7 +5,7 @@
         "        <a onclick='unsubscribe(__id__)'><i class=\"ml-auto layui-icon layui-icon-close py-2 px-1 \"></i></a>\n" +
         "        </div>\n" +
         "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">QoS __qos__</span>\n" +
-        "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">__ty__</span>\n"
+        "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">__ty__</span>\n" +
      "        <span class=\"px-2 py-1 ml-auto\">__time__</span>\n"
      ;
 
@@ -124,4 +124,35 @@
              console.error('copy fail :', error);
          });
      });
+ }
+
+
+ function init_subscribe_his_item(broker_id, topic, qos, ty) {
+     let template = "        <div class=\"flex items-center pb-1 mb-2\">\n" +
+         "            <span id=\"copy-subcribe-topic-__id__\" class=\"flex-grow text-gray-800\">__topic__</span>\n" +
+         "        <a onclick='delete_subscribe_his(__topic__, __qos__, __ty__)'><i class=\"ml-auto layui-icon layui-icon-close py-2 px-1 \"></i></a>\n" +
+         "        </div>\n" +
+         "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">QoS __qos__</span>\n" +
+         "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">__ty__</span>\n"
+     ;
+
+     const htmlString = template.replaceAll("__topic__", topic)
+         .replaceAll("__qos__", qos).replaceAll("__ty__", ty);
+
+     var tempDiv = document.createElement('div');
+     tempDiv.innerHTML = htmlString;
+     tempDiv.className = "items-center justify-between p-2 bg-white rounded-lg shadow-md mb-4";
+     tempDiv.addEventListener('dblclick', async function () {
+         let trace_id = next_trace_id();
+         init_subscribe_item(trace_id, topic, qos, ty, broker_id, get_time());
+         var formObject = {};
+         formObject["trace_id"] = trace_id;
+         formObject["broker_id"] = broker_id;
+         formObject["qos"] = get_qos(qos);
+         formObject["topic"] = topic;
+         formObject["payload_ty"] = ty;
+         let rs = await get_invoke()("subscribe", { datas : formObject});
+         console.log(rs);
+     });
+     return tempDiv
  }
