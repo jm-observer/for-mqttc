@@ -12,6 +12,7 @@ use crate::mqtt::data::MqttPublicInput;
 
 use log::debug;
 
+use crate::mqtt::to_unsubscribe;
 use std::mem::swap;
 use std::path::PathBuf;
 use tauri::AppHandle;
@@ -40,6 +41,13 @@ pub async fn subscribe(datas: SubscribeInput, state: State<'_, ArcApp>) -> Resul
     app.update_subscribe_his(datas.clone())?;
     to_subscribe(&app.mqtt_clients, SubscribeTopic::from(datas)).await;
     Ok(())
+}
+
+#[command]
+pub async fn unsubscribe(broker_id: usize, topic: String, state: State<'_, ArcApp>) -> Result<u32> {
+    let app = state.read().await;
+    let tarce_id = to_unsubscribe(broker_id, topic, &app.mqtt_clients).await?;
+    Ok(tarce_id)
 }
 
 #[command]
@@ -114,8 +122,7 @@ pub async fn connect_to_broker(
             None
         }
     }) else {
-        //todo to notify frontend
-        return Ok(());
+        return Error::init_rs(format!("not found broker {}", id));
     };
     connect(&mut app.mqtt_clients, app_handle, broker).await;
     // app.tx.send(AppEvent::ToConnect(broker)).map_err(|_| {

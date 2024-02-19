@@ -25,8 +25,18 @@ function subscribe(broker_id)  {
     }
 }
 
-function unsubscribe(subscribe_id)  {
-    console.log("unsubscribe:" + subscribe_id);
+function unsubscribe(subscribe_id, topic, broker_id)  {
+    let div_id = "subscribe_" + subscribe_id;
+    try {
+        const element = document.getElementById(div_id);
+        if (element) {
+            element.remove();
+        }
+        let rs = get_invoke()("unsubscribe", { brokerId : broker_id, topic: topic});
+        console.log(rs);
+    } catch(e) {
+        console.error("unsubscribe error:", e);
+    }
 }
 
 async function display_subscribe_his(event, broker_id){

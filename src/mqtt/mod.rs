@@ -143,6 +143,17 @@ pub async fn mqtt_subscribe(
         .await?)
 }
 
+pub async fn to_unsubscribe(
+    index: usize,
+    topic: String,
+    clients: &HashMap<usize, Client>,
+) -> Result<u32> {
+    let Some(client) = clients.get(&index) else {
+        bail!("can't get mqtt client: {}", index);
+    };
+    Ok(client.unsubscribe(topic).await?)
+}
+
 pub async fn mqtt_public(
     index: usize,
     input: MqttPublicInput,

@@ -2,7 +2,7 @@
     let template = "        <div class=\"flex items-center pb-1 mb-2\">\n" +
         "            <span id=\"subcribe-status-__id__\" class=\"h-3 w-3 bg-gray-400 rounded-full mr-2\"></span>\n" +
         "            <span id=\"copy-subcribe-topic-__id__\" class=\"flex-grow text-gray-800\">__topic__</span>\n" +
-        "        <a onclick='unsubscribe(__id__)'><i class=\"ml-auto layui-icon layui-icon-close py-2 px-1 \"></i></a>\n" +
+        "        <a onclick='unsubscribe(__id__, \"__topic__\", __connect_id__)'><i class=\"ml-auto layui-icon layui-icon-close py-2 px-1 \"></i></a>\n" +
         "        </div>\n" +
         "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">QoS __qos__</span>\n" +
         "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">__ty__</span>\n" +
@@ -10,13 +10,15 @@
      ;
 
      const htmlString = template.replaceAll("__id__", id).replaceAll("__topic__", topic)
-         .replaceAll("__qos__", qos).replaceAll("__ty__", ty).replaceAll("__time__", time);
+         .replaceAll("__qos__", qos).replaceAll("__ty__", ty).replaceAll("__time__", time)
+         .replaceAll("__connect_id__", connect_id);
 
      var tempDiv = document.createElement('div');
+     tempDiv.id = "subscribe_" + id;
      tempDiv.innerHTML = htmlString;
      tempDiv.className = "items-center justify-between p-2 bg-white rounded-lg shadow-md mb-4";
      tempDiv.addEventListener('dblclick', function () {
-         unsubscribe(id);
+         unsubscribe(id, topic, connect_id);
      });
 
      var targetElement = document.getElementById(connect_id + 'subs'); // 目标元素

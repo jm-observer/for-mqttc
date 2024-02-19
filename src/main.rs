@@ -103,7 +103,8 @@ fn main() -> anyhow::Result<()> {
             update_or_new_broker,
             loading,
             publish_his,
-            subscribe_his
+            subscribe_his,
+            unsubscribe
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

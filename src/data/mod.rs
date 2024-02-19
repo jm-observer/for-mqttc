@@ -91,8 +91,21 @@ impl AppEvent {
                 .build();
                 ("ClientSubAck", Some(event))
             }
-            UnSubAck(_id, _ack) => {
-                todo!()
+            UnSubAck(id, mut ack) => {
+                let Some(reason) = ack.acks.pop() else {
+                    let event = EventBuilder::default()
+                        .with_param("broker_id", id)
+                        .with_param("trace_id", ack.id)
+                        .with_param("reason", "success")
+                        .build();
+                    return Some(("ClientUnSubAck", Some(event)));
+                };
+                let event = EventBuilder::default()
+                    .with_param("broker_id", id)
+                    .with_param("trace_id", ack.id)
+                    .with_param("reason", format!("{:?}", reason))
+                    .build();
+                ("ClientUnSubAck", Some(event))
             }
             ReceivePublic {
                 broker_id,
