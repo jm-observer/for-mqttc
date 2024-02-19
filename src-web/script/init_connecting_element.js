@@ -168,6 +168,9 @@
          formObject["payload_ty"] = ty;
          window.subscribes[formObject["topic"]] = formObject["payload_ty"];
          let rs = await get_invoke()("subscribe", { datas : formObject});
+
+         var tableBody = document.getElementById("subs_his_modal");
+         tableBody.style.display = 'none';
          console.log(rs);
      });
      return tempDiv
@@ -210,6 +213,9 @@
          formObject["retain"] = retain;
          formObject["msg"] = payload;
          let rs = await get_invoke()("publish", { datas : formObject});
+
+         var tableBody = document.getElementById("publish_his_modal");
+         tableBody.style.display = 'none';
          console.log(rs);
      });
      return tempDiv

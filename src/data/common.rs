@@ -2,7 +2,11 @@ mod impls;
 
 use crate::data::db::BrokerDB;
 use crate::util::db::ArcDb;
+use anyhow::bail;
+use bytes::Bytes;
+use log::debug;
 use serde::{Deserialize, Serialize};
+use serde_json::Value;
 use serde_repr::{Deserialize_repr, Serialize_repr};
 use std::sync::atomic::{AtomicU32, Ordering};
 
@@ -151,77 +155,55 @@ pub enum PayloadTy {
 }
 
 impl PayloadTy {
-    // pub fn format(&self, data: Arc<Bytes>) -> String {
-    //     match self {
-    //         PayloadTy::Text => String::from_utf8_lossy(data.as_ref()).to_string(),
-    //         PayloadTy::Json => match String::from_utf8(data.to_vec()) {
-    //             Ok(rs) => {
-    //                 let Ok(json) = serde_json::from_str::<Value>(rs.as_str()) else {
-    //                     return rs;
-    //                 };
-    //                 let Ok(json) = serde_json::to_string_pretty(&json) else {
-    //                     return rs;
-    //                 };
-    //                 json
-    //             }
-    //             Err(err) => {
-    //                 error!("{}", err.to_string());
-    //                 let rs = String::from_utf8_lossy(data.as_ref()).to_string();
-    //                 rs
-    //             }
-    //         },
-    //         PayloadTy::Hex => simple_hex(data.as_ref()),
-    //     }
-    // }
-    // pub fn to_bytes(&self, msg: &String) -> anyhow::Result<(Bytes, String)> {
-    //     Ok(match self {
-    //         PayloadTy::Text => (Bytes::from(msg.as_bytes().to_vec()), msg.clone()),
-    //         PayloadTy::Json => (
-    //             Bytes::from(msg.as_bytes().to_vec()),
-    //             to_pretty_json_from_str(msg.as_str())?,
-    //         ),
-    //         PayloadTy::Hex => {
-    //             let chars = msg.chars();
-    //             let mut hex_datas = Vec::with_capacity(chars.clone().count());
-    //             let mut data_str = String::with_capacity(msg.len());
-    //             // 去除非16进制字符，且暂时将16进制转成8进制
-    //             let mut len = 0;
-    //             for c in chars {
-    //                 if c.is_ascii_hexdigit() {
-    //                     let Some(digit) = c.to_digit(16) else {
-    //                         debug!("{} to_digit fail", c);
-    //                         continue;
-    //                     };
-    //                     hex_datas.push(digit as u8);
-    //                     len += 1;
-    //                     data_str.push(c);
-    //                     if len % 2 == 0 {
-    //                         data_str.push(' ');
-    //                     }
-    //                 }
-    //             }
-    //             // 判定长度
-    //             if len % 2 != 0 {
-    //                 bail!("ascii_hexdigit len % 2 != 0!");
-    //             }
-    //             // 合并2位16进制至8进制
-    //             let mut i = 0;
-    //             let mut datas = Vec::with_capacity(len / 2);
-    //             while i < len {
-    //                 // debug!("{} {} {}", hex_datas[i], hex_datas[i] << 4, hex_datas[i + 1], )
-    //                 datas.push((hex_datas[i] << 4) | (hex_datas[i + 1]));
-    //                 i += 2;
-    //             }
-    //             (datas.into(), data_str)
-    //         }
-    //     })
-    // }
+    pub fn to_bytes(&self, msg: &String) -> anyhow::Result<(Bytes, String)> {
+        Ok(match self {
+            PayloadTy::Text => (Bytes::from(msg.as_bytes().to_vec()), msg.clone()),
+            PayloadTy::Json => (
+                Bytes::from(msg.as_bytes().to_vec()),
+                to_pretty_json_from_str(msg.as_str())?,
+            ),
+            PayloadTy::Hex => {
+                let chars = msg.chars();
+                let mut hex_datas = Vec::with_capacity(chars.clone().count());
+                let mut data_str = String::with_capacity(msg.len());
+                // 去除非16进制字符，且暂时将16进制转成8进制
+                let mut len = 0;
+                for c in chars {
+                    if c.is_ascii_hexdigit() {
+                        let Some(digit) = c.to_digit(16) else {
+                            debug!("{} to_digit fail", c);
+                            continue;
+                        };
+                        hex_datas.push(digit as u8);
+                        len += 1;
+                        data_str.push(c);
+                        if len % 2 == 0 {
+                            data_str.push(' ');
+                        }
+                    }
+                }
+                // 判定长度
+                if len % 2 != 0 {
+                    bail!("ascii_hexdigit len % 2 != 0!");
+                }
+                // 合并2位16进制至8进制
+                let mut i = 0;
+                let mut datas = Vec::with_capacity(len / 2);
+                while i < len {
+                    // debug!("{} {} {}", hex_datas[i], hex_datas[i] << 4, hex_datas[i + 1], )
+                    datas.push((hex_datas[i] << 4) | (hex_datas[i + 1]));
+                    i += 2;
+                }
+                (datas.into(), data_str)
+            }
+        })
+    }
 }
 
-// fn to_pretty_json_from_str(data: &str) -> anyhow::Result<String> {
-//     let json = serde_json::from_str::<Value>(data)?;
-//     Ok(serde_json::to_string_pretty(&json)?)
-// }
+fn to_pretty_json_from_str(data: &str) -> anyhow::Result<String> {
+    let json = serde_json::from_str::<Value>(data)?;
+    Ok(serde_json::to_string_pretty(&json)?)
+}
 
 impl Default for PayloadTy {
     fn default() -> Self {

@@ -59,7 +59,7 @@ listen('ClientReceivePublic', (event) => {
     }
     if (payload_ty == "Hex") {
         var byteStream = new Uint8Array(event.payload.payload);
-        var utf8String = byteArrayToHex(byteStream);
+        const utf8String = byteArrayToHex(byteStream);
         init_receive_publish_item(next_trace_id(), event.payload.topic, utf8String, event.payload.qos, payload_ty, event.payload.broker_id, get_time())
     } else {
         var byteStream = new Uint8Array(event.payload.payload);
@@ -81,16 +81,14 @@ listen('ClientDisconnect', (event) => {
     console.log("ClientDisconnect:" + event.payload.broker_id);
 });
 
-
-
-
 function byteArrayToHex(byteArray) {
-    return byteArray.map(function(byte) {
-        // 将每个字节转换为16进制，确保结果为两位数，不足前面补零
-        return ('0' + (byte & 0xFF).toString(16)).slice(-2);
-    }).join(' '); // 将所有生成的16进制数拼接成字符串
+    const hexes = [];
+    for (let i = 0; i < byteArray.length; i++) {
+        const hex = (byteArray[i] & 0xFF).toString(16);
+        hexes.push(hex.length === 1 ? '0' + hex : hex);
+    }
+    return hexes.join(' ')
 }
-
 
 
 

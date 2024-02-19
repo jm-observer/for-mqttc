@@ -18,16 +18,19 @@ pub struct MqttSubscribeInput {
     pub qos: QoS,
 }
 
-impl From<PublishInput> for MqttPublicInput {
-    fn from(val: PublishInput) -> Self {
-        Self {
+impl TryFrom<PublishInput> for MqttPublicInput {
+    type Error = anyhow::Error;
+
+    fn try_from(val: PublishInput) -> Result<Self, Self::Error> {
+        let msg = val.payload_ty.to_bytes(&val.msg)?;
+        Ok(Self {
             broker_id: val.broker_id,
             trace_id: val.trace_id,
             topic: Arc::new(val.topic),
-            msg: Bytes::from(val.msg),
+            msg: msg.0,
             qos: val.qos,
             retain: val.retain,
-        }
+        })
     }
 }
 impl From<SubscribeTopic> for MqttSubscribeInput {

@@ -55,7 +55,7 @@ pub async fn publish(datas: PublishInput, state: State<'_, ArcApp>) -> Result<()
     debug!("publish: {:?}", datas);
     let mut app = state.write().await;
     app.update_publish_his(datas.clone())?;
-    to_publish(&app.mqtt_clients, MqttPublicInput::from(datas)).await?;
+    to_publish(&app.mqtt_clients, MqttPublicInput::try_from(datas)?).await?;
     Ok(())
 }
 
