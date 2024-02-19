@@ -1,5 +1,4 @@
 let trace_id = 0;
-
 function next_trace_id() {
     trace_id += 1;
     return trace_id
@@ -16,7 +15,7 @@ function subscribe(broker_id)  {
         formObject["trace_id"] = trace_id;
         formObject["broker_id"] = broker_id;
         formObject["qos"] = get_qos(formObject["qos"]);
-
+        window.subscribes[formObject["topic"]] = formObject["payload_ty"];
         init_subscribe_item(trace_id, formObject["topic"], formObject["qos"], formObject["payload_ty"], broker_id, get_time());
         let rs = get_invoke()("subscribe", { datas : formObject});
         console.log(rs);
@@ -32,6 +31,7 @@ function unsubscribe(subscribe_id, topic, broker_id)  {
         if (element) {
             element.remove();
         }
+        delete window.subscribes.topic;
         let rs = get_invoke()("unsubscribe", { brokerId : broker_id, topic: topic});
         console.log(rs);
     } catch(e) {

@@ -27,19 +27,69 @@ listen('ClientReceivePublic', (event) => {
         + " " + event.payload.topic
         + " " + event.payload.qos
         + " " + event.payload.payload);
-
-    var byteStream = new Uint8Array(event.payload.payload);
-    console.log(byteStream);
-    var decoder = new TextDecoder('utf-8');
-    var utf8String = decoder.decode(byteStream);
-    init_receive_publish_item(next_trace_id(), event.payload.topic, utf8String, event.payload.qos, "todo", event.payload.broker_id, get_time())
-    console.log(utf8String); // 输出: "Hello"
+    let topic = event.payload.topic;
+    let payload_ty = "Text";
+    for (var key in window.subscribes) {
+        if (key === "#") {
+            payload_ty = window.subscribes[key];
+            break;
+        } else if (key.endsWith("/#")) {
+            // todo key.substring(0, key.length - 2) end /
+            if (topic.startsWith(key.substring(0, key.length - 2))) {
+                payload_ty = window.subscribes[key];
+                break;
+            }
+        } else if (key === "+") {
+            if (!topic.contains('/')) {
+                payload_ty = window.subscribes[key];
+                break;
+            }
+        } else if (key.endsWith("/+")) {
+            let sub_topic = key.substring(0, key.length - 2);
+            if (topic.startsWith(sub_topic)) {
+                if (!topic.substring(sub_topic.length, topic.length).contains('/')) {
+                    payload_ty = window.subscribes[key];
+                    break;
+                }
+            }
+        } else if (key === topic){
+            payload_ty = window.subscribes[key];
+            break;
+        }
+    }
+    if (payload_ty == "Hex") {
+        var byteStream = new Uint8Array(event.payload.payload);
+        var utf8String = byteArrayToHex(byteStream);
+        init_receive_publish_item(next_trace_id(), event.payload.topic, utf8String, event.payload.qos, payload_ty, event.payload.broker_id, get_time())
+    } else {
+        var byteStream = new Uint8Array(event.payload.payload);
+        var decoder = new TextDecoder('utf-8');
+        var utf8String = decoder.decode(byteStream);
+        if (payload_ty == "Json") {
+            try {
+                let obj = JSON.parse(utf8String);
+                utf8String = JSON.stringify(obj, null, 4);
+            } catch (e) {
+                console.error('Json fail :', e);
+            }
+        }
+        init_receive_publish_item(next_trace_id(), event.payload.topic, utf8String, event.payload.qos, payload_ty, event.payload.broker_id, get_time())
+    }
 });
 
 listen('ClientDisconnect', (event) => {
     console.log("ClientDisconnect:" + event.payload.broker_id);
 });
 
+
+
+
+function byteArrayToHex(byteArray) {
+    return byteArray.map(function(byte) {
+        // 将每个字节转换为16进制，确保结果为两位数，不足前面补零
+        return ('0' + (byte & 0xFF).toString(16)).slice(-2);
+    }).join(' '); // 将所有生成的16进制数拼接成字符串
+}
 
 
 

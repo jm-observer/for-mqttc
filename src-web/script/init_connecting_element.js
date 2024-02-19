@@ -86,13 +86,31 @@
          "        <div id=\"copy-publish-payload-__id__\" class=\"mb-2 px-2 py-1 flex-grow rounded-lg bg-green-200 text-gray-800\">" +
          "          <p class='clamp-2 break-words'>__payload__</p></div>\n" +
          "        <div class=\"flex justify-end\"><span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full mr-2\">QoS __qos__</span>\n" +
-         "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">__ty__</span>\n" +
+         "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\"><select class=\"bg-green-200 shadow rounded px-0.5\" >\n" +
+         "                        <option __Text__>Text</option>\n" +
+         "                        <option __Json__>Json</option>\n" +
+         "                        <option __Hex__>Hex</option>\n" +
+         "                    </select></span>\n" +
          "        <span class=\"px-2 py-1 ml-auto\">__time__</span></div>\n"
      ;
 
+     let option_text = "";
+     let option_json = "";
+     let option_hex = "";
+     if (ty === "Text") {
+         option_text = "selected";
+     } else if (ty === "Json") {
+         option_json = "selected";
+     } else if (ty === "Hex") {
+         option_hex = "selected";
+     }
+
      const htmlString = template.replaceAll("__id__", id).replaceAll("__topic__", topic)
          .replaceAll("__payload__", payload)
-         .replaceAll("__qos__", qos).replaceAll("__ty__", ty).replaceAll("__time__", time);
+         .replaceAll("__qos__", qos).replaceAll("__time__", time)
+         .replaceAll("__Text__", option_text)
+         .replaceAll("__Json__", option_json)
+         .replaceAll("__Hex__", option_hex);
 
      var tempDiv = document.createElement('div');
      tempDiv.innerHTML = htmlString;
@@ -148,6 +166,7 @@
          formObject["qos"] = get_qos(qos);
          formObject["topic"] = topic;
          formObject["payload_ty"] = ty;
+         window.subscribes[formObject["topic"]] = formObject["payload_ty"];
          let rs = await get_invoke()("subscribe", { datas : formObject});
          console.log(rs);
      });
