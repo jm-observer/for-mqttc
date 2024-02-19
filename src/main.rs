@@ -104,7 +104,9 @@ fn main() -> anyhow::Result<()> {
             loading,
             publish_his,
             subscribe_his,
-            unsubscribe
+            unsubscribe,
+            delete_subscribe_his,
+            delete_publish_his
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

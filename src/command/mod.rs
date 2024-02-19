@@ -71,6 +71,55 @@ pub async fn publish_his(broker_id: usize, state: State<'_, ArcApp>) -> Result<V
     rs.reverse();
     Ok(rs)
 }
+
+#[command]
+pub async fn delete_publish_his(
+    broker_id: usize,
+    his: PublishHis,
+    state: State<'_, ArcApp>,
+) -> Result<()> {
+    let mut app = state.write().await;
+    let Some(broker) = app.brokers.iter_mut().find(|x| x.data.id == broker_id) else {
+        return Error::init_rs(format!("not found broker {}", broker_id));
+    };
+
+    let Some(index) = broker.data.publish_his.iter().enumerate().find_map(|x| {
+        if x.1 == &his {
+            Some(x.0)
+        } else {
+            None
+        }
+    }) else {
+        return Error::init_rs("not found publish his");
+    };
+    broker.data.publish_his.remove(index);
+    broker.db.save_broker(&broker.data)?;
+    Ok(())
+}
+
+#[command]
+pub async fn delete_subscribe_his(
+    broker_id: usize,
+    his: SubscribeHis,
+    state: State<'_, ArcApp>,
+) -> Result<()> {
+    let mut app = state.write().await;
+    let Some(broker) = app.brokers.iter_mut().find(|x| x.data.id == broker_id) else {
+        return Error::init_rs(format!("not found broker {}", broker_id));
+    };
+    let Some(index) = broker.data.subscribe_his.iter().enumerate().find_map(|x| {
+        if x.1 == &his {
+            Some(x.0)
+        } else {
+            None
+        }
+    }) else {
+        return Error::init_rs("not found publish his");
+    };
+    broker.data.subscribe_his.remove(index);
+    broker.db.save_broker(&broker.data)?;
+    Ok(())
+}
 #[command]
 pub async fn subscribe_his(
     broker_id: usize,

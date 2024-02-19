@@ -26,7 +26,6 @@
 
      document.getElementById('copy-subcribe-topic-' + id).addEventListener('contextmenu', function(event) {
          event.preventDefault();
-         // todo 提示
          navigator.clipboard.writeText(topic).then(function() {
              console.log('copy:' + topic);
          }).catch(function(error) {
@@ -65,7 +64,6 @@
 
      document.getElementById('copy-publish-topic-' + id).addEventListener('contextmenu', function(event) {
          event.preventDefault();
-         // todo 提示
          navigator.clipboard.writeText(topic).then(function() {
              console.log('copy:' + topic);
          }).catch(function(error) {
@@ -74,7 +72,6 @@
      });
      document.getElementById('copy-publish-payload-' + id).addEventListener('contextmenu', function(event) {
          event.preventDefault();
-         // todo 提示
          navigator.clipboard.writeText(payload).then(function() {
              console.log('copy:' + payload);
          }).catch(function(error) {
@@ -110,7 +107,6 @@
 
      document.getElementById('copy-publish-topic-' + id).addEventListener('contextmenu', function(event) {
          event.preventDefault();
-         // todo 提示
          navigator.clipboard.writeText(topic).then(function() {
              console.log('copy:' + topic);
          }).catch(function(error) {
@@ -119,7 +115,6 @@
      });
      document.getElementById('copy-publish-payload-' + id).addEventListener('contextmenu', function(event) {
          event.preventDefault();
-         // todo 提示
          navigator.clipboard.writeText(payload).then(function() {
              console.log('copy:' + payload);
          }).catch(function(error) {
@@ -132,14 +127,14 @@
  function init_subscribe_his_item(broker_id, topic, qos, ty) {
      let template = "        <div class=\"flex items-center pb-1 mb-2\">\n" +
          "            <span id=\"copy-subcribe-topic-__id__\" class=\"flex-grow text-gray-800\">__topic__</span>\n" +
-         "        <a onclick='delete_subscribe_his(__topic__, __qos__, __ty__)'><i class=\"ml-auto layui-icon layui-icon-close py-2 px-1 \"></i></a>\n" +
+         "        <a onclick='delete_subscribe_his(\"__topic__\", __qos__, \"__ty__\", __broker_id__)'><i class=\"ml-auto layui-icon layui-icon-close py-2 px-1 \"></i></a>\n" +
          "        </div>\n" +
          "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">QoS __qos__</span>\n" +
          "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">__ty__</span>\n"
      ;
 
      const htmlString = template.replaceAll("__topic__", topic)
-         .replaceAll("__qos__", qos).replaceAll("__ty__", ty);
+         .replaceAll("__qos__", qos).replaceAll("__ty__", ty).replaceAll("__broker_id__", broker_id);
 
      var tempDiv = document.createElement('div');
      tempDiv.innerHTML = htmlString;
@@ -159,13 +154,10 @@
      return tempDiv
  }
 
-
-
-
  function init_publish_his_item(broker_id, topic, qos, ty, payload, retain) {
      let template = "        <div class=\"flex items-center pb-1  \">\n" +
          "            <span class=\"flex-grow text-gray-800\">__topic__</span>\n" +
-         "        <a onclick='delete_publish_his(__topic__, __qos__, __ty__, __payload__)'><i class=\"ml-auto layui-icon layui-icon-close py-2 px-1 \"></i></a>\n" +
+         "        <a onclick='delete_publish_his(\"__topic__\", __qos__, \"__ty__\", \"__payload__\", __retain__, __broker_id__)'><i class=\"ml-auto layui-icon layui-icon-close py-2 px-1 \"></i></a>\n" +
          "        </div>\n" +
          "        <div class=\"mb-2 px-2 py-1 flex-grow rounded-lg bg-green-200 text-gray-800\">" +
          "          <p class='clamp-2 break-words'>__payload__</p></div>\n" +
@@ -180,7 +172,8 @@
 
      const htmlString = template.replaceAll("__topic__", topic)
          .replaceAll("__payload__", payload)
-         .replaceAll("__qos__", qos).replaceAll("__ty__", ty);
+         .replaceAll("__qos__", qos)
+         .replaceAll("__retain__", retain).replaceAll("__ty__", ty).replaceAll("__broker_id__", broker_id);
 
 
      var tempDiv = document.createElement('div');

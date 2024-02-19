@@ -92,6 +92,52 @@ async function display_publish_his(event, broker_id){
     }
 }
 
+async function delete_publish_his(topic, qos, ty, payload, retain, broker_id) {
+    try {
+        var formObject = {};
+        formObject["topic"] = topic;
+        formObject["payload_ty"] = ty;
+        formObject["qos"] = qos;
+        formObject["msg"] = payload;
+        formObject["retain"] = retain;
+        get_invoke()("delete_publish_his", { brokerId : broker_id, his: formObject});
+        let jsonObj = await get_invoke()("publish_his", { brokerId : broker_id});
+        var tableBody = document.getElementById("publish_his");
+        while (tableBody.firstChild) {
+            tableBody.removeChild(tableBody.firstChild);
+        }
+        jsonObj.forEach(function(item) {
+            let div = init_publish_his_item(broker_id, item["topic"], item["qos"], item["payload_ty"]
+                , item["msg"], item["retain"]);
+            tableBody.appendChild(div);
+        });
+    } catch(e) {
+        console.error("unsubscribe error:", e);
+    }
+}
+
+async function delete_subscribe_his(topic, qos, ty, broker_id) {
+    try {
+        var formObject = {};
+        formObject["topic"] = topic;
+        formObject["payload_ty"] = ty;
+        formObject["qos"] = qos;
+        get_invoke()("delete_subscribe_his", { brokerId : broker_id, his: formObject});
+        let jsonObj = await get_invoke()("subscribe_his", { brokerId : broker_id});
+        var tableBody = document.getElementById("subs_his");
+        while (tableBody.firstChild) {
+            tableBody.removeChild(tableBody.firstChild);
+        }
+        jsonObj.forEach(function(item) {
+            let div = init_subscribe_his_item(broker_id, item["topic"], item["qos"], item["payload_ty"]);
+            tableBody.appendChild(div);
+        });
+    } catch(e) {
+        console.error("unsubscribe error:", e);
+    }
+}
+
+
 function publish(broker_id)  {
     try {
         var form = document.getElementById('form-publish-' + broker_id);
