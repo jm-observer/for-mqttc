@@ -9,16 +9,16 @@ listen('ClientConnectAckSuccess', (event) => {
 
 listen('ClientSubAck', (event) => {
     console.log("ClientSubAck:" + event.payload.broker_id + " " + event.payload.trace_id);
-    // let status = document.getElementById("status-" + event.payload.broker_id);
-    // status.classList.remove("bg-gray-400");
-    // status.classList.add("bg-green-400");
+    let status = document.getElementById("subcribe-status-" + event.payload.trace_id);
+    status.classList.remove("bg-gray-400");
+    status.classList.add("bg-green-400");
 });
 
 listen('ClientPubAck', (event) => {
     console.log("ClientPubAck:" + event.payload.broker_id + " " + event.payload.trace_id);
-    // let status = document.getElementById("status-" + event.payload.broker_id);
-    // status.classList.remove("bg-gray-400");
-    // status.classList.add("bg-green-400");
+    let status = document.getElementById("publish-status-" + event.payload.trace_id);
+    status.classList.remove("bg-gray-400");
+    status.classList.add("bg-green-400");
 });
 
 

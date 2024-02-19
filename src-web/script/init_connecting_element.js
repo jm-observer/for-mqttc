@@ -34,7 +34,7 @@
      });
 }
 
- async function init_publish_item(id, topic, payload, qos, ty, connect_id, time) {
+ async function init_publish_item(id, topic, payload, qos, ty, connect_id, time, retain) {
      let template = "        <div class=\"flex items-center pb-1  \">\n" +
          "            <span id=\"publish-status-__id__\" class=\"h-3 w-3 bg-gray-400 rounded-full mr-2\"></span>\n" +
          "            <span id=\"copy-publish-topic-__id__\" class=\"flex-grow text-gray-800\">__topic__</span>\n" +
@@ -42,13 +42,18 @@
          "        <div id=\"copy-publish-payload-__id__\" class=\"mb-2 px-2 py-1 flex-grow rounded-lg bg-green-200 text-gray-800\">" +
          "          <p class='clamp-2 break-words'>__payload__</p></div>\n" +
          "        <div class=\"flex justify-end\"><span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full mr-2\">QoS __qos__</span>\n" +
-         "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">__ty__</span>\n" +
+         "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full mr-2\">__ty__</span>__retain__\n" +
          "        <span class=\"px-2 py-1 ml-auto\">__time__</span></div>\n"
      ;
 
+     let retain_str = "";
+     if (retain) {
+         retain_str = "<span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\">retain</span>";
+     }
+
      const htmlString = template.replaceAll("__id__", id).replaceAll("__topic__", topic)
          .replaceAll("__payload__", payload)
-         .replaceAll("__qos__", qos).replaceAll("__ty__", ty).replaceAll("__time__", time);
+         .replaceAll("__qos__", qos).replaceAll("__ty__", ty).replaceAll("__time__", time).replaceAll("__retain__", retain_str);
 
      var tempDiv = document.createElement('div');
      tempDiv.innerHTML = htmlString;
@@ -203,7 +208,7 @@
      tempDiv.className = "items-center justify-between p-2 bg-white rounded-lg shadow-md mb-4";
      tempDiv.addEventListener('dblclick', async function () {
          let trace_id = next_trace_id();
-         init_publish_item(trace_id, topic, payload, qos, ty, broker_id, get_time());
+         init_publish_item(trace_id, topic, payload, qos, ty, broker_id, get_time(), retain);
          var formObject = {};
          formObject["trace_id"] = trace_id;
          formObject["broker_id"] = broker_id;

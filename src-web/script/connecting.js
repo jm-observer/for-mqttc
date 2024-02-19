@@ -154,7 +154,7 @@ function publish(broker_id)  {
         console.log("publish:" + json);
 
         init_publish_item(formObject["trace_id"], formObject["topic"], formObject["msg"]
-            , formObject["qos"], formObject["payload_ty"], broker_id, get_time())
+            , formObject["qos"], formObject["payload_ty"], broker_id, get_time(), formObject["retain"])
         let rs = get_invoke()("publish", { datas : formObject});
         console.log(rs);
     } catch(e) {
