@@ -11,6 +11,12 @@ module.exports = {
       gridTemplateColumns: {
         content: '1fr 2fr',
       },
+      width: {
+        130: '32.5rem'
+      },
+      borderWidth: {
+        1: '1px'
+      }
     },
   },
   plugins: [require("daisyui")],

@@ -37,45 +37,47 @@ async function init_broker_model() {
     if (main) {
         main.addEventListener('click', function(event) {
             var modal = document.getElementById('modal');
-            if (event.target != modal && modal.style.display == 'block') {
+            if (event.target !== modal && modal.style.display === 'block') {
                 modal.style.display = 'none';
             }
-            var modal = document.getElementById('subs_his_modal');
-            if (event.target != modal && modal.style.display == 'block') {
+            modal = document.getElementById('subs_his_modal');
+            if (event.target !== modal && modal.style.display === 'block') {
                 modal.style.display = 'none';
             }
-            var modal = document.getElementById('publish_his_modal');
-            if (event.target != modal && modal.style.display == 'block') {
+            modal = document.getElementById('publish_his_modal');
+            if (event.target !== modal && modal.style.display === 'block') {
+                modal.style.display = 'none';
+            }
+            modal = document.getElementById('tips-msg');
+            if (event.target !== modal && modal.style.display === 'block') {
                 modal.style.display = 'none';
             }
         });
     }
-
-
-    document.getElementById('self_signed_ca').addEventListener('click', function(event) {
+    document.getElementById('self_signed_ca').addEventListener('click', function() {
         select_file()
     });
 
-    document.getElementById('version-v3-label').addEventListener('click', function(event) {
+    document.getElementById('version-v3-label').addEventListener('click', function() {
         document.getElementById('version-v3').checked = true;
     });
-    document.getElementById('version-v5-label').addEventListener('click', function(event) {
+    document.getElementById('version-v5-label').addEventListener('click', function() {
         document.getElementById('version-v5').checked = true;
     });
 
-    document.getElementById('tls-none-label').addEventListener('click', function(event) {
+    document.getElementById('tls-none-label').addEventListener('click', function() {
         document.getElementById('tls-none').checked = true;
         document.getElementById('self_signed_ca_div').classList.add('hidden');
     });
-    document.getElementById('tls-ca-label').addEventListener('click', function(event) {
+    document.getElementById('tls-ca-label').addEventListener('click', function() {
         document.getElementById('tls-ca').checked = true;
         document.getElementById('self_signed_ca_div').classList.add('hidden');
     });
-    document.getElementById('tls-insecurity-label').addEventListener('click', function(event) {
+    document.getElementById('tls-insecurity-label').addEventListener('click', function() {
         document.getElementById('tls-insecurity').checked = true;
         document.getElementById('self_signed_ca_div').classList.add('hidden');
     });
-    document.getElementById('tls-self-signed-label').addEventListener('click', function(event) {
+    document.getElementById('tls-self-signed-label').addEventListener('click', function() {
         document.getElementById('tls-self-signed').checked = true;
         document.getElementById('self_signed_ca_div').classList.remove('hidden');
     });
@@ -154,7 +156,7 @@ async function check_then_save() {
         document.getElementById('port').classList.remove('input-error')
     }
     try {
-        const _ = JSON.parse(formObject["params"]);
+        JSON.parse(formObject["params"]);
         document.getElementById('params').classList.remove('textarea-error')
     } catch (error) {
         result = false;

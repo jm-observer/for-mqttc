@@ -215,11 +215,11 @@ pub async fn update_or_new_broker(
 }
 
 #[command]
-pub async fn loading(state: State<'_, ArcApp>) -> Result<()> {
+pub async fn loading(state: State<'_, ArcApp>) -> Result<String> {
     let mut app = state.write().await;
     let clients = std::mem::take(&mut app.mqtt_clients);
     for client in clients.values() {
         let _ = client.disconnect().await;
     }
-    Ok(())
+    Ok(app.hint.clone())
 }

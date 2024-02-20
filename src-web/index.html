@@ -4,11 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>TailwindCSS Documentation</title>
-<!--    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.4.24/dist/full.min.css" rel="stylesheet" type="text/css" />-->
-<!--    <script src="https://cdn.tailwindcss.com"></script>-->
-<!--    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">-->
-<!--    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"></link>-->
-    <link rel="stylesheet" href="./output.css"></link>
+    <link rel="stylesheet" href="./output.css" />
     <script src="script/brokers.js"></script>
     <script src="script/init_element.js"></script>
     <script src="script/listen.js"></script>
@@ -64,7 +60,7 @@
         <div class="items-center">
         </div>
         <div class="flex px-2">
-            <i class="layui-icon layui-icon-tips"></i>
+            <i id="tips" class="layui-icon layui-icon-tips"></i>
             <a id="github" href="#" class="ml-6 block text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
                 <i class="layui-icon layui-icon-github"></i></a>
         </div>
@@ -77,7 +73,7 @@
                     <ul id="tabs" class="flex border-b py-1">
                         <li id="tab-brokers" class="mr-1 shadow rounded-md justify-center">
                             <div class="flex px-4">
-                                <a onclick="display_tab('brokers')" class="bg-white inline-block py-2 px-1 flex" href="#">
+                                <a onclick="display_tab('brokers')" class="bg-white inline-block py-2 px-1" href="#">
                                     brokers</a>
                             </div>
                         </li>
@@ -87,7 +83,7 @@
                         <div id="tab-content-brokers" class="tab-pane active block bg-white h-full">
                             <div>
                                 <button id="new" class="m-1 bg-yellow-500 py-1 px-2 rounded mr-1">
-                                    新增
+                                    new
                                 </button>
                             </div>
                             <table id="brokers" class="table table-xs table-pin-rows table-pin-cols">
@@ -114,7 +110,7 @@
 <div id="modal" class="fixed right-0 w-96 h-full z-50">
     <!-- 表单内容 -->
     <form id="broker" class="p-2 bg-white shadow-md rounded h-5/6 overflow-y-auto text-xs">
-        <input class="input input-bordered input-xs flex-grow hidden" name="id" id="id" type="text">
+        <input class="input input-bordered input-xs flex-grow hidden" aria-label="id" name="id" id="id" type="text">
         <div class="flex mb-2">
             <label class="w-24" for="name">
                 alias
@@ -196,22 +192,22 @@
             </div>
         </div>
         <div class="flex items-center mb-2" id="self_signed_ca_div">
-            <label class="w-24">self-signed-ca</label>
+            <label class="w-24" for="self_signed_ca">self-signed-ca</label>
             <input readonly id="self_signed_ca" name="self_signed_ca"  class="input input-bordered input-xs flex-grow" type="text">
         </div>
 
         <div class="flex items-center mb-2">
-            <label class="w-24">
+            <label class="w-24" for="params" >
                 params
             </label>
             <textarea class="textarea textarea-bordered textarea-xs h-56  flex-grow" name="params" id="params" rows="6"></textarea>
         </div>
         <div class="flex items-center justify-center">
             <button onclick="check_then_save()" type="button" id="save" class="m-1 bg-yellow-500 py-1 px-2 rounded mr-1">
-                保存
+                save
             </button>
             <button onclick="check_then_save_then_connect()" type="button" id="save_and_connect" class="m-1 bg-yellow-500 py-1 px-2 rounded mr-1">
-                保存并连接
+                save then connect
             </button>
         </div>
     </form>
@@ -227,11 +223,25 @@
     <div id="publish_his" class="h-84 w-full overflow-y-auto text-xs">
     </div>
 </div>
+<div id="tips-msg" class="fixed right-0 w-130 h-20 z-50 text-xs p-2 border-2 bg-white shadow-md">
+<pre id="tips-msg-pre"></pre>
+</div>
 </body>
 <script>
     document.getElementById('github').addEventListener('click', function() {
         // 使用 Tauri 的 shell.open API 打开外部链接
         window.__TAURI__.shell.open('https://github.com/jm-observer/for-mqttc').catch(console.error);
+    });
+
+    document.getElementById('tips').addEventListener('click', function(event) {
+        event.stopPropagation();
+        let modal = document.getElementById('tips-msg');
+        modal.style.display = 'block';
+        modal.style.top = (event.target.getBoundingClientRect().top + 20) + 'px'; // 或者使用 rect.bottom + 'px'，取决于需要
+    });
+
+    document.addEventListener('contextmenu', function(event) {
+        event.preventDefault(); // 阻止默认的右键菜单
     });
 
     window.subscribes = {};

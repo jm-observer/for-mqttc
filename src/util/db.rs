@@ -56,12 +56,23 @@ impl ArcDb {
         } else {
             Vec::new()
         };
+        let commit = env!("GIT_COMMIT", "error");
+        let branch = env!("GIT_BRANCH", "error");
+        let build_date_time = env!("BUILD_DATE_TIME", "error");
+
+        let hint = format!(
+            r#"1. Double-clicking on the broker record can connect to the broker.
+2. Right-click topic/payload can copy it.
+3. Double-clicking on the subscribe record can unsubscribe the topic.
+4. Current Git build version: {}-{}, build time: {}."#,
+            branch, commit, build_date_time
+        );
         Ok(App {
             brokers,
             db: self.clone(),
-            hint: "".to_string(),
             mqtt_clients: Default::default(),
             home_path,
+            hint,
         })
     }
 
@@ -139,6 +150,7 @@ mod test {
             auto_connect: true,
             tls: Tls::None,
             subscribe_his: vec![],
+            publish_his: vec![],
         };
         db.save_broker(&broker).unwrap();
     }

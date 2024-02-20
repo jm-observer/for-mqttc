@@ -11,10 +11,11 @@ edition = "2021"
 
 [build-dependencies]
 tauri-build = { version = "1.5", features = [] }
+chrono = { version = "0.4.26", features = [] }
+anyhow = { version = "1.0.64"}
 
 [dependencies]
 tauri = { version = "1.5", features = ["dialog-open", "shell-open"] }
-chrono = "0.4.26"
 custom-utils = "0.10.13"
 log = "0.4.17"
 anyhow = { version = "1.0.64"}
@@ -41,6 +42,7 @@ lazy_static = "1.4.0"
 pretty-hex = "0.3.0"
 #piet = "0.6.2"
 directories = "5.0.0"
+
 
 [features]
 # this feature is used for production builds or when `devPath` points to the filesystem

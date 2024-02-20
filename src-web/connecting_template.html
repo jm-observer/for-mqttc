@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/html">
-<head></head>
+<head title="for-mqttc"></head>
 <body>
 <div id="tab-content-__id__" class="tab-pane block h-full w-full">
     <div class="grid gap-1 mb-2 h-full w-full grid-cols-content">
@@ -11,26 +11,26 @@
             <form id="form-subscribe-__id__" class="bg-white p-2 rounded shadow">
                 <div class="mb-2">
                     <label class="mb-2 p-2">
-                        QoS<select name="qos" class="shadow px-2 rounded w-16 relative -left-8 text-right text-last-right bg-transparent z-10" >
+                        QoS<select name="qos" class="border-1 shadow px-2 rounded w-16 relative -left-8 text-right text-last-right bg-transparent z-10" >
                         <option class="text-center">0</option>
                         <option class="text-center">1</option>
                         <option class="text-center">2</option>
                     </select>
                     </label>
-                    <select name="payload_ty" class="shadow rounded px-0.5" title="decide how to parse the received publish message of this topic" >
+                    <select name="payload_ty" class="border-1 shadow rounded px-0.5" title="decide how to parse the received publish message of this topic" >
                         <option>Text</option>
                         <option>Json</option>
                         <option>Hex</option>
                     </select>
                 </div>
                 <div class="mb-2 flex items-end">
-                    <input name="topic"  class="flex-grow shadow appearance-none border rounded w-full py-1 px-2  leading-tight" type="text" placeholder="topic" autocomplete="off">
+                    <input id="subscribe_topic_input___id__" name="topic"  class="flex-grow shadow appearance-none border rounded w-full py-1 px-2  leading-tight" type="text" placeholder="topic" autocomplete="off">
                     <a onclick="display_subscribe_his(event, __id__)" href="#" class="ml-2 block text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
                         <i class="layui-icon layui-icon-history"></i></a>
                 </div>
                 <div class="flex items-center justify-between">
                     <button onclick="subscribe(__id__)" type="button" class="m-1 bg-yellow-500 py-1 px-2 rounded mr-1">
-                        订阅
+                        subscribe
                     </button>
                 </div>
             </form>
@@ -40,13 +40,13 @@
             <form id="form-publish-__id__" class="bg-white p-2 rounded shadow">
                 <div class="mb-2 flex items-center">
                     <label class="px-2">
-                        QoS<select name="qos" class="shadow px-2 rounded w-16 relative -left-8 text-right text-last-right bg-transparent z-10" >
+                        QoS<select name="qos" class="border-1 shadow px-2 rounded w-16 relative -left-8 text-right text-last-right bg-transparent z-10" >
                         <option class="text-center">0</option>
                         <option class="text-center">1</option>
                         <option class="text-center">2</option>
                     </select>
                     </label>
-                    <select name="payload_ty" class="shadow rounded px-0.5" title="Payload Type" >
+                    <select id="publish_payload_ty_input___id__" name="payload_ty" class="border-1 shadow rounded px-0.5" title="Payload Type" >
                         <option>Text</option>
                         <option>Json</option>
                         <option>Hex</option>
@@ -57,16 +57,16 @@
                     <button title="clear all publish message" onclick="clear_publish(__id__)" type="button" class="btn btn-xs ml-16 ">clear</button>
                 </div>
                 <div class="flex items-end mb-2">
-                    <input class="py-1 px-2 flex-grow shadow appearance-none border rounded w-full  leading-tight" name="topic" type="text" placeholder="topic" autocomplete="off">
+                    <input id="publish_topic_input___id__" class="py-1 px-2 flex-grow shadow appearance-none border rounded w-full  leading-tight" name="topic" type="text" placeholder="topic" autocomplete="off">
                     <a onclick="display_publish_his(event, __id__)" href="#" class="ml-2 block text-slate-400 hover:text-slate-500 dark:hover:text-slate-300">
                         <i class="layui-icon layui-icon-history"></i></a>
                 </div>
                 <div class="mb-2">
-                    <textarea class="py-1 px-2 shadow appearance-none border rounded w-full" name="msg" placeholder="payload"></textarea>
+                    <textarea id="publish_payload_input___id__" class="py-1 px-2 shadow appearance-none border rounded w-full" name="msg" placeholder="payload"></textarea>
                 </div>
                 <div class="flex items-center justify-between">
                     <button onclick="publish(__id__)" class="m-1 bg-yellow-500 py-1 px-2 rounded mr-1" type="button">
-                        发布
+                        publish
                     </button>
                 </div>
             </form>

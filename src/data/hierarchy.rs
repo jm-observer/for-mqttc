@@ -13,11 +13,10 @@ use std::path::PathBuf;
 pub struct App {
     pub brokers: Vec<Broker>,
     pub db: ArcDb,
-    pub hint: String,
     pub mqtt_clients: HashMap<usize, Client>,
     pub home_path: PathBuf,
+    pub hint: String,
 }
-
 impl App {
     pub fn save_broker(&mut self, data: BrokerDB) -> Result<()> {
         if self.db.save_broker(&data)? {

@@ -12,6 +12,17 @@ function subscribe(broker_id)  {
         formData.forEach(function(value, key){
             formObject[key] = value;
         });
+        let input = document.getElementById('subscribe_topic_input_' + broker_id);
+        if (input) {
+            if (!formObject["topic"]) {
+                input.classList.add('input-error');
+                return;
+            } else {
+                input.classList.remove('input-error')
+            }
+        } else {
+            return;
+        }
         formObject["trace_id"] = trace_id;
         formObject["broker_id"] = broker_id;
         formObject["qos"] = get_qos(formObject["qos"]);
@@ -165,13 +176,57 @@ function publish(broker_id)  {
         formData.forEach(function(value, key){
             formObject[key] = value;
         });
+        let topic_input = document.getElementById('publish_topic_input_' + broker_id);
+        let payload_input = document.getElementById('publish_payload_input_' + broker_id);
+        let check_rs = false;
+        if (topic_input && payload_input) {
+            if (!formObject["topic"]) {
+                check_rs = true;
+                topic_input.classList.add('input-error')
+            } else {
+                topic_input.classList.remove('input-error')
+            }
+            if (!formObject["msg"]) {
+                check_rs = true;
+                payload_input.classList.add('input-error')
+            } else {
+                payload_input.classList.remove('input-error')
+            }
+        } else {
+            console.error('not found publish_topic_input_' + broker_id + ' or publish_payload_input_' + broker_id )
+            return;
+        }
+        if (check_rs) {
+            return;
+        }
+        let payload_ty_input = document.getElementById('publish_payload_ty_input_' + broker_id);
+        if (payload_ty_input) {
+            if (formObject["payload_ty"] === "Hex") {
+                if (!hexStringToByteArray(formObject["msg"])) {
+                    payload_ty_input.classList.add('select-error');
+                    payload_input.classList.add('input-error');
+                    return;
+                }
+            } else if (formObject["payload_ty"] === "Json") {
+                if (!strToJson(formObject["msg"])) {
+                    payload_ty_input.classList.add('select-error');
+                    payload_input.classList.add('input-error');
+                    return;
+                }
+            }
+        } else {
+            console.error('not found publish_payload_ty_input_' + broker_id )
+            return;
+        }
+        payload_ty_input.classList.remove('select-error');
+        payload_input.classList.remove('input-error');
+
         formObject["trace_id"] = next_trace_id();
         formObject["broker_id"] = broker_id;
         formObject["qos"] = get_qos(formObject["qos"]);
         formObject["retain"] = check_to_bool(formObject["retain"]);
         var json = JSON.stringify(formObject);
         console.log("publish:" + json);
-
         init_publish_item(formObject["trace_id"], formObject["topic"], formObject["msg"]
             , formObject["qos"], formObject["payload_ty"], broker_id, get_time(), formObject["retain"])
         let rs = get_invoke()("publish", { datas : formObject});
@@ -189,5 +244,33 @@ function get_qos(qos) {
         return 2
     } else {
         return qos
+    }
+}
+function strToJson(hexString) {
+    try {
+        let byte = JSON.parse(hexString);
+        console.debug("JSON:" + byte);
+        return true;
+    } catch (_) {
+        return false;
+    }
+}
+function hexStringToByteArray(hexString) {
+    hexString = hexString.replaceAll(" ", "");
+    if (hexString.length % 2 > 0) {
+        return false;
+    }
+    try {
+        for (let i = 0; i < hexString.length; i += 2) {
+            let hexByte = hexString.substring(i, i + 2);
+            let byte = parseInt(hexByte, 16);
+            if (isNaN(byte)) {
+                return false;
+            }
+            console.debug("byte:" + byte);
+        }
+        return true;
+    } catch (_) {
+        return false;
     }
 }

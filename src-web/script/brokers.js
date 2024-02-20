@@ -15,7 +15,7 @@ function get_invoke() {
 
 
 async function loading() {
-    await get_invoke()("loading");
+    document.getElementById("tips-msg-pre").innerText = await get_invoke()("loading");
 }
 
 function isTauriEnvironment() {
