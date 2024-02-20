@@ -86,12 +86,12 @@
  }
 
 
- async function init_receive_publish_item(id, topic, payload, qos, ty, connect_id, time) {
+ async function init_receive_publish_item(trace_id, topic, payload, qos, ty, connect_id, time, byteStream) {
      let template = "<div></div><span id=\"copy-publish-topic-__id__\" class=\"mb-2 px-2 py-1 text-gray-800\">__topic__</span></div>\n" +
          "        <div id=\"copy-publish-payload-__id__\" class=\"mb-2 px-2 py-1 flex-grow rounded-lg bg-green-200 text-gray-800\">" +
-         "          <p class='clamp-2 break-words'>__payload__</p></div>\n" +
+         "          <p id='payload___id__' class='clamp-2 break-words'>__payload__</p></div>\n" +
          "        <div class=\"flex justify-end\"><span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full mr-2\">QoS __qos__</span>\n" +
-         "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\"><select class=\"bg-green-200 shadow rounded px-0.5\" >\n" +
+         "        <span class=\"px-2 py-1 text-green-800 bg-green-200 rounded-full\"><select id='payload_ty___id__' class=\"bg-green-200 shadow rounded px-0.5\" >\n" +
          "                        <option __Text__>Text</option>\n" +
          "                        <option __Json__>Json</option>\n" +
          "                        <option __Hex__>Hex</option>\n" +
@@ -110,7 +110,7 @@
          option_hex = "selected";
      }
 
-     const htmlString = template.replaceAll("__id__", id).replaceAll("__topic__", topic)
+     const htmlString = template.replaceAll("__id__", trace_id).replaceAll("__topic__", topic)
          .replaceAll("__payload__", payload)
          .replaceAll("__qos__", qos).replaceAll("__time__", time)
          .replaceAll("__Text__", option_text)
@@ -120,15 +120,12 @@
      var tempDiv = document.createElement('div');
      tempDiv.innerHTML = htmlString;
      tempDiv.className = "items-center justify-between p-2 bg-white rounded-lg shadow-md mb-2 max-w-72";
-     // tempDiv.addEventListener('dblclick', function () {
-     //     unsubscribe(id);
-     // });
 
      var targetElement = document.getElementById(connect_id + 'publish'); // 目标元素
      targetElement.appendChild(tempDiv);
      targetElement.scrollTop = targetElement.scrollHeight;
 
-     document.getElementById('copy-publish-topic-' + id).addEventListener('contextmenu', function(event) {
+     document.getElementById('copy-publish-topic-' + trace_id).addEventListener('contextmenu', function(event) {
          event.preventDefault();
          navigator.clipboard.writeText(topic).then(function() {
              console.log('copy:' + topic);
@@ -136,7 +133,14 @@
              console.error('copy fail :', error);
          });
      });
-     document.getElementById('copy-publish-payload-' + id).addEventListener('contextmenu', function(event) {
+     document.getElementById('payload_ty_' + trace_id).addEventListener('change', function(event) {
+         event.preventDefault();
+         let value = event.target.value;
+         let payload_new = parse_payload(value, byteStream);
+         document.getElementById('payload_' + trace_id).innerText = payload_new;
+     });
+
+     document.getElementById('copy-publish-payload-' + trace_id).addEventListener('contextmenu', function(event) {
          event.preventDefault();
          navigator.clipboard.writeText(payload).then(function() {
              console.log('copy:' + payload);

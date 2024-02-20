@@ -57,24 +57,9 @@ listen('ClientReceivePublic', (event) => {
             break;
         }
     }
-    if (payload_ty == "Hex") {
-        var byteStream = new Uint8Array(event.payload.payload);
-        const utf8String = byteArrayToHex(byteStream);
-        init_receive_publish_item(next_trace_id(), event.payload.topic, utf8String, event.payload.qos, payload_ty, event.payload.broker_id, get_time())
-    } else {
-        var byteStream = new Uint8Array(event.payload.payload);
-        var decoder = new TextDecoder('utf-8');
-        var utf8String = decoder.decode(byteStream);
-        if (payload_ty == "Json") {
-            try {
-                let obj = JSON.parse(utf8String);
-                utf8String = JSON.stringify(obj, null, 4);
-            } catch (e) {
-                console.error('Json fail :', e);
-            }
-        }
-        init_receive_publish_item(next_trace_id(), event.payload.topic, utf8String, event.payload.qos, payload_ty, event.payload.broker_id, get_time())
-    }
+    var byteStream = new Uint8Array(event.payload.payload);
+    let payload = parse_payload(payload_ty, byteStream);
+    init_receive_publish_item(next_trace_id(), event.payload.topic, payload, event.payload.qos, payload_ty, event.payload.broker_id, get_time(), byteStream)
 });
 
 listen('ClientDisconnect', (event) => {
@@ -90,5 +75,22 @@ function byteArrayToHex(byteArray) {
     return hexes.join(' ')
 }
 
-
+function parse_payload(payload_ty, byteStream) {
+    let utf8String;
+    if (payload_ty == "Hex") {
+        utf8String = byteArrayToHex(byteStream);
+    } else {
+        var decoder = new TextDecoder('utf-8');
+        utf8String = decoder.decode(byteStream);
+        if (payload_ty == "Json") {
+            try {
+                let obj = JSON.parse(utf8String);
+                utf8String = JSON.stringify(obj, null, 4);
+            } catch (e) {
+                console.error('Json fail :', e);
+            }
+        }
+    }
+    return utf8String;
+}
 
