@@ -15,15 +15,25 @@ function subscribe(broker_id)  {
         formObject["trace_id"] = trace_id;
         formObject["broker_id"] = broker_id;
         formObject["qos"] = get_qos(formObject["qos"]);
+        remove_subcribe(broker_id, formObject["topic"]);
         window.subscribes[broker_id][formObject["topic"]] = {
             ty: formObject["payload_ty"],
-            topic: formObject["topic"]
+            topic: formObject["topic"],id: trace_id
         };
         init_subscribe_item(trace_id, formObject["topic"], formObject["qos"], formObject["payload_ty"], broker_id, get_time());
         let rs = get_invoke()("subscribe", { datas : formObject});
         console.log(rs);
     } catch(e) {
         console.error("Parsing error:", e);
+    }
+}
+
+async function remove_subcribe(broker_id, topic) {
+    if (window.subscribes[broker_id][topic].id) {
+        let element = document.getElementById("subscribe_" + window.subscribes[broker_id][topic].id);
+        if(element) {
+            element.remove();
+        }
     }
 }
 

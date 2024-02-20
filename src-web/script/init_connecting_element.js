@@ -1,4 +1,4 @@
- async function init_subscribe_item(id, topic, qos, ty, connect_id, time) {
+ async function init_subscribe_item(id, topic, qos, ty, broker_id, time) {
     let template = "        <div class=\"flex items-center pb-1 mb-2\">\n" +
         "            <span id=\"subcribe-status-__id__\" class=\"h-3 w-3 bg-gray-400 rounded-full mr-2\"></span>\n" +
         "            <span id=\"copy-subcribe-topic-__id__\" class=\"flex-grow text-gray-800\">__topic__</span>\n" +
@@ -11,17 +11,17 @@
 
      const htmlString = template.replaceAll("__id__", id).replaceAll("__topic__", topic)
          .replaceAll("__qos__", qos).replaceAll("__ty__", ty).replaceAll("__time__", time)
-         .replaceAll("__connect_id__", connect_id);
+         .replaceAll("__connect_id__", broker_id);
 
      var tempDiv = document.createElement('div');
      tempDiv.id = "subscribe_" + id;
      tempDiv.innerHTML = htmlString;
      tempDiv.className = "items-center justify-between p-2 bg-white rounded-lg shadow-md mb-4";
      tempDiv.addEventListener('dblclick', function () {
-         unsubscribe(id, topic, connect_id);
+         unsubscribe(id, topic, broker_id);
      });
 
-     var targetElement = document.getElementById(connect_id + 'subs'); // 目标元素
+     var targetElement = document.getElementById(broker_id + 'subs'); // 目标元素
      targetElement.appendChild(tempDiv);
      targetElement.scrollTop = targetElement.scrollHeight;
 
@@ -182,9 +182,11 @@
          formObject["qos"] = get_qos(qos);
          formObject["topic"] = topic;
          formObject["payload_ty"] = ty;
+         remove_subcribe(broker_id, formObject["topic"]);
          window.subscribes[broker_id][formObject["topic"]] = {
              ty: formObject["payload_ty"],
-             topic: formObject["topic"]
+             topic: formObject["topic"],
+             id: trace_id
          };
          let rs = await get_invoke()("subscribe", { datas : formObject});
 
