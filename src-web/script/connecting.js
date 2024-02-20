@@ -15,7 +15,10 @@ function subscribe(broker_id)  {
         formObject["trace_id"] = trace_id;
         formObject["broker_id"] = broker_id;
         formObject["qos"] = get_qos(formObject["qos"]);
-        window.subscribes[formObject["topic"]] = formObject["payload_ty"];
+        window.subscribes[broker_id][formObject["topic"]] = {
+            ty: formObject["payload_ty"],
+            topic: formObject["topic"]
+        };
         init_subscribe_item(trace_id, formObject["topic"], formObject["qos"], formObject["payload_ty"], broker_id, get_time());
         let rs = get_invoke()("subscribe", { datas : formObject});
         console.log(rs);
@@ -31,7 +34,7 @@ function unsubscribe(subscribe_id, topic, broker_id)  {
         if (element) {
             element.remove();
         }
-        delete window.subscribes.topic;
+        delete window.subscribes[broker_id].topic;
         let rs = get_invoke()("unsubscribe", { brokerId : broker_id, topic: topic});
         console.log(rs);
     } catch(e) {

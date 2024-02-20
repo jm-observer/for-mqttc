@@ -81,7 +81,7 @@ async function connect_to_broker(id, name) {
             .catch(error => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
-
+        window.subscribes[id] = {};
         await get_invoke()("connect_to_broker", { id : id});
     }
     display_tab(id);
@@ -148,6 +148,7 @@ async function close_tab(broker_id) {
         element.parentNode.removeChild(element);
     }
     display_tab("brokers");
+    window.subscribes[broker_id] = {};
     await get_invoke()("disconnect", { id : broker_id});
 }
 

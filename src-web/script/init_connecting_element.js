@@ -23,6 +23,7 @@
 
      var targetElement = document.getElementById(connect_id + 'subs'); // 目标元素
      targetElement.appendChild(tempDiv);
+     targetElement.scrollTop = targetElement.scrollHeight;
 
      document.getElementById('copy-subcribe-topic-' + id).addEventListener('contextmenu', function(event) {
          event.preventDefault();
@@ -64,8 +65,11 @@
 
      var targetElement = document.getElementById(connect_id + 'publish'); // 目标元素
      targetElement.appendChild(tempDiv);
-
      targetElement.scrollTop = targetElement.scrollHeight;
+     while (targetElement.children.length > 30) {
+         // 删除最前面的子元素
+         targetElement.removeChild(targetElement.firstChild);
+     }
 
      document.getElementById('copy-publish-topic-' + id).addEventListener('contextmenu', function(event) {
          event.preventDefault();
@@ -124,6 +128,10 @@
      var targetElement = document.getElementById(connect_id + 'publish'); // 目标元素
      targetElement.appendChild(tempDiv);
      targetElement.scrollTop = targetElement.scrollHeight;
+     while (targetElement.children.length > 30) {
+         // 删除最前面的子元素
+         targetElement.removeChild(targetElement.firstChild);
+     }
 
      document.getElementById('copy-publish-topic-' + trace_id).addEventListener('contextmenu', function(event) {
          event.preventDefault();
@@ -175,7 +183,10 @@
          formObject["qos"] = get_qos(qos);
          formObject["topic"] = topic;
          formObject["payload_ty"] = ty;
-         window.subscribes[formObject["topic"]] = formObject["payload_ty"];
+         window.subscribes[broker_id][formObject["topic"]] = {
+             ty: formObject["payload_ty"],
+             topic: formObject["topic"]
+         };
          let rs = await get_invoke()("subscribe", { datas : formObject});
 
          var tableBody = document.getElementById("subs_his_modal");

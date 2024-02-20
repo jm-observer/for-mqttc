@@ -29,31 +29,33 @@ listen('ClientReceivePublic', (event) => {
         + " " + event.payload.payload);
     let topic = event.payload.topic;
     let payload_ty = "Text";
-    for (var key in window.subscribes) {
+    let broker_id = event.payload.broker_id;
+    for (var key in window.subscribes[broker_id]) {
+        var topic_payload_ty = window.subscribes[broker_id][key].ty;
         if (key === "#") {
-            payload_ty = window.subscribes[key];
+            payload_ty = topic_payload_ty;
             break;
         } else if (key.endsWith("/#")) {
             // todo key.substring(0, key.length - 2) end /
             if (topic.startsWith(key.substring(0, key.length - 2))) {
-                payload_ty = window.subscribes[key];
+                payload_ty = topic_payload_ty;
                 break;
             }
         } else if (key === "+") {
             if (!topic.contains('/')) {
-                payload_ty = window.subscribes[key];
+                payload_ty = topic_payload_ty;
                 break;
             }
         } else if (key.endsWith("/+")) {
             let sub_topic = key.substring(0, key.length - 2);
             if (topic.startsWith(sub_topic)) {
                 if (!topic.substring(sub_topic.length, topic.length).contains('/')) {
-                    payload_ty = window.subscribes[key];
+                    payload_ty = topic_payload_ty;
                     break;
                 }
             }
         } else if (key === topic){
-            payload_ty = window.subscribes[key];
+            payload_ty = topic_payload_ty;
             break;
         }
     }
@@ -77,12 +79,12 @@ function byteArrayToHex(byteArray) {
 
 function parse_payload(payload_ty, byteStream) {
     let utf8String;
-    if (payload_ty == "Hex") {
+    if (payload_ty === "Hex") {
         utf8String = byteArrayToHex(byteStream);
     } else {
         var decoder = new TextDecoder('utf-8');
         utf8String = decoder.decode(byteStream);
-        if (payload_ty == "Json") {
+        if (payload_ty === "Json") {
             try {
                 let obj = JSON.parse(utf8String);
                 utf8String = JSON.stringify(obj, null, 4);
