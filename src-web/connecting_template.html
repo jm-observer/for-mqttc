@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" xmlns="http://www.w3.org/1999/html">
 <head></head>
 <body>
 <div id="tab-content-__id__" class="tab-pane block h-full w-full">
@@ -17,7 +17,7 @@
                         <option class="text-center">2</option>
                     </select>
                     </label>
-                    <select name="payload_ty" class="shadow rounded px-0.5" title="Payload Type" >
+                    <select name="payload_ty" class="shadow rounded px-0.5" title="decide how to parse the received publish message of this topic" >
                         <option>Text</option>
                         <option>Json</option>
                         <option>Hex</option>
@@ -38,7 +38,7 @@
         <div class="min-w-0 p-2 bg-white rounded-lg shadow-xs flex flex-col">
             <div id="__id__publish" class="flex-grow h-72 overflow-y-auto"></div>
             <form id="form-publish-__id__" class="bg-white p-2 rounded shadow">
-                <div class="mb-2">
+                <div class="mb-2 flex items-center">
                     <label class="px-2">
                         QoS<select name="qos" class="shadow px-2 rounded w-16 relative -left-8 text-right text-last-right bg-transparent z-10" >
                         <option class="text-center">0</option>
@@ -52,9 +52,9 @@
                         <option>Hex</option>
                     </select>
                     <label class=" ml-10">
-                        retain
+                        retain<input type="checkbox" class="checkbox checkbox-xs ml-1" name="retain"/>
                     </label>
-                    <input type="checkbox" class="checkbox checkbox-xs ml-1" name="retain"/>
+                    <button title="clear all publish message" onclick="clear_publish(__id__)" type="button" class="btn btn-xs ml-16 ">clear</button>
                 </div>
                 <div class="flex items-end mb-2">
                     <input class="py-1 px-2 flex-grow shadow appearance-none border rounded w-full  leading-tight" name="topic" type="text" placeholder="topic" autocomplete="off">

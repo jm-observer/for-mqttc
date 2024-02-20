@@ -43,6 +43,9 @@ impl App {
         let his: SubscribeHis = sub.into();
         if !broker.data.subscribe_his.iter().any(|x| *x == his) {
             broker.data.subscribe_his.push(his);
+            while broker.data.subscribe_his.len() > 15 {
+                broker.data.subscribe_his.remove(0);
+            }
             broker.db.save_broker(&broker.data)?;
         }
         Ok(())
@@ -53,6 +56,9 @@ impl App {
         let his: PublishHis = sub.into();
         if !broker.data.publish_his.iter().any(|x| *x == his) {
             broker.data.publish_his.push(his);
+            while broker.data.publish_his.len() > 15 {
+                broker.data.publish_his.remove(0);
+            }
             broker.db.save_broker(&broker.data)?;
         }
         Ok(())

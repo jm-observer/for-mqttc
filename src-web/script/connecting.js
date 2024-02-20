@@ -137,6 +137,12 @@ async function delete_subscribe_his(topic, qos, ty, broker_id) {
     }
 }
 
+function clear_publish(broker_id) {
+    var tableBody = document.getElementById(broker_id + 'publish'); // 目标元素
+    while (tableBody.firstChild) {
+        tableBody.removeChild(tableBody.firstChild);
+    }
+}
 
 function publish(broker_id)  {
     try {
