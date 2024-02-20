@@ -57,7 +57,7 @@ async function display_subscribe_his(event, broker_id){
         var triggerButton = document.getElementById('tabs-content');
         // 获取触发按钮的位置
         var rect = triggerButton.getBoundingClientRect();
-        var tableBody = document.getElementById("subs_his_modal");
+        tableBody = document.getElementById("subs_his_modal");
 
         // 设置模态窗口的位置
         tableBody.style.display = 'block';
@@ -85,7 +85,7 @@ async function display_publish_his(event, broker_id){
         var triggerButton = document.getElementById('tabs-content');
         // 获取触发按钮的位置
         var rect = triggerButton.getBoundingClientRect();
-        var tableBody = document.getElementById("publish_his_modal");
+        tableBody = document.getElementById("publish_his_modal");
 
         // 设置模态窗口的位置
         tableBody.style.display = 'block';

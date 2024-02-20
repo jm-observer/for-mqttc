@@ -143,7 +143,7 @@ async function close_tab(broker_id) {
         element.parentNode.removeChild(element);
     }
     let tab_content_id = 'tab-content-' + broker_id;
-    var element = document.getElementById(tab_content_id);
+    element = document.getElementById(tab_content_id);
     if (element) {
         element.parentNode.removeChild(element);
     }

@@ -144,8 +144,7 @@
      document.getElementById('payload_ty_' + trace_id).addEventListener('change', function(event) {
          event.preventDefault();
          let value = event.target.value;
-         let payload_new = parse_payload(value, byteStream);
-         document.getElementById('payload_' + trace_id).innerText = payload_new;
+         document.getElementById('payload_' + trace_id).innerText = parse_payload(value, byteStream);
      });
 
      document.getElementById('copy-publish-payload-' + trace_id).addEventListener('contextmenu', function(event) {
