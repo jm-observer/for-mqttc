@@ -1,7 +1,11 @@
 # for-mqttc
 
+This is a MQTT client desktop program developed based on Tauri, using Tailwind and DaisyUI for styling. The program basically covers daily use functions, including v3, v5, TLS, etc. Usability has also been considered, with details available in the tooltip in the top right corner of the program.
 
 
-npm install -D tailwindcss
 
-npx tailwindcss -i ./src-web/input.css -o ./src-web/output.css --watch
+
+# screenshot
+
+![connection parameters](.\screenshot_1.png)
+![connection interface](.\screenshot_2.png)
