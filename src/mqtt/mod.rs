@@ -44,7 +44,6 @@ pub async fn init_connect(broker: Broker, tx: AppHandle) -> Result<Client> {
     tokio::spawn(async move {
         let tx = &tx;
         while let Ok(event) = eventloop.recv().await {
-            info!("receive mqtt event");
             match event.as_ref() {
                 MqttEvent::ConnectSuccess(retain) => {
                     send_event(

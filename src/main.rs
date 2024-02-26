@@ -3,13 +3,11 @@
 
 use crate::config::Config;
 
-use crate::util::custom_logger::CustomWriter;
 use crate::util::db::ArcDb;
 use directories::UserDirs;
-use flexi_logger::{Age, Cleanup, Criterion, FileSpec, Naming};
 
+use custom_utils::logger::*;
 use log::LevelFilter::{Debug, Info};
-
 use tokio::sync::RwLock;
 
 mod data;
@@ -24,8 +22,6 @@ mod logic;
 use command::*;
 
 fn main() -> anyhow::Result<()> {
-    let (tx, _rx) = crossbeam_channel::bounded(1024);
-
     let user_dirs = UserDirs::new().unwrap();
     let home_path = user_dirs.home_dir().to_path_buf().join(".for-mqttc");
 
@@ -51,7 +47,7 @@ fn main() -> anyhow::Result<()> {
     .module("for_event_bus", Info)
     .module("for_mqtt_client::protocol::packet", Info)
     .config(fs, criterion, naming, cleanup, append)
-    .log_to_write(Box::new(CustomWriter(tx.clone())))
+    // .log_to_write(Box::new(CustomWriter(tx.clone())))
     .build();
 
     // panic::set_hook(Box::new(|panic_info| {

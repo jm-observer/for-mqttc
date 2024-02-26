@@ -33,7 +33,7 @@ indexmap = "1.9.1"
 notify = "5.0.0"
 thiserror = "1.0.37"
 rand = "0.8.5"
-flexi_logger = { version = "0.24.0", features = ["specfile_without_notification", "specfile", "colors"], default-features = false }
+#flexi_logger = { version = "0.24.0", features = ["specfile_without_notification", "specfile", "colors"], default-features = false }
 crossbeam-channel = "0.5.6"
 for-mqtt-client = { git = "https://github.com/jm-observer/for-mqtt-client.git", features = ["tls"] }
 
@@ -45,6 +45,8 @@ directories = "5.0.0"
 
 
 [features]
+default = ["custom-utils/prod"]
 # this feature is used for production builds or when `devPath` points to the filesystem
 # DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
+

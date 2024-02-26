@@ -40,10 +40,12 @@ function subscribe(broker_id)  {
 }
 
 async function remove_subcribe(broker_id, topic) {
-    if (window.subscribes[broker_id][topic].id) {
-        let element = document.getElementById("subscribe_" + window.subscribes[broker_id][topic].id);
-        if(element) {
-            element.remove();
+    if (window.subscribes[broker_id][topic]) {
+        if (window.subscribes[broker_id][topic].id) {
+            let element = document.getElementById("subscribe_" + window.subscribes[broker_id][topic].id);
+            if(element) {
+                element.remove();
+            }
         }
     }
 }

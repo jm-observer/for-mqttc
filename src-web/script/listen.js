@@ -42,14 +42,15 @@ listen('ClientReceivePublic', (event) => {
                 break;
             }
         } else if (key === "+") {
-            if (!topic.contains('/')) {
+            if (!topic.includes('/')) {
                 payload_ty = topic_payload_ty;
                 break;
             }
         } else if (key.endsWith("/+")) {
-            let sub_topic = key.substring(0, key.length - 2);
-            if (topic.startsWith(sub_topic)) {
-                if (!topic.substring(sub_topic.length, topic.length).contains('/')) {
+            let front_key = key.substring(0, key.length - 1);
+            if (topic.startsWith(front_key)) {
+                let sub_topic = topic.substring(front_key.length, topic.length);
+                if (!sub_topic.includes('/')) {
                     payload_ty = topic_payload_ty;
                     break;
                 }
