@@ -10,11 +10,10 @@
             </div>
             <form id="form-subscribe-__id__" class="bg-white p-2 rounded shadow">
                 <div class="mb-2">
-                    <label class="mb-2 p-2">
-                        QoS<select name="qos" class="border-1 shadow px-2 rounded w-16 relative -left-8 text-right text-last-right bg-transparent z-10" >
-                        <option class="text-center">0</option>
-                        <option class="text-center">1</option>
-                        <option class="text-center">2</option>
+                    <select name="qos" class="border-1 shadow px-0.5 rounded w-18 bg-transparent mr-10" >
+                        <option value="0">QoS 0</option>
+                        <option value="1">QoS 1</option>
+                        <option value="2">QoS 2</option>
                     </select>
                     </label>
                     <select name="payload_ty" class="border-1 shadow rounded px-0.5" title="decide how to parse the received publish message of this topic" >
@@ -39,19 +38,17 @@
             <div id="__id__publish" class="flex-grow h-72 overflow-y-auto"></div>
             <form id="form-publish-__id__" class="bg-white p-2 rounded shadow">
                 <div class="mb-2 flex items-center">
-                    <label class="px-2">
-                        QoS<select name="qos" class="border-1 shadow px-2 rounded w-16 relative -left-8 text-right text-last-right bg-transparent z-10" >
-                        <option class="text-center">0</option>
-                        <option class="text-center">1</option>
-                        <option class="text-center">2</option>
+                    <select name="qos" class="border-1 shadow px-0.5 rounded w-18 bg-transparent mr-10" >
+                        <option value="0">QoS 0</option>
+                        <option value="1">QoS 1</option>
+                        <option value="2">QoS 2</option>
                     </select>
-                    </label>
                     <select id="publish_payload_ty_input___id__" name="payload_ty" class="border-1 shadow rounded px-0.5" title="Payload Type" >
                         <option>Text</option>
                         <option>Json</option>
                         <option>Hex</option>
                     </select>
-                    <label class=" ml-10">
+                    <label class="ml-10">
                         retain<input type="checkbox" class="checkbox checkbox-xs ml-1" name="retain"/>
                     </label>
                     <button title="clear all publish message" onclick="clear_publish(__id__)" type="button" class="btn btn-xs ml-16 ">clear</button>

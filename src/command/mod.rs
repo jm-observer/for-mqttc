@@ -2,7 +2,7 @@ mod error;
 pub mod view;
 
 use crate::command::error::Error;
-use crate::command::view::{BrokerList, BrokerView, TlsView};
+use crate::command::view::{BrokerList, BrokerView, TlsView, ViewConfig};
 use crate::data::common::{PublishHis, PublishInput, SubscribeHis, SubscribeInput, SubscribeTopic};
 use crate::data::db::BrokerDB;
 use crate::data::hierarchy::App;
@@ -12,6 +12,7 @@ use crate::mqtt::data::MqttPublicInput;
 
 use log::debug;
 
+use crate::config::Config;
 use crate::mqtt::to_unsubscribe;
 use std::mem::swap;
 use std::path::PathBuf;
@@ -215,11 +216,11 @@ pub async fn update_or_new_broker(
 }
 
 #[command]
-pub async fn loading(state: State<'_, ArcApp>) -> Result<String> {
+pub async fn loading(state: State<'_, ArcApp>) -> Result<ViewConfig> {
     let mut app = state.write().await;
     let clients = std::mem::take(&mut app.mqtt_clients);
     for client in clients.values() {
         let _ = client.disconnect().await;
     }
-    Ok(app.hint.clone())
+    Ok(ViewConfig::init(&app, &Config::init(app.home_path.clone())))
 }

@@ -15,7 +15,13 @@ function get_invoke() {
 
 
 async function loading() {
-    document.getElementById("tips-msg-pre").innerText = await get_invoke()("loading");
+    let config = await get_invoke()("loading");
+    document.getElementById("tips-msg-pre").innerText = config["hint"];
+    if (!config["debug"]) {
+        document.addEventListener('contextmenu', function(event) {
+            event.preventDefault(); // 阻止默认的右键菜单
+        });
+    }
 }
 
 function isTauriEnvironment() {

@@ -1,6 +1,22 @@
+use crate::config::Config;
 use crate::data::common::Protocol;
 use crate::data::db::{BrokerDB, Credentials, Tls};
+use crate::data::hierarchy::App;
 use serde::{Deserialize, Serialize};
+#[derive(Debug, Clone, Deserialize, Serialize)]
+pub struct ViewConfig {
+    hint: String,
+    debug: bool,
+}
+
+impl ViewConfig {
+    pub fn init(app: &App, config: &Config) -> Self {
+        Self {
+            hint: app.hint.clone(),
+            debug: config.debug,
+        }
+    }
+}
 
 #[derive(Debug, Clone, Serialize)]
 pub struct BrokerList {

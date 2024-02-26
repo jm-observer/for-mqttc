@@ -1,12 +1,8 @@
 // Prevents additional console window on Windows in release, DO NOT REMOVE!!
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
-
-use crate::config::Config;
-
 use crate::util::db::ArcDb;
-use directories::UserDirs;
-
 use custom_utils::logger::*;
+use directories::UserDirs;
 use log::LevelFilter::{Debug, Info};
 use tokio::sync::RwLock;
 
@@ -62,30 +58,9 @@ fn main() -> anyhow::Result<()> {
     //     exit(1);
     // }));
 
-    let config = Config::init(home_path.clone());
-    // if config.display_tips {
-    //     config.display_tips = false;
-    //     config.clone().update(home_path.clone());
-    //     tx.send(AppEvent::OtherDisplayTips).unwrap();
-    // }
-
-    // let locale = get_locale();
-    // let win = WindowDesc::new(init_layout(tx.clone(), locale.clone())) //.background(B_WINDOW))
-    //     .title("for-mqtt")
-    //     .window_size((1200.0, 710.0)); //.menu(menu);
+    info!("home path: {:?}", home_path);
     let mut db = ArcDb::init_db(home_path.join("db"))?;
     let data = db.read_app_data(home_path)?;
-
-    let _config_clone = config.clone();
-
-    // thread::Builder::new()
-    //     .name("logic-worker".to_string())
-    //     .spawn(move || {
-    //         if let Err(e) = deal_event(ExtEventSink, rx, tx, config_clone.auto_retract) {
-    //             error!("{:?}", e);
-    //         }
-    //     })
-    //     .unwrap();
 
     tauri::Builder::default()
         .manage(RwLock::new(data))

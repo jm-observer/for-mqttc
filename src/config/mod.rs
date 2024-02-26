@@ -1,13 +1,11 @@
 use anyhow::Result;
+use log::error;
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
 pub struct Config {
-    pub display_tips: bool,
-    pub theme: Theme,
-    pub payload_font_size: f64,
-    pub auto_retract: AutoRetract,
+    pub debug: bool,
 }
 #[derive(Debug, Clone, Deserialize, Serialize, Eq, PartialEq)]
 pub enum Theme {
@@ -24,10 +22,14 @@ pub enum AutoRetract {
 impl Config {
     pub fn init(home_path: PathBuf) -> Self {
         let file_path = home_path.join("config.json");
-        if let Ok(config) = Self::_init(file_path) {
+        if let Ok(config) = Self::_init(file_path.clone()) {
             config
         } else {
-            Self::default()
+            let config = Self::default();
+            if let Err(e) = config.clone()._update(file_path) {
+                error!("config update fail: {:?}", e);
+            }
+            config
         }
     }
 
@@ -45,12 +47,7 @@ impl Config {
 
 impl Default for Config {
     fn default() -> Self {
-        Self {
-            display_tips: true,
-            theme: Theme::Light,
-            payload_font_size: 14.0,
-            auto_retract: Default::default(),
-        }
+        Self { debug: false }
     }
 }
 

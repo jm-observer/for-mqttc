@@ -12,7 +12,8 @@ module.exports = {
         content: '1fr 2fr',
       },
       width: {
-        130: '32.5rem'
+        130: '32.5rem',
+        18: '4.5rem'
       },
       borderWidth: {
         1: '1px'
