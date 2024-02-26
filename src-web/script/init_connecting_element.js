@@ -25,13 +25,9 @@
      targetElement.appendChild(tempDiv);
      targetElement.scrollTop = targetElement.scrollHeight;
 
-     document.getElementById('copy-subcribe-topic-' + id).addEventListener('contextmenu', function(event) {
+     document.getElementById('copy-subcribe-topic-' + id).addEventListener('contextmenu', async function(event) {
          event.preventDefault();
-         navigator.clipboard.writeText(topic).then(function() {
-             console.log('copy:' + topic);
-         }).catch(function(error) {
-             console.error('copy fail :', error);
-         });
+         await window.__TAURI__.clipboard.writeText(topic);
      });
 }
 
@@ -71,21 +67,13 @@
          targetElement.removeChild(targetElement.firstChild);
      }
 
-     document.getElementById('copy-publish-topic-' + id).addEventListener('contextmenu', function(event) {
+     document.getElementById('copy-publish-topic-' + id).addEventListener('contextmenu',  async function(event) {
          event.preventDefault();
-         navigator.clipboard.writeText(topic).then(function() {
-             console.log('copy:' + topic);
-         }).catch(function(error) {
-             console.error('copy fail :', error);
-         });
+         await window.__TAURI__.clipboard.writeText(topic);
      });
-     document.getElementById('copy-publish-payload-' + id).addEventListener('contextmenu', function(event) {
+     document.getElementById('copy-publish-payload-' + id).addEventListener('contextmenu', async function(event) {
          event.preventDefault();
-         navigator.clipboard.writeText(payload).then(function() {
-             console.log('copy:' + payload);
-         }).catch(function(error) {
-             console.error('copy fail :', error);
-         });
+         await window.__TAURI__.clipboard.writeText(payload);
      });
  }
 
@@ -133,13 +121,9 @@
          targetElement.removeChild(targetElement.firstChild);
      }
 
-     document.getElementById('copy-publish-topic-' + trace_id).addEventListener('contextmenu', function(event) {
+     document.getElementById('copy-publish-topic-' + trace_id).addEventListener('contextmenu', async function(event) {
          event.preventDefault();
-         navigator.clipboard.writeText(topic).then(function() {
-             console.log('copy:' + topic);
-         }).catch(function(error) {
-             console.error('copy fail :', error);
-         });
+         await window.__TAURI__.clipboard.writeText(topic);
      });
      document.getElementById('payload_ty_' + trace_id).addEventListener('change', function(event) {
          event.preventDefault();
@@ -147,13 +131,9 @@
          document.getElementById('payload_' + trace_id).innerText = parse_payload(value, byteStream);
      });
 
-     document.getElementById('copy-publish-payload-' + trace_id).addEventListener('contextmenu', function(event) {
+     document.getElementById('copy-publish-payload-' + trace_id).addEventListener('contextmenu', async function(event) {
          event.preventDefault();
-         navigator.clipboard.writeText(payload).then(function() {
-             console.log('copy:' + payload);
-         }).catch(function(error) {
-             console.error('copy fail :', error);
-         });
+         await window.__TAURI__.clipboard.writeText(payload);
      });
  }
 
