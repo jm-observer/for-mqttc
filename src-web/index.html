@@ -170,22 +170,22 @@
         </div>
         <div class="flex items-center mb-2">
             <label class="w-24">
-                tls
+                tls server
             </label>
             <div class="flex-grow">
-                <div class="flex items-center mb-2">
+                <div class="flex items-center mb-2" title="TCP connection">
                     <input id="tls-none" class="radio radio-xs" type="radio" name="tls" value="none" checked>
                     <label id="tls-none-label" class="mr-2 px-2 w-full" for="tls-none">none</label>
                 </div>
-                <div class="flex items-center mb-2">
+                <div class="flex items-center mb-2" title="Tls connection and through CA verification of the server">
                     <input id="tls-ca" class="radio radio-xs"  type="radio" name="tls" value="ca">
                     <label id="tls-ca-label" class="mr-2 px-2 w-full" for="tls-ca">ca</label>
                 </div>
-                <div class="flex items-center mb-2">
+                <div class="flex items-center mb-2" title="Tls connection and not verifying the server">
                     <input id="tls-insecurity" class="radio radio-xs" type="radio" name="tls" value="insecurity">
                     <label id="tls-insecurity-label" class="mr-2 px-2 w-full" for="tls-insecurity">insecurity</label>
                 </div>
-                <div class="flex items-center mb-2">
+                <div class="flex items-center mb-2" title="Tls connection and through self-signed certificate verification of the server">
                     <input id="tls-self-signed" class="radio radio-xs" type="radio" name="tls" value="self_signed">
                     <label id="tls-self-signed-label" class="mr-2 px-2 w-full" for="tls-self-signed">self-signed</label>
                 </div>
@@ -194,6 +194,29 @@
         <div class="flex items-center mb-2" id="self_signed_ca_div">
             <label class="w-24" for="self_signed_ca">self-signed-ca</label>
             <input readonly id="self_signed_ca" name="self_signed_ca"  class="input input-bordered input-xs flex-grow" type="text">
+        </div>
+        <div class="flex items-center mb-2" id="client_tls_div">
+            <label class="w-24">
+                tls client
+            </label>
+            <div class="flex-grow">
+                <div id="tls_client_none_div" class="flex items-center mb-2" title="The server does not verify the client">
+                    <input id="tls_client_none" class="radio radio-xs" type="radio" name="client_tls" value="none" checked>
+                    <label class="mr-2 px-2 w-full" for="tls_client_none">none</label>
+                </div>
+                <div id="tls_client_verify_div" class="flex items-center mb-2" title="The server will verify the client">
+                    <input id="tls_client_verify" class="radio radio-xs" type="radio" name="client_tls" value="verify">
+                    <label class="mr-2 px-2 w-full" for="tls_client_verify">verify</label>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center mb-2" id="certificate_div">
+            <label class="w-24" for="certificate"> client's certificate</label>
+            <input readonly id="certificate" name="certificate"  class="input input-bordered input-xs flex-grow" type="text">
+        </div>
+        <div class="flex items-center mb-2" id="private_key_div">
+            <label class="w-24" for="private_key">client's private key</label>
+            <input readonly id="private_key" name="private_key" class="input input-bordered input-xs flex-grow" type="text">
         </div>
 
         <div class="flex items-center mb-2">

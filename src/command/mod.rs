@@ -209,6 +209,42 @@ pub async fn update_or_new_broker(
             .ok_or(Error::init("self signed ca copied fail"))?
             .to_string();
     }
+    if broker.tls.is_tls() && broker.client_tls.is_verify() {
+        let broker_path = app.home_path.join(broker.id.to_string());
+        {
+            let ca_path: PathBuf = broker.certificate.into();
+            let (Some(parent), Some(file_name)) = (ca_path.parent(), ca_path.file_name()) else {
+                return Error::init_rs("client certificate copied fail");
+            };
+            let broker_ca_path = broker_path.join(file_name);
+            if parent != broker_path.as_path() {
+                fs::create_dir_all(broker_path.clone()).await?;
+                // copy to home_path/id
+                fs::copy(ca_path, broker_ca_path.as_path()).await?;
+            }
+            broker.certificate = broker_ca_path
+                .to_str()
+                .ok_or(Error::init("client certificate copied fail"))?
+                .to_string();
+        }
+        {
+            let ca_path: PathBuf = broker.private_key.into();
+            let (Some(parent), Some(file_name)) = (ca_path.parent(), ca_path.file_name()) else {
+                return Error::init_rs("client private key copied fail");
+            };
+            let broker_ca_path = broker_path.join(file_name);
+            if parent != broker_path.as_path() {
+                fs::create_dir_all(broker_path).await?;
+                // copy to home_path/id
+                fs::copy(ca_path, broker_ca_path.as_path()).await?;
+            }
+            broker.private_key = broker_ca_path
+                .to_str()
+                .ok_or(Error::init("client private key copied fail"))?
+                .to_string();
+        }
+    }
+
     let id = broker.id;
     let data: BrokerDB = broker.into();
     app.save_broker(data)?;

@@ -1,4 +1,4 @@
-use crate::command::view::{BrokerView, TlsView};
+use crate::command::view::{BrokerView, ClientTlsView, TlsView};
 use crate::data::common::{Broker, Protocol, PublishHis, SubscribeHis};
 
 use anyhow::Result;
@@ -33,6 +33,7 @@ pub struct BrokerDB {
     pub credentials: Credentials,
     pub auto_connect: bool,
     pub tls: Tls,
+    pub client_tls: ClientTls,
     #[serde(default)]
     pub subscribe_his: Vec<SubscribeHis>,
     #[serde(default)]
@@ -61,6 +62,9 @@ impl From<BrokerView> for BrokerDB {
             tls,
             self_signed_ca,
             params,
+            certificate,
+            private_key,
+            client_tls,
         } = value;
         let credentials = if credential {
             Credentials::Credentials {
@@ -76,6 +80,13 @@ impl From<BrokerView> for BrokerDB {
             TlsView::Insecurity => Tls::Insecurity,
             TlsView::SelfSigned => Tls::SelfSigned { self_signed_ca },
         };
+        let client_tls = match client_tls {
+            ClientTlsView::None => ClientTls::None,
+            ClientTlsView::Verify => ClientTls::Verify {
+                certificate,
+                private_key,
+            },
+        };
         Self {
             id,
             protocol: version,
@@ -89,6 +100,7 @@ impl From<BrokerView> for BrokerDB {
             tls,
             subscribe_his: vec![],
             publish_his: vec![],
+            client_tls,
         }
     }
 }
@@ -105,6 +117,16 @@ pub enum Tls {
     Ca,
     Insecurity,
     SelfSigned { self_signed_ca: String },
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum ClientTls {
+    None,
+    Verify {
+        certificate: String,
+        private_key: String,
+    },
 }
 
 impl ToString for Tls {

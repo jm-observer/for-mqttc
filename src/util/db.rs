@@ -118,7 +118,7 @@ impl ArcDb {
 #[cfg(test)]
 mod test {
     use crate::data::common::Protocol;
-    use crate::data::db::{BrokerDB, Credentials, Tls};
+    use crate::data::db::{BrokerDB, ClientTls, Credentials, Tls};
     use crate::util::db::ArcDb;
     use directories::UserDirs;
 
@@ -149,6 +149,7 @@ mod test {
             credentials: Credentials::None,
             auto_connect: true,
             tls: Tls::None,
+            client_tls: ClientTls::None,
             subscribe_his: vec![],
             publish_his: vec![],
         };

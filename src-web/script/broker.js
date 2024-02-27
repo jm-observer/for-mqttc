@@ -21,6 +21,8 @@ async function init_broker_model() {
             } else  {
                 inputElement.classList.add('hidden'); // 隐藏 input
             }
+            init_client_tls();
+            init_server_self_signed();
         });
     });
 
@@ -58,6 +60,13 @@ async function init_broker_model() {
         select_file()
     });
 
+    document.getElementById('certificate').addEventListener('click', function() {
+        select_client_cert_file()
+    });
+    document.getElementById('private_key').addEventListener('click', function() {
+        select_client_key_file()
+    });
+
     document.getElementById('version-v3-label').addEventListener('click', function() {
         document.getElementById('version-v3').checked = true;
     });
@@ -67,21 +76,76 @@ async function init_broker_model() {
 
     document.getElementById('tls-none-label').addEventListener('click', function() {
         document.getElementById('tls-none').checked = true;
-        document.getElementById('self_signed_ca_div').classList.add('hidden');
+        hidden_server_self_signed();
+        hidden_client_tls();
     });
     document.getElementById('tls-ca-label').addEventListener('click', function() {
         document.getElementById('tls-ca').checked = true;
-        document.getElementById('self_signed_ca_div').classList.add('hidden');
+        hidden_server_self_signed();
+        init_client_tls();
     });
     document.getElementById('tls-insecurity-label').addEventListener('click', function() {
         document.getElementById('tls-insecurity').checked = true;
-        document.getElementById('self_signed_ca_div').classList.add('hidden');
+        hidden_server_self_signed();
+        init_client_tls();
     });
     document.getElementById('tls-self-signed-label').addEventListener('click', function() {
         document.getElementById('tls-self-signed').checked = true;
-        document.getElementById('self_signed_ca_div').classList.remove('hidden');
+        display_server_self_signed();
     });
     document.getElementById('self_signed_ca_div').classList.add('hidden');
+
+    document.getElementById('tls_client_none_div').addEventListener('click', function() {
+        document.getElementById('tls_client_none').checked = true;
+        document.getElementById('certificate_div').classList.add('hidden');
+        document.getElementById('private_key_div').classList.add('hidden');
+    });
+    document.getElementById('tls_client_verify_div').addEventListener('click', function() {
+        document.getElementById('tls_client_verify').checked = true;
+        document.getElementById('certificate_div').classList.remove('hidden');
+        document.getElementById('private_key_div').classList.remove('hidden');
+    });
+    init_server_self_signed();
+    init_client_tls();
+}
+
+function init_server_self_signed() {
+    if(document.getElementById('tls-self-signed').checked) {
+        document.getElementById('self_signed_ca_div').classList.remove('hidden');
+    } else {
+        document.getElementById('self_signed_ca_div').classList.add('hidden');
+    }
+}
+
+function display_server_self_signed() {
+    document.getElementById('self_signed_ca_div').classList.remove('hidden');
+    init_client_tls();
+}
+function hidden_server_self_signed() {
+    document.getElementById('self_signed_ca_div').classList.add('hidden');
+    init_client_tls();
+}
+function init_client_tls() {
+    if(document.getElementById('tls-none').checked) {
+        hidden_client_tls();
+    } else {
+        display_client_tls();
+    }
+}
+function display_client_tls() {
+    document.getElementById('client_tls_div').classList.remove('hidden');
+    if(document.getElementById('tls_client_verify').checked) {
+        document.getElementById('certificate_div').classList.remove('hidden');
+        document.getElementById('private_key_div').classList.remove('hidden');
+    } else {
+        document.getElementById('certificate_div').classList.add('hidden');
+        document.getElementById('private_key_div').classList.add('hidden');
+    }
+}
+function hidden_client_tls() {
+    document.getElementById('client_tls_div').classList.add('hidden');
+    document.getElementById('certificate_div').classList.add('hidden');
+    document.getElementById('private_key_div').classList.add('hidden');
 }
 
 async function check_then_save_then_connect() {
@@ -189,6 +253,35 @@ async function select_file() {
         // user cancelled the selection
     } else {
         document.getElementById('self_signed_ca').value = selected;
+    }
+}
+
+
+async function select_client_cert_file() {
+    const open = window.__TAURI__.dialog.open;
+    const selected = await open({
+        multiple: false,
+        directory: false,
+    });
+    if (Array.isArray(selected)) {
+        // user selected multiple files
+    } else if (selected === null) {
+        // user cancelled the selection
+    } else {
+        document.getElementById('certificate').value = selected;
+    }
+}
+
+async function select_client_key_file() {
+    const open = window.__TAURI__.dialog.open;
+    const selected = await open({
+        multiple: false,
+        directory: false,
+    });
+    if (Array.isArray(selected)) {
+    } else if (selected === null) {
+    } else {
+        document.getElementById('private_key').value = selected;
     }
 }
 
