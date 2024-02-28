@@ -3,11 +3,12 @@ use crate::data::db::BrokerDB;
 
 use crate::util::db::ArcDb;
 
+use anyhow::anyhow;
 use anyhow::Result;
-use anyhow::{anyhow, bail};
 
 use for_mqtt_client::Client;
 use std::collections::HashMap;
+use std::mem::swap;
 use std::path::PathBuf;
 
 pub struct App {
@@ -18,14 +19,15 @@ pub struct App {
     pub hint: String,
 }
 impl App {
-    pub fn save_broker(&mut self, data: BrokerDB) -> Result<()> {
-        if self.db.save_broker(&data)? {
-            self.brokers.push(data.into_broker(self.db.clone()));
-        } else {
-            let Some(broker) = self.brokers.iter_mut().find(|x| x.data.id == data.id) else {
-                bail!("could not find broker");
-            };
+    pub fn save_broker(&mut self, mut data: BrokerDB) -> Result<()> {
+        if let Some(broker) = self.brokers.iter_mut().find(|x| x.data.id == data.id) {
+            swap(&mut broker.data.subscribe_his, &mut data.subscribe_his);
+            swap(&mut broker.data.publish_his, &mut data.publish_his);
+            self.db.save_broker(&data)?;
             broker.data = data;
+        } else {
+            self.db.save_broker(&data)?;
+            self.brokers.push(data.into_broker(self.db.clone()));
         }
         Ok(())
     }
