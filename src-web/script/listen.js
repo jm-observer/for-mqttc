@@ -2,10 +2,48 @@ const listen = window.__TAURI__.event.listen;
 
 listen('ClientConnectAckSuccess', (event) => {
     console.log("ClientConnectAckSuccess:" + event.payload.broker_id);
+    window.connections[event.payload.broker_id] = true;
+
     let status = document.getElementById("status-" + event.payload.broker_id);
     status.classList.remove("bg-gray-400");
     status.classList.add("bg-green-400");
+    let button = document.getElementById("publish_button_" + event.payload.broker_id);
+    if(button) {
+        button.disabled = false;
+        button.classList.add('bg-yellow-500');
+        button.classList.remove('bg-gray-300'); // Add disabled styles
+    }
+    button = document.getElementById("subscribe_button_" + event.payload.broker_id);
+    if(button) {
+        button.disabled = false;
+        button.classList.add('bg-yellow-500');
+        button.classList.remove('bg-gray-300'); // Add disabled styles
+    }
 });
+
+listen('ClientConnectAckFail', (event) => {
+    console.log("ClientConnectAckFail:" + event.payload.broker_id);
+    window.connections[event.payload.broker_id] = false;
+
+    let status = document.getElementById("status-" + event.payload.broker_id);
+    status.classList.remove("bg-green-400");
+    status.classList.add("bg-gray-400");
+
+    let button = document.getElementById("publish_button_" + event.payload.broker_id);
+    if(button) {
+        button.disabled = true;
+        button.classList.remove('bg-yellow-500');
+        button.classList.add('bg-gray-300'); // Add disabled styles
+    }
+    button = document.getElementById("subscribe_button_" + event.payload.broker_id);
+    if(button) {
+        button.disabled = true;
+        button.classList.remove('bg-yellow-500');
+        button.classList.add('bg-gray-300'); // Add disabled styles
+    }
+});
+
+
 
 listen('ClientSubAck', (event) => {
     console.log("ClientSubAck:" + event.payload.broker_id + " " + event.payload.trace_id);

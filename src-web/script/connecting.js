@@ -3,8 +3,11 @@ function next_trace_id() {
     trace_id += 1;
     return trace_id
 }
-function subscribe(broker_id)  {
+function subscribe(event, broker_id)  {
     try {
+        if(!window.connections[broker_id]) {
+            return
+        }
         let trace_id = next_trace_id();
         var form = document.getElementById('form-subscribe-' + broker_id);
         var formData = new FormData(form);
@@ -34,6 +37,11 @@ function subscribe(broker_id)  {
         init_subscribe_item(trace_id, formObject["topic"], formObject["qos"], formObject["payload_ty"], broker_id, get_time());
         let rs = get_invoke()("subscribe", { datas : formObject});
         console.log(rs);
+        event.target.classList.add('bg-yellow-600');
+        setTimeout(() => {
+            event.target.classList.remove('bg-yellow-600');
+            event.target.classList.add('bg-yellow-500');
+        }, 200);
     } catch(e) {
         console.error("Parsing error:", e);
     }
@@ -170,8 +178,11 @@ function clear_publish(broker_id) {
     }
 }
 
-function publish(broker_id)  {
+function publish(event, broker_id)  {
     try {
+        if(!window.connections[broker_id]) {
+            return
+        }
         var form = document.getElementById('form-publish-' + broker_id);
         var formData = new FormData(form);
         var formObject = {};
@@ -233,6 +244,12 @@ function publish(broker_id)  {
             , formObject["qos"], formObject["payload_ty"], broker_id, get_time(), formObject["retain"])
         let rs = get_invoke()("publish", { datas : formObject});
         console.log(rs);
+
+        event.target.classList.add('bg-yellow-600');
+        setTimeout(() => {
+            event.target.classList.remove('bg-yellow-600');
+            event.target.classList.add('bg-yellow-500');
+        }, 200);
     } catch(e) {
         console.error("Parsing error:", e);
     }

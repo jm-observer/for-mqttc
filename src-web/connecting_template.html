@@ -28,7 +28,7 @@
                         <i class="layui-icon layui-icon-history"></i></a>
                 </div>
                 <div class="flex items-center justify-between">
-                    <button onclick="subscribe(__id__)" type="button" class="m-1 bg-yellow-500 py-1 px-2 rounded mr-1">
+                    <button id="subscribe_button___id__" onclick="subscribe(event, __id__)" type="button" class="m-1 bg-gray-300 py-1 px-2 rounded mr-1 disabled">
                         subscribe
                     </button>
                 </div>
@@ -62,7 +62,7 @@
                     <textarea id="publish_payload_input___id__" aria-label="payload" class="py-1 px-2 shadow appearance-none border rounded w-full" name="msg" placeholder="payload"></textarea>
                 </div>
                 <div class="flex items-center justify-between">
-                    <button onclick="publish(__id__)" class="m-1 bg-yellow-500 py-1 px-2 rounded mr-1" type="button">
+                    <button id="publish_button___id__" onclick="publish(event, __id__)" class="m-1 bg-gray-300 py-1 px-2 rounded mr-1 disabled" type="button">
                         publish
                     </button>
                 </div>

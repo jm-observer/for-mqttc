@@ -32,7 +32,6 @@ function isTauriEnvironment() {
 async function broker_list() {
     try {
         let rs = await get_invoke()("broker_list");
-        console.log(rs);
         var jsonObj = JSON.parse(rs);
         var tableBody = document.getElementById("brokers").getElementsByTagName('tbody')[0];
 
@@ -62,6 +61,7 @@ async function broker_list() {
 async function connect_to_broker(id, name) {
     console.log("connect_to_broker" + id);
     await close_tab(id);
+    window.connections[id] = false;
     const tableBody = document.getElementById("tabs");
     const tab = document.getElementById("tab-" + id);
     if(!tab) {
@@ -112,11 +112,9 @@ function edit_broker(id) {
             display_broker_info()
         }
     }
-    console.log("edit_broker" + id);
 }
 
 function display_tab(tab_id) {
-    console.log("display_tab" + tab_id);
     let parentElement = document.getElementById('tabs');
     for (let i = 0; i < parentElement.children.length; i++) {
         let tab = parentElement.children[i];
@@ -142,7 +140,6 @@ function display_tab(tab_id) {
 
 
 async function close_tab(broker_id) {
-    console.log("close_tab: " + broker_id);
     let tab_id = 'tab-' + broker_id;
     var element = document.getElementById(tab_id);
     if (element) {
@@ -155,6 +152,7 @@ async function close_tab(broker_id) {
     }
     display_tab("brokers");
     window.subscribes[broker_id] = {};
+    window.connections[broker_id] = {};
     await get_invoke()("disconnect", { id : broker_id});
 }
 
