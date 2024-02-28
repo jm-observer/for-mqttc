@@ -49,8 +49,8 @@ default = ["custom-utils/prod"]
 # this feature is used for production builds or when `devPath` points to the filesystem
 # DO NOT REMOVE!!
 custom-protocol = ["tauri/custom-protocol"]
-
-[patch.crates-io]
-for-mqtt-client = { path = "../for-mqtt-client"}
+#
+#[patch.crates-io]
+#for-mqtt-client = { path = "../for-mqtt-client"}
 
 
