@@ -306,10 +306,14 @@ async function init_new_broker() {
         '\t"inflight": 100,\n' +
         '\t"conn_timeout": 5\n' +
         '}';
-    init_broker_value(0, '', '', '',1883, true, false, '', '', 'v4', 'none', '',  params)
+    init_broker_value(0, '', '', '',1883, true, false
+        , '', '', 'v4', 'none', '', 'none', '', '',  params)
 }
 
-async function init_broker_value(id, name, client_id, addr, port, auto_connect, credential, user_name, password, version, tls, self_signed_ca, params) {
+async function init_broker_value(id, name, client_id, addr, port, auto_connect, credential, user_name
+                                 , password, version, tls, self_signed_ca
+                                 ,client_tls, certificate, private_key
+                                 , params) {
     document.getElementById('id').value = id;
     document.getElementById('name').value = name;
     document.getElementById('client_id').value = client_id;
@@ -321,7 +325,18 @@ async function init_broker_value(id, name, client_id, addr, port, auto_connect, 
     document.getElementById('user_name').value = user_name;
     document.getElementById('password').value = password;
 
+    document.getElementById('certificate').value = certificate;
+    document.getElementById('private_key').value = private_key;
+
     document.getElementById('params').value = params;
+
+    document.getElementById('self_signed_ca').value = self_signed_ca;
+
+    if(client_tls === "none") {
+        document.getElementById('tls_client_none').checked = true;
+    } else {
+        document.getElementById('tls_client_verify').checked = true
+    }
 
     if (version === "v4") {
         document.getElementById('version-v3').checked = true;
@@ -331,20 +346,13 @@ async function init_broker_value(id, name, client_id, addr, port, auto_connect, 
 
     if (tls === "none") {
         document.getElementById('tls-none').checked = true;
-        document.getElementById('self_signed_ca').value = '';
-        document.getElementById('self_signed_ca_div').classList.add('hidden');
     } else if (tls === "ca") {
         document.getElementById('tls-ca').checked = true;
-        document.getElementById('self_signed_ca').value = '';
-        document.getElementById('self_signed_ca_div').classList.add('hidden');
     } else if (tls === "insecurity") {
         document.getElementById('tls-insecurity').checked = true;
-        document.getElementById('self_signed_ca').value = '';
-        document.getElementById('self_signed_ca_div').classList.add('hidden');
     } else if (tls === "self_signed") {
         document.getElementById('tls-self-signed').checked = true;
-        document.getElementById('self_signed_ca').value = self_signed_ca;
-        document.getElementById('self_signed_ca_div').classList.remove('hidden');
     }
-    document.getElementById('self_signed_ca_div').classList.add('hidden');
+    init_server_self_signed();
+    init_client_tls();
 }

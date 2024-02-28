@@ -10,10 +10,10 @@ use log::{debug, error, info};
 use serde::{Deserialize, Serialize};
 use std::collections::HashMap;
 
-use crate::data::db::{Credentials, Tls};
+use crate::data::db::{ClientTls, Credentials, Tls};
 use for_mqtt_client::protocol::packet::Publish;
 use for_mqtt_client::protocol::MqttOptions;
-use for_mqtt_client::tls::TlsConfig;
+use for_mqtt_client::tls::{CertificateFile, PrivateKeyFile, TlsConfig};
 use for_mqtt_client::MqttEvent;
 pub use for_mqtt_client::{Client, QoS, QoSWithPacketId};
 use tauri::{AppHandle, Manager};
@@ -221,7 +221,19 @@ fn update_tls_option(option: MqttOptions, value: Broker) -> MqttOptions {
             TlsConfig::default().set_server_ca_pem_file(self_signed_ca.as_str().into())
         }
     };
-    option.set_tls(tls_config)
+    match value.data.client_tls {
+        ClientTls::None => option.set_tls(tls_config),
+        ClientTls::Verify {
+            certificate,
+            private_key,
+        } => {
+            let tls_config = tls_config.verify_client(
+                CertificateFile::Pem(certificate.into()),
+                PrivateKeyFile::Rsa(private_key.into()),
+            );
+            option.set_tls(tls_config)
+        }
+    }
 }
 
 #[cfg(test)]

@@ -108,7 +108,7 @@ function edit_broker(id) {
                 , item.password
                 , item.version
                 , item.tls
-                , item.self_signed_ca, item.params);
+                , item.self_signed_ca, item.client_tls, item.certificate, item.private_key,item.params);
             display_broker_info()
         }
     }
