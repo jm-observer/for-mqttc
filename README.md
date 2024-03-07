@@ -8,5 +8,5 @@ Support function:
 3. client auth
 # screenshot
 
-![connection parameters](.\screenshot_1.png)
-![connection interface](.\screenshot_2.png)
+![connection parameters](screenshot_1.png)
+![connection interface](screenshot_2.png)
